@@ -31,10 +31,13 @@
         android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission
         android:name="android.permission.INTERNET" />
-<!--    <uses-permission
+    <!-- We are hoping to avoid needing this, but if we support backing up
+         and restoring settings someday, we will.
+    <uses-permission
         android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission
-            android:name="android.permission.WRITE_SECURE_SETTINGS" /> -->
+            android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    -->
     <uses-permission
         android:name="android.permission.READ_CONTACTS" />
     <uses-permission
@@ -45,6 +48,10 @@
         android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission
         android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <!-- To restore the external storage. We do not yet back up the external
+         storage device, but plan to. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application
         android:icon="@drawable/icon"
