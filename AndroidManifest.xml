@@ -95,8 +95,6 @@
         </activity>
         <activity
             android:name=".TestActivity"
-            android:label="@string/ui_activity_title"
-            android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="false"
             >
         </activity>
