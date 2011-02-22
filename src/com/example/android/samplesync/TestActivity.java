@@ -12,8 +12,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.Base64;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -37,7 +35,7 @@ public class TestActivity extends Activity {
     private static String secretKey = "yourshere";
 
     /*private String errorTrace;
-    private Handler mHandler;*/
+      private Handler mHandler;*/
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,20 +50,20 @@ public class TestActivity extends Activity {
     }
 
     /*
-    protected Runnable displayError = new Runnable() {
-        public void run(){
-            Log.e(LOG_TAG, errorTrace);
-            AlertDialog.Builder confirm = new AlertDialog.Builder( AlertActivity.this );
-            confirm.setTitle( "A Connection Error Occured!");
-            confirm.setMessage( "Please Review the README\n" + errorTrace );
-            confirm.setNegativeButton( "OK", new DialogInterface.OnClickListener() {
-                public void onClick( DialogInterface dialog, int which ) {
-                    AlertActivity.this.finish();
-                }
-            } );
-            confirm.show().show();   
-        }
-    };*/
+       protected Runnable displayError = new Runnable() {
+       public void run(){
+       Log.e(LOG_TAG, errorTrace);
+       AlertDialog.Builder confirm = new AlertDialog.Builder( AlertActivity.this );
+       confirm.setTitle( "A Connection Error Occured!");
+       confirm.setMessage( "Please Review the README\n" + errorTrace );
+       confirm.setNegativeButton( "OK", new DialogInterface.OnClickListener() {
+       public void onClick( DialogInterface dialog, int which ) {
+       AlertActivity.this.finish();
+       }
+       } );
+       confirm.show().show();   
+       }
+       };*/
 
     protected void setStackTrace(Throwable aThrowable) {
         final Writer result = new StringWriter();
@@ -96,10 +94,11 @@ public class TestActivity extends Activity {
             buf.append(date).append("\n");
             buf.append(bucket);
             String signature = sign(buf.toString());
+            String AWSAuth = "AWS " + keyId + ":" + signature;
 
             // Connection to s3.amazonaws.com
             HttpURLConnection httpConn = null;
-            URL url = new URL("https", "s3.amazonaws.com", 443, bucket);
+            URL url = new URL("http", "s3.amazonaws.com", 80, bucket);
             httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setDoInput(true);
             httpConn.setDoOutput(true);
@@ -109,33 +108,42 @@ public class TestActivity extends Activity {
             httpConn.setRequestMethod(method);
             httpConn.setRequestProperty("Date", date);
             httpConn.setRequestProperty("Content-Length", "0");
-            String AWSAuth = "AWS " + keyId + ":" + signature;
             httpConn.setRequestProperty("Authorization", AWSAuth);
             // Send the HTTP PUT request.
             int statusCode = httpConn.getResponseCode();
-            
-            Log.i(LOG_TAG, "Bucket created successfully, probably");
+
+            if ((statusCode/100) != 2)
+            {
+                Log.i(LOG_TAG, "Status is " + statusCode);
+                String resp = httpConn.getResponseMessage();
+                Log.i(LOG_TAG, resp);
+            } 
+            else 
+            {
+                Log.i(LOG_TAG, "Bucket created successfully, probably");
+            }
         }
+
         catch (Exception e) {
             setStackTrace(e);
             Log.e(LOG_TAG, e.getMessage());
         }
-    }  
-
-    // This method creates S3 signature for a given String.
-    public String sign(String data) throws Exception {
-        Mac mac = Mac.getInstance("HmacSHA256");
-        byte [] keyBytes = secretKey.getBytes("UTF8");
-        SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA256");
-        mac.init(signingKey);
-
-        byte[] signBytes = mac.doFinal(data.getBytes("UTF8"));
-        return encodeBase64(signBytes);
     }
 
-    public String encodeBase64(byte[] data)
-    {
-        return Base64.encodeToString(data, 0);
+        // This method creates S3 signature for a given String.
+        public String sign(String data) throws Exception {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            byte [] keyBytes = secretKey.getBytes("UTF8");
+            SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA256");
+            mac.init(signingKey);
+
+            byte[] signBytes = mac.doFinal(data.getBytes("UTF8"));
+            return encodeBase64(signBytes);
+        }
+
+        public String encodeBase64(byte[] data)
+        {
+            return Base64.encodeToString(data, 0);
+        }
     }
-}
 
