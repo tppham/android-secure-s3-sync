@@ -93,7 +93,6 @@
                 someone who explicitly knows the class name
             -->
         </activity>
-    </application>
         <activity
             android:name=".TestActivity"
             android:label="@string/ui_activity_title"
@@ -101,6 +100,7 @@
             android:excludeFromRecents="false"
             >
         </activity>
+    </application>
     <uses-sdk
         android:minSdkVersion="5" />
 </manifest>
