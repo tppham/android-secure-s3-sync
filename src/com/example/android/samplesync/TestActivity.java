@@ -33,11 +33,21 @@ public class TestActivity extends Activity {
 
     public static String LOG_TAG = "Goat Activity";
 
+    private static String keyId = "yourshere";
+    private static String secretKey = "yourshere";
+
     /*private String errorTrace;
     private Handler mHandler;*/
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(LOG_TAG, "I was born, but...");
+        try{ 
+            createBucket();
+        }
+        catch(Exception e){
+            Log.e(LOG_TAG, e.getMessage());
+        }
         //mHandler = new Handler();
     }
 
@@ -108,13 +118,14 @@ public class TestActivity extends Activity {
         }
         catch (Exception e) {
             setStackTrace(e);
+            Log.e(LOG_TAG, e.getMessage());
         }
     }  
 
     // This method creates S3 signature for a given String.
     public String sign(String data) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");
-        byte [] keyBytes = AWSSecretKey.getBytes("UTF8");
+        byte [] keyBytes = secretKey.getBytes("UTF8");
         SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA256");
         mac.init(signingKey);
 
