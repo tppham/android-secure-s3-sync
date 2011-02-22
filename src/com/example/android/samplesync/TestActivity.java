@@ -84,7 +84,7 @@ public class TestActivity extends Activity {
             String contentMD5 = "";
             String contentType = "";
             String date = df.format(new Date()) + "GMT";
-            String bucket = "/onjava";
+            String bucket = "/onblitzen";
 
             // Generate signature
             StringBuffer buf = new StringBuffer();
@@ -132,9 +132,9 @@ public class TestActivity extends Activity {
 
         // This method creates S3 signature for a given String.
         public String sign(String data) throws Exception {
-            Mac mac = Mac.getInstance("HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA1");
             byte [] keyBytes = secretKey.getBytes("UTF8");
-            SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA256");
+            SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA1");
             mac.init(signingKey);
 
             byte[] signBytes = mac.doFinal(data.getBytes("UTF8"));
@@ -143,7 +143,7 @@ public class TestActivity extends Activity {
 
         public String encodeBase64(byte[] data)
         {
-            return Base64.encodeToString(data, 0);
+            return Base64.encodeToString(data, 2);
         }
     }
 
