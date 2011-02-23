@@ -11,10 +11,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+//import android.app.AlertDialog;
+//import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
+//import android.os.Handler;
 import android.util.Log;
 import android.util.Base64;
 
