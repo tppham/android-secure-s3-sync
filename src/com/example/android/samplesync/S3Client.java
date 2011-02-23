@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.util.Base64;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -76,7 +78,9 @@ public class S3Client {
      *
      * @return The HTTP status code for the request.
      */
-    public static int createBucket(String key, String keyId, String bucketName) {
+    public static int createBucket(String key, String keyId, String bucketName)
+        throws GeneralSecurityException, UnsupportedEncodingException
+    {
         String path = "/" + bucketName;
         String date = timestamp();
         String method = "PUT";
@@ -114,7 +118,9 @@ public class S3Client {
      *
      * @return The HTTP status code for the request.
      */
-    public static int getObject(String key, String keyId, String bucketName, String objectName) {
+    public static int getObject(String key, String keyId, String bucketName, String objectName)
+        throws GeneralSecurityException, UnsupportedEncodingException
+    {
         String path = "/" + bucketName + "/" + objectName;
         String date = timestamp();
         String method = "GET";
@@ -154,7 +160,10 @@ public class S3Client {
      *
      * @return The HTTP status code for the request.
      */
-    public static int createObject(String key, String keyId, String bucketName, String objectName, byte [] data) {
+    public static int createObject(String key, String keyId, String bucketName,
+                                   String objectName, byte [] data)
+        throws GeneralSecurityException, UnsupportedEncodingException
+    {
         String path = "/" + bucketName + "/" + objectName;
         String date = timestamp();
         String method = "PUT";
@@ -198,7 +207,9 @@ public class S3Client {
      *
      * @return A signature in the format S3 requires.
      */
-    private static String sign(String key, String keyId, String [] items) {
+    private static String sign(String key, String keyId, String [] items)
+        throws GeneralSecurityException, UnsupportedEncodingException
+    {
         StringBuffer buf = new StringBuffer();
 
         for (int i = 0; i < items.length; i++) {
@@ -207,9 +218,12 @@ public class S3Client {
                 buf.append("\n");
         }
 
-        // TODO: Sign here!
+        Mac mac = Mac.getInstance("HmacSHA1");
+        SecretKeySpec signingKey = new SecretKeySpec(key.getBytes("UTF8"), "HmacSHA1");
+        mac.init(signingKey);
+        byte [] sig = mac.doFinal(buf.toString().getBytes("UTF8"));
 
-        return "AWS " + keyId + ":" + buf.toString();
+        return "AWS " + keyId + ":" + Base64.encodeToString(sig, Base64.NO_WRAP);
     }
 
 
