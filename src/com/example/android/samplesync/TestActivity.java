@@ -32,8 +32,8 @@ public class TestActivity extends Activity {
 
     public static String LOG_TAG = "Goat Activity";
 
-    private static String keyId = "yourshere";
-    private static String secretKey = "yourshere";
+    private static String keyId = "1V8B0Z36A2D2M4Q89Z02";
+    private static String secretKey = "u66fKmyC0fOcappL6qLapfvMOxe8ZwrNzoj29bRL";
 
     /*private String errorTrace;
       private Handler mHandler;*/
@@ -151,8 +151,7 @@ public class TestActivity extends Activity {
             buf.append(contentMD5).append("\n");
             buf.append(contentType).append("\n");
             buf.append(date).append("\n");
-            // TODO: Bug here. http://docs.amazonwebservices.com/AmazonS3/latest/dev/index.html?RESTAuthentication.html
-            buf.append("/" + bucket);
+            buf.append("/" + bucket + "/" + object);
             String signature = sign(buf.toString());
             String AWSAuth = "AWS " + keyId + ":" + signature;
 
@@ -161,7 +160,6 @@ public class TestActivity extends Activity {
 
             // Connection to s3.amazonaws.com
             HttpURLConnection httpConn = null;
-            // TODO: Abstract this bucket name
             URL url = new URL("http", "s3.amazonaws.com", 80, "/" + bucket + "/" + object);
             httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setDoInput(true);
@@ -172,6 +170,7 @@ public class TestActivity extends Activity {
             httpConn.setRequestMethod(method);
             httpConn.setRequestProperty("Date", date);
             httpConn.setRequestProperty("Authorization", AWSAuth);
+            httpConn.setRequestProperty("Content-Type", "text/plain");
             httpConn.setRequestProperty("Expect", "100-continue");
             // TODO: Integrity check
             // Tack on the object itself
@@ -213,8 +212,7 @@ public class TestActivity extends Activity {
             // Data needed for signature
             String method = "GET";
             String contentMD5 = "";
-            // TODO: Change this to octet-stream after testing
-            String contentType = "text/plain";
+            String contentType = "";
             String date = df.format(new Date()) + "GMT";
 
             // Generate signature
@@ -223,7 +221,7 @@ public class TestActivity extends Activity {
             buf.append(contentMD5).append("\n");
             buf.append(contentType).append("\n");
             buf.append(date).append("\n");
-            buf.append("/" + bucket);
+            buf.append("/" + bucket + "/" + object);
             String signature = sign(buf.toString());
             String AWSAuth = "AWS " + keyId + ":" + signature;
 
