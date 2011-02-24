@@ -37,7 +37,7 @@ public class S3Client {
     private static final String LOG_TAG = "S3Client";
 
     private static final String PROTOCOL = "http",
-                          HOSTNAME = "s3.amazon.com"
+                          HOSTNAME = "s3.amazonaws.com"
                           ;
     private static final int PORT = 80;
 
@@ -95,6 +95,7 @@ public class S3Client {
             status = conn.getResponseCode();
 
             if (200 != status) {
+                Log.e(LOG_TAG, "createBucket path was: " + path);
                 Log.i(LOG_TAG, "Status is " + status);
                 String resp = conn.getResponseMessage();
                 Log.i(LOG_TAG, resp);
@@ -135,6 +136,7 @@ public class S3Client {
             status = conn.getResponseCode();
 
             if (200 != status) {
+                Log.e(LOG_TAG, "getObject path was: " + path);
                 Log.i(LOG_TAG, "Status is " + status);
                 String resp = conn.getResponseMessage();
                 Log.i(LOG_TAG, resp);
@@ -176,13 +178,16 @@ public class S3Client {
         try {
             HttpURLConnection conn = connection(path, date, method, signature);
 
-            String body = "data=" + readFile(objectName);
+            //String body = "data=" + readFile(objectName);
+            // XXX: Bad
+            String body = "data=" + new String(data, "UTF-8");
 
             conn.setRequestProperty("Content-Length", "" + body.getBytes("UTF-8").length);
             conn.setRequestProperty("Content-Type", contentType);
             status = conn.getResponseCode();
 
             if (200 != status) {
+                Log.e(LOG_TAG, "createObject path was: " + path);
                 Log.i(LOG_TAG, "Status is " + status);
                 String resp = conn.getResponseMessage();
                 Log.i(LOG_TAG, resp);
@@ -233,7 +238,7 @@ public class S3Client {
     private static String timestamp() {
         SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return df.format(new Date() + "GMT");
+        return df.format(new Date()) + "GMT";
     }
 
 
