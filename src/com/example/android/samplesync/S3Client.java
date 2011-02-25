@@ -289,7 +289,7 @@ public class S3Client {
     }
 
 
-    private static logProblem(int status, HttpURLConnection connection) {
+    private static void logProblem(int status, HttpURLConnection connection) throws IOException {
           Log.e(LOG_TAG, "" + status + connection.getResponseMessage());
           //Log.d(LOG_TAG, new String(slurpStream(connection.getErrorStream())));
     }
