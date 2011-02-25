@@ -17,6 +17,7 @@ import android.os.Bundle;
 //import android.os.Handler;
 import android.util.Log;
 import android.util.Base64;
+import android.widget.Toast;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class TestActivity extends Activity {
 
-    public static String LOG_TAG = "Goat Activity";
+    public static String LOG_TAG = "TestActivity";
 
     private static String keyId = "AKIAJEHY7QJUAWU2PDNA";
     private static String secretKey = "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";
@@ -42,27 +43,42 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         try {
-            Log.i(LOG_TAG, "start");
+            String bucket = "gaggle",
+                   pathname = "test-for-fun.txt";
 
-            S3Client.createBucket(secretKey, keyId, "blibble");
-            Log.i(LOG_TAG, "createBucket");
+            if (200 != S3Client.createBucket(secretKey, keyId, bucket)) {
+                toast("Could not create bucket " + bucket);
+                return;
+            }
 
-            makeTestFile("mynewfile.txt");
-            Log.i(LOG_TAG, "makeTestFile");
+            makeTestFile(pathname);
 
-            S3Client.createObject(secretKey, keyId, "blibble", "mynewfile.txt",
-                                  readFile("mynewfile.txt").getBytes("UTF-8"));
-            Log.i(LOG_TAG, "createObject");
+            if (200 != S3Client.createObject(secretKey, keyId, bucket, pathname,
+                                  readFile(pathname).getBytes("UTF-8")))
+            {
+                toast("Could not create object " + pathname);
+                return;
+            }
 
-            S3Client.ObjectResponse r = S3Client.getObject(secretKey, keyId, "blibble", "mynewfile.txt");
-            Log.i(LOG_TAG, new String(S3Client.slurpStream(r.stream)));
-            Log.i(LOG_TAG, "getObject");
+            S3Client.ObjectResponse r = S3Client.getObject(secretKey, keyId, bucket, pathname);
+            if (200 != r.responseCode) {
+                toast("Could not get object " + pathname);
+                return;
+            }
+
+            String data = new String(S3Client.slurpStream(r.stream));
+            toast("/" + bucket + "/" + pathname + ": '" + data + "'");
         }
         catch (Exception e) {
             Log.e(LOG_TAG, "onCreate", e);
         }
 
         //mHandler = new Handler();
+    }
+
+
+    void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     /*
@@ -86,11 +102,9 @@ public class TestActivity extends Activity {
         FileInputStream fin = openFileInput(filename);
         InputStreamReader isr = new InputStreamReader(fin);
         char[] inputBuffer = new char[128];
-        isr.read(inputBuffer);
+        int c = isr.read(inputBuffer);
 
-        Log.i(LOG_TAG, "hooray");
-
-        return new String(inputBuffer);
+        return new String(inputBuffer, 0, c);
     }
 
 
