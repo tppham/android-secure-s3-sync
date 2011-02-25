@@ -1,18 +1,10 @@
 package com.example.android.samplesync;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.Base64;
 
@@ -21,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -37,9 +30,24 @@ public class S3Client {
     private static final String LOG_TAG = "S3Client";
 
     private static final String PROTOCOL = "http",
-                          HOSTNAME = "s3.amazonaws.com"
-                          ;
+                                HOSTNAME = "s3.amazonaws.com"
+                                ;
     private static final int PORT = 80;
+
+
+    /**
+     * A tuple returned by {@see #getObject} containing both the HTTP
+     * response code and the Stream of the response body.
+     */
+    public static class ObjectResponse {
+        public int responseCode;
+        public InputStream stream;
+
+        public ObjectResponse(int responseCode, InputStream stream) {
+            this.responseCode = responseCode;
+            this.stream = stream;
+        }
+    }
 
 
     /**
@@ -94,17 +102,11 @@ public class S3Client {
             conn.setRequestProperty("Content-Length", "0");
             status = conn.getResponseCode();
 
-            if (200 != status) {
-                Log.e(LOG_TAG, "createBucket path was: " + path);
-                Log.i(LOG_TAG, "Status is " + status);
-                String resp = conn.getResponseMessage();
-                Log.i(LOG_TAG, resp);
-            } else
-                Log.i(LOG_TAG, "Bucket created successfully, probably");
+            if (200 != status)
+                logProblem(status, conn);
         }
         catch (Exception e) {
-            setStackTrace(e);
-            Log.e(LOG_TAG, e.getMessage());
+            Log.e(LOG_TAG, "createBucket", e);
         }
 
         return status;
@@ -116,10 +118,14 @@ public class S3Client {
      * @param keyId The secret S3 key ID.
      * @param bucketName The name of the bucket that contains the object.
      * @param objectName The name of the object to retrieve.
+     * @param data A sink for the response data. getObject will only populate data if the request
+     * was successful (return value 200).
      *
-     * @return The HTTP status code for the request.
+     * @return The HTTP status code for the request and the data stream. The
+     * stream will be null on non-200 responses. See {@see #ObjectResponse}.
      */
-    public static int getObject(String key, String keyId, String bucketName, String objectName)
+    public static ObjectResponse getObject(String key, String keyId, String bucketName,
+                                           String objectName)
         throws GeneralSecurityException, UnsupportedEncodingException
     {
         String path = "/" + bucketName + "/" + objectName;
@@ -128,27 +134,24 @@ public class S3Client {
         String [] toSign = { method, "", "", date, path };
         String signature = sign(key, keyId, toSign);
 
-        int status = 400;
+        int status = 0;
+        InputStream stream = null;
 
         try {
             HttpURLConnection conn = connection(path, date, method, signature);
             conn.setRequestProperty("Content-Length", "0");
             status = conn.getResponseCode();
 
-            if (200 != status) {
-                Log.e(LOG_TAG, "getObject path was: " + path);
-                Log.i(LOG_TAG, "Status is " + status);
-                String resp = conn.getResponseMessage();
-                Log.i(LOG_TAG, resp);
-            } else
-                Log.i(LOG_TAG, "Here is your object, probably");
+            if (200 != status)
+                logProblem(status, conn);
+
+            stream = 200 == status ? conn.getInputStream() : null;
         }
         catch (Exception e) {
-            setStackTrace(e);
-            Log.e(LOG_TAG, e.getMessage());
+            Log.e(LOG_TAG, "getObject", e);
         }
 
-        return status;
+        return new ObjectResponse(status, stream);
     }
 
 
@@ -178,25 +181,21 @@ public class S3Client {
         try {
             HttpURLConnection conn = connection(path, date, method, signature);
 
-            //String body = "data=" + readFile(objectName);
-            // XXX: Bad
-            String body = "data=" + new String(data, "UTF-8");
-
-            conn.setRequestProperty("Content-Length", "" + body.getBytes("UTF-8").length);
+            conn.setRequestProperty("Content-Length", "" + data.length);
             conn.setRequestProperty("Content-Type", contentType);
+
+            conn.connect();
+            OutputStream out = conn.getOutputStream();
+            out.write(data);
+            out.flush();
+
             status = conn.getResponseCode();
 
-            if (200 != status) {
-                Log.e(LOG_TAG, "createObject path was: " + path);
-                Log.i(LOG_TAG, "Status is " + status);
-                String resp = conn.getResponseMessage();
-                Log.i(LOG_TAG, resp);
-            } else
-                Log.i(LOG_TAG, "Object stored, probably");
+            if (200 != status)
+                logProblem(status, conn);
         }
         catch (Exception e) {
-            setStackTrace(e);
-            Log.e(LOG_TAG, e.getMessage());
+            Log.e(LOG_TAG, "createObject", e);
         }
 
         return status;
@@ -242,40 +241,57 @@ public class S3Client {
     }
 
 
-    /**
-     * @param pathname A relative or absolute filesystem pathname.
-     *
-     * @return The contents of the named file as a UTF-8 string.
-     */
-    private static String readFile(String filename) throws Exception {
-        try {
-            FileInputStream fin = new FileInputStream(filename);
-            byte [] buf = new byte [4096];
-            fin.read(buf);
-            fin.close();
+    static class Chunk {
+        int count;
+        byte [] data;
 
-            Log.d(LOG_TAG, "hooray");
-
-            return new String(buf, "UTF-8");
-        }
-        catch (IOException e) {
-            setStackTrace(e);
-            Log.e(LOG_TAG, e.getMessage());
-            return new String("darn.");
+        Chunk(int c, byte [] d) {
+            count = c;
+            data = d;
         }
     }
 
 
     /**
-     * Logs a stack trace to the Android log.
+     * With this code I have defiled my family's honor. My shame is eternal and
+     * incalculable.
      *
-     * @param t The source of the stack trace.
+     * @param stream An input stream to read all the bytes from.
+     *
+     * @return All the bytes read from the input stream.
      */
-    private static void setStackTrace(Throwable t) {
-        final Writer result = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(result);
-        t.printStackTrace(printWriter);
-        Log.d(LOG_TAG, result.toString());
+    public static byte [] slurpStream(InputStream stream) throws IOException {
+        ArrayList<Chunk> chunks = new ArrayList<Chunk>();
+
+        while (true) {
+            byte [] d = new byte [4096];
+            int c = stream.read(d);
+
+            if (-1 == c)
+                break;
+
+            chunks.add(new Chunk(c, d));
+        }
+
+        int sz = chunks.size(),
+            ttl = 0;
+        for (int i = 0; i < sz; i++)
+            ttl += chunks.get(i).count;
+
+        int offst = 0;
+        byte [] d = new byte [ttl];
+        for (int i = 0; i < sz; i++) {
+            Chunk c = chunks.get(i);
+            System.arraycopy(c.data, 0, d, offst, c.count);
+        }
+
+        return d;
+    }
+
+
+    private static logProblem(int status, HttpURLConnection connection) {
+          Log.e(LOG_TAG, "" + status + connection.getResponseMessage());
+          //Log.d(LOG_TAG, new String(slurpStream(connection.getErrorStream())));
     }
  
 }
