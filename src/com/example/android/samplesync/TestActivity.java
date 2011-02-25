@@ -59,8 +59,7 @@ public class TestActivity extends Activity {
             Log.i(LOG_TAG, "getObject");
         }
         catch (Exception e) {
-            setStackTrace(e);
-            Log.e(LOG_TAG, e.toString());
+            Log.e(LOG_TAG, "onCreate", e);
         }
 
         //mHandler = new Handler();
@@ -83,31 +82,15 @@ public class TestActivity extends Activity {
        };*/
 
 
-    protected void setStackTrace(Throwable aThrowable) {
-        final Writer result = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(result);
-        aThrowable.printStackTrace(printWriter);
-        Log.i(LOG_TAG, result.toString());
-    }
+    public String readFile(String filename) throws IOException {
+        FileInputStream fin = openFileInput(filename);
+        InputStreamReader isr = new InputStreamReader(fin);
+        char[] inputBuffer = new char[128];
+        isr.read(inputBuffer);
 
+        Log.i(LOG_TAG, "hooray");
 
-    public String readFile(String filename) throws Exception {
-        try {
-            FileInputStream fin = openFileInput(filename);
-            InputStreamReader isr = new InputStreamReader(fin);
-            char[] inputBuffer = new char[128];
-            isr.read(inputBuffer);
-
-            Log.i(LOG_TAG, "hooray");
-
-            return new String(inputBuffer);
-        }
-
-        catch (IOException ioe) {
-            setStackTrace(ioe);
-            Log.e(LOG_TAG, ioe.getMessage());
-            return new String("darn.");
-        }
+        return new String(inputBuffer);
     }
 
 
