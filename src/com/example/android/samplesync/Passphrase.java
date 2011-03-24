@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -84,6 +85,35 @@ public class Passphrase {
         }
 
         return sb.toString();
+    }
+
+
+    static final byte [] HexDigits = {
+        '0', '1', '2', '3', '4', '5',
+        '6', '7', '8', '9', 'a', 'b',
+        'c', 'd', 'e', 'f'
+    };
+
+    static byte [] hexEncode(byte [] bytes) {
+        int ln = bytes.length;
+        byte [] hex = new byte [2 * ln];
+
+        for (int i = 0; i < ln; i++) {
+            int v = bytes[i] & 0xff;
+            hex[2 * i]     = HexDigits[v >>> 4];
+            hex[2 * i + 1] = HexDigits[v & 0xf];
+        }
+
+        return hex;
+    }
+
+
+    public static String hexadecimalKey(int byteCount)
+        throws GeneralSecurityException, IOException, UnsupportedEncodingException
+    {
+        byte [] rndm = new byte [byteCount];
+        getSecureRandom().nextBytes(rndm);
+        return new String(hexEncode(rndm), "UTF-8");
     }
 
 }

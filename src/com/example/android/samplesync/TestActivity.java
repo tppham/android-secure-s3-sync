@@ -68,7 +68,7 @@ public class TestActivity extends Activity {
         }
 
         try {
-            String bucket = "gaggle",
+            String bucket = Passphrase.hexadecimalKey(8),
                    pathname = "test-for-fun.txt";
 
             if (200 != S3Client.createBucket(SecretKey, KeyId, bucket)) {
