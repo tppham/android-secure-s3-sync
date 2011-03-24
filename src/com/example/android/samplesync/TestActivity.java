@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
@@ -11,10 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
-//import android.app.AlertDialog;
-//import android.content.DialogInterface;
 import android.os.Bundle;
-//import android.os.Handler;
 import android.util.Log;
 import android.util.Base64;
 import android.widget.Toast;
@@ -29,38 +27,65 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+
+/**
+ * Just for testing out our infrastructure code. Will not be used in the
+ * real application.
+ */
 public class TestActivity extends Activity {
 
-    public static String LOG_TAG = "TestActivity";
+    static String LogTag = "TestActivity";
 
-    private static String keyId = "AKIAJEHY7QJUAWU2PDNA";
-    private static String secretKey = "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";
+    // TODO XXX: Get these dynamically, probably from a Service that
+    // remembers them after asking the user in a KeyInputActivity.
+    static String KeyId = "Your S3 access key ID here",
+                  SecretKey = "Your S3 secret access key here";
 
-    /*private String errorTrace;
-      private Handler mHandler;*/
+
+    /**
+     * TODO: Make this return a dictionary appropriate for the locale.
+     *
+     * @return The dictionary filename, relative to the assets path.
+     */
+    String dictionaryFile() {
+        return "basic-words-en.txt";
+    }
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Demo code to generate a random key protector passphrase.
+        try {
+            InputStream r = getResources().getAssets().open(dictionaryFile());
+            String passphrase = Passphrase.dictionaryPassphrase(r, 5);
+            r.close();
+
+            toast(passphrase);
+        }
+        catch (Exception e) {
+            Log.e(LogTag, "passphrase", e);
+        }
 
         try {
             String bucket = "gaggle",
                    pathname = "test-for-fun.txt";
 
-            if (200 != S3Client.createBucket(secretKey, keyId, bucket)) {
+            if (200 != S3Client.createBucket(SecretKey, KeyId, bucket)) {
                 toast("Could not create bucket " + bucket);
                 return;
             }
 
             makeTestFile(pathname);
 
-            if (200 != S3Client.createObject(secretKey, keyId, bucket, pathname,
-                                  readFile(pathname).getBytes("UTF-8")))
+            if (200 != S3Client.createObject(SecretKey, KeyId, bucket, pathname,
+                                             readFile(pathname).getBytes("UTF-8")))
             {
                 toast("Could not create object " + pathname);
                 return;
             }
 
-            S3Client.ObjectResponse r = S3Client.getObject(secretKey, keyId, bucket, pathname);
+            S3Client.ObjectResponse r = S3Client.getObject(SecretKey, KeyId, bucket, pathname);
             if (200 != r.responseCode) {
                 toast("Could not get object " + pathname);
                 return;
@@ -70,10 +95,8 @@ public class TestActivity extends Activity {
             toast("/" + bucket + "/" + pathname + ": '" + data + "'");
         }
         catch (Exception e) {
-            Log.e(LOG_TAG, "onCreate", e);
+            Log.e(LogTag, "onCreate", e);
         }
-
-        //mHandler = new Handler();
     }
 
 
@@ -81,24 +104,8 @@ public class TestActivity extends Activity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    /*
-       protected Runnable displayError = new Runnable() {
-       public void run(){
-       Log.e(LOG_TAG, errorTrace);
-       AlertDialog.Builder confirm = new AlertDialog.Builder( AlertActivity.this );
-       confirm.setTitle( "A Connection Error Occured!");
-       confirm.setMessage( "Please Review the README\n" + errorTrace );
-       confirm.setNegativeButton( "OK", new DialogInterface.OnClickListener() {
-       public void onClick( DialogInterface dialog, int which ) {
-       AlertActivity.this.finish();
-       }
-       } );
-       confirm.show().show();   
-       }
-       };*/
 
-
-    public String readFile(String filename) throws IOException {
+    String readFile(String filename) throws IOException {
         FileInputStream fin = openFileInput(filename);
         InputStreamReader isr = new InputStreamReader(fin);
         char[] inputBuffer = new char[128];
@@ -108,23 +115,20 @@ public class TestActivity extends Activity {
     }
 
 
-    // Replace this with the logic for pulling out the contacts
-    public void makeTestFile(String filename) throws Exception {
+    // TODO: Replace this with the logic for pulling out the contacts
+    void makeTestFile(String filename) throws Exception {
         try { 
-            final String TESTSTRING = new String("Hello Android");
-
             FileOutputStream fos = openFileOutput(filename, MODE_WORLD_READABLE);
             OutputStreamWriter osw = new OutputStreamWriter(fos); 
 
-            osw.write(TESTSTRING);
+            osw.write("Hello Android");
             osw.flush();
             osw.close();
         }
-
-        catch (IOException ioe) {
-            ioe.printStackTrace();
+        catch (IOException e) {
+            Log.e(LogTag, "makeTestFile", e);
         }
-
     }
+
 }
 
