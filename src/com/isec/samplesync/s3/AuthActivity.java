@@ -26,7 +26,7 @@ import com.isecpartners.samplesync.R;
  */
 public class AuthActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "s3.AuthActivity";
-    public static final String ACCOUNT_TYPE = "com.isecpartners.sync.s3";
+    public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.s3";
     public static final int DIALOG_PROGRESS = 0;
 
     private final Handler mCb = new Handler();
