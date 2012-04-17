@@ -1,0 +1,6 @@
+- do we need account preferences?
+- do we need to support other account adapter methods, perhaps
+  to let user change their password when it doesnt work?
+  - what happens when a password fails during synch?
+  - do we need to send notification back somehow?
+
