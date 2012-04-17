@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.syncadapter;
+package com.isecpartners.samplesync.syncadapter;
 
 import android.app.Service;
 import android.content.Intent;

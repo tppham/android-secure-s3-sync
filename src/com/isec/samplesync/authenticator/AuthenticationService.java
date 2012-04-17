@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.authenticator;
+package com.isecpartners.samplesync.authenticator;
 
 import android.app.Service;
 import android.content.Intent;

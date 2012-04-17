@@ -1,4 +1,4 @@
-package com.example.android.samplesync;
+package com.isecpartners.samplesync;
 
 import java.io.InputStream;
 import java.io.IOException;

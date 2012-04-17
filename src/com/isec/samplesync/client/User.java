@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.client;
+package com.isecpartners.samplesync.client;
 
 import android.util.Log;
 

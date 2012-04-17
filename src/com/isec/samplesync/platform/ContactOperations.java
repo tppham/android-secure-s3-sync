@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.platform;
+package com.isecpartners.samplesync.platform;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -29,8 +29,8 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.android.samplesync.Constants;
-import com.example.android.samplesync.R;
+import com.isecpartners.samplesync.Constants;
+import com.isecpartners.samplesync.R;
 
 /**
  * Helper class for storing data in the platform content providers.
