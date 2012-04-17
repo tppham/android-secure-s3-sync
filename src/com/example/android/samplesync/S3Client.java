@@ -13,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -25,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * A very simple Amazon S3 client.
  */
-public class S3Client {
+public class S3Client implements IBlobStore {
 
     private static final String LOG_TAG = "S3Client";
 
@@ -33,6 +32,17 @@ public class S3Client {
                                 HOSTNAME = "s3.amazonaws.com"
                                 ;
     private static final int PORT = 80;
+
+    private String mKey, mKeyId;
+
+    /*
+     * @param key The secret S3 key.
+     * @param keyId The secret S3 key ID.
+     */
+    public S3Client(String key, String keyId) {
+        mKey = key;
+        mKeyId = keyId;
+    }
 
 
     /**
@@ -80,24 +90,20 @@ public class S3Client {
 
 
     /**
-     * @param key The secret S3 key.
-     * @param keyId The secret S3 key ID.
      * @param bucketName The name of the bucket to create.
      *
-     * @return The HTTP status code for the request.
+     * @return True for success.
      */
-    public static int createBucket(String key, String keyId, String bucketName)
-        throws GeneralSecurityException, UnsupportedEncodingException
+    public boolean create(String bucketName)
     {
+        int status = 400;
         String path = "/" + bucketName;
         String date = timestamp();
         String method = "PUT";
-        String [] toSign = { method, "", "", date, path };
-        String signature = sign(key, keyId, toSign);
-
-        int status = 400;
-
         try {
+            String [] toSign = { method, "", "", date, path };
+            String signature = sign(toSign);
+
             HttpURLConnection conn = connection(path, date, method, signature);
             conn.setRequestProperty("Content-Length", "0");
             status = conn.getResponseCode();
@@ -106,79 +112,69 @@ public class S3Client {
                 logProblem(status, conn);
         }
         catch (Exception e) {
-            Log.e(LOG_TAG, "createBucket", e);
+            Log.e(LOG_TAG, "create", e);
         }
 
-        return status;
+        return status == 200;
     }
 
 
     /**
-     * @param key The secret S3 key.
-     * @param keyId The secret S3 key ID.
      * @param bucketName The name of the bucket that contains the object.
      * @param objectName The name of the object to retrieve.
-     * @param data A sink for the response data. getObject will only populate data if the request
-     * was successful (return value 200).
      *
-     * @return The HTTP status code for the request and the data stream. The
-     * stream will be null on non-200 responses. See {@see #ObjectResponse}.
+     * @return The data fetched, or null.
      */
-    public static ObjectResponse getObject(String key, String keyId, String bucketName,
-                                           String objectName)
-        throws GeneralSecurityException, UnsupportedEncodingException
+    public byte[] get(String bucketName, String objectName)
     {
         String path = "/" + bucketName + "/" + objectName;
         String date = timestamp();
         String method = "GET";
-        String [] toSign = { method, "", "", date, path };
-        String signature = sign(key, keyId, toSign);
-
-        int status = 0;
-        InputStream stream = null;
+        byte[] dat = null;
 
         try {
+            String [] toSign = { method, "", "", date, path };
+            String signature = sign(toSign);
+
             HttpURLConnection conn = connection(path, date, method, signature);
             conn.setRequestProperty("Content-Length", "0");
-            status = conn.getResponseCode();
+            int status = conn.getResponseCode();
 
             if (200 != status)
                 logProblem(status, conn);
 
-            stream = 200 == status ? conn.getInputStream() : null;
+            if (200 == status) {
+                InputStream stream = conn.getInputStream();
+                dat = Utils.readAll(stream);
+            }
         }
         catch (Exception e) {
-            Log.e(LOG_TAG, "getObject", e);
+            Log.e(LOG_TAG, "get", e);
         }
-
-        return new ObjectResponse(status, stream);
+        return dat;
     }
 
 
     /**
-     * @param key The secret S3 key.
-     * @param keyId The secret S3 key ID.
      * @param bucketName The name of the bucket in which to create the
      * object.
      * @param objectName The name of the object to create.
      * @param data The data to store in the object.
      *
-     * @return The HTTP status code for the request.
+     * @return True on success.
      */
-    public static int createObject(String key, String keyId, String bucketName,
-                                   String objectName, byte [] data)
-        throws GeneralSecurityException, UnsupportedEncodingException
+    public boolean put(String bucketName, String objectName, byte [] data)
     {
         String path = "/" + bucketName + "/" + objectName;
         String date = timestamp();
         String method = "PUT";
         String contentType = "text/plain";
-        String [] toSign = { method, "", contentType, date, path };
-        String signature = sign(key, keyId, toSign);
-
         int status = 400;
 
         try {
+            String [] toSign = { method, "", contentType, date, path };
+            String signature = sign(toSign);
+
             HttpURLConnection conn = connection(path, date, method, signature);
 
             conn.setRequestProperty("Content-Length", "" + data.length);
@@ -197,21 +193,18 @@ public class S3Client {
         catch (Exception e) {
             Log.e(LOG_TAG, "createObject", e);
         }
-
-        return status;
+        return 200 == status;
     }
 
 
     /**
-     * @param key The secret S3 key.
-     * @param keyId The secret S3 key ID.
      * @param items The data items that Amazon S3 requests require to be
      * signed. Should be an array of length 5: { method, MD5, content-type,
      * timestamp, path }.
      *
      * @return A signature in the format S3 requires.
      */
-    private static String sign(String key, String keyId, String [] items)
+    private String sign(String [] items)
         throws GeneralSecurityException, UnsupportedEncodingException
     {
         StringBuffer buf = new StringBuffer();
@@ -223,13 +216,12 @@ public class S3Client {
         }
 
         Mac mac = Mac.getInstance("HmacSHA1");
-        SecretKeySpec signingKey = new SecretKeySpec(key.getBytes("UTF8"), "HmacSHA1");
+        SecretKeySpec signingKey = new SecretKeySpec(mKey.getBytes("UTF8"), "HmacSHA1");
         mac.init(signingKey);
         byte [] sig = mac.doFinal(buf.toString().getBytes("UTF8"));
 
-        return "AWS " + keyId + ":" + Base64.encodeToString(sig, Base64.NO_WRAP);
+        return "AWS " + mKeyId + ":" + Base64.encodeToString(sig, Base64.NO_WRAP);
     }
-
 
     /**
      * @return A timestamp in the format S3 requires.
@@ -241,58 +233,9 @@ public class S3Client {
     }
 
 
-    static class Chunk {
-        int count;
-        byte [] data;
-
-        Chunk(int c, byte [] d) {
-            count = c;
-            data = d;
-        }
-    }
-
-
-    /**
-     * With this code I have defiled my family's honor. My shame is eternal and
-     * incalculable.
-     *
-     * @param stream An input stream to read all the bytes from.
-     *
-     * @return All the bytes read from the input stream.
-     */
-    public static byte [] slurpStream(InputStream stream) throws IOException {
-        ArrayList<Chunk> chunks = new ArrayList<Chunk>();
-
-        while (true) {
-            byte [] d = new byte [4096];
-            int c = stream.read(d);
-
-            if (-1 == c)
-                break;
-
-            chunks.add(new Chunk(c, d));
-        }
-
-        int sz = chunks.size(),
-            ttl = 0;
-        for (int i = 0; i < sz; i++)
-            ttl += chunks.get(i).count;
-
-        int offst = 0;
-        byte [] d = new byte [ttl];
-        for (int i = 0; i < sz; i++) {
-            Chunk c = chunks.get(i);
-            System.arraycopy(c.data, 0, d, offst, c.count);
-        }
-
-        return d;
-    }
-
-
-    private static void logProblem(int status, HttpURLConnection connection) throws IOException {
+    private void logProblem(int status, HttpURLConnection connection) throws IOException {
           Log.e(LOG_TAG, "" + status + connection.getResponseMessage());
           //Log.d(LOG_TAG, new String(slurpStream(connection.getErrorStream())));
     }
- 
 }
 
