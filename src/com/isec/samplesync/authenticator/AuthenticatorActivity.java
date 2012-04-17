@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.authenticator;
+package com.isecpartners.samplesync.authenticator;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -34,9 +34,9 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.android.samplesync.Constants;
-import com.example.android.samplesync.R;
-import com.example.android.samplesync.client.NetworkUtilities;
+import com.isecpartners.samplesync.Constants;
+import com.isecpartners.samplesync.R;
+import com.isecpartners.samplesync.client.NetworkUtilities;
 
 /**
  * Activity which displays login screen to the user.

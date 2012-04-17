@@ -1,4 +1,4 @@
-package com.example.android.samplesync;
+package com.isecpartners.samplesync;
 
 import java.io.File;
 import java.io.FileInputStream;

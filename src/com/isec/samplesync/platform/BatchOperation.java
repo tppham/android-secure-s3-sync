@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.platform;
+package com.isecpartners.samplesync.platform;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;

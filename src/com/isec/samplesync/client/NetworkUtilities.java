@@ -14,14 +14,14 @@
  * the License.
  */
 
-package com.example.android.samplesync.client;
+package com.isecpartners.samplesync.client;
 
 import android.accounts.Account;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
-import com.example.android.samplesync.authenticator.AuthenticatorActivity;
+import com.isecpartners.samplesync.authenticator.AuthenticatorActivity;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.syncadapter;
+package com.isecpartners.samplesync.syncadapter;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -27,11 +27,11 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.android.samplesync.Constants;
-import com.example.android.samplesync.client.NetworkUtilities;
-import com.example.android.samplesync.client.User;
-import com.example.android.samplesync.client.User.Status;
-import com.example.android.samplesync.platform.ContactManager;
+import com.isecpartners.samplesync.Constants;
+import com.isecpartners.samplesync.client.NetworkUtilities;
+import com.isecpartners.samplesync.client.User;
+import com.isecpartners.samplesync.client.User.Status;
+import com.isecpartners.samplesync.platform.ContactManager;
 
 import org.apache.http.ParseException;
 import org.apache.http.auth.AuthenticationException;

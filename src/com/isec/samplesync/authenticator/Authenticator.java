@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.authenticator;
+package com.isecpartners.samplesync.authenticator;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -24,13 +24,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.android.samplesync.Constants;
-import com.example.android.samplesync.R;
-import com.example.android.samplesync.client.NetworkUtilities;
+import com.isecpartners.samplesync.Constants;
+import com.isecpartners.samplesync.R;
+import com.isecpartners.samplesync.client.NetworkUtilities;
 
 /**
  * This class is an implementation of AbstractAccountAuthenticator for
- * authenticating accounts in the com.example.android.samplesync domain.
+ * authenticating accounts in the com.isecpartners.samplesync domain.
  */
 class Authenticator extends AbstractAccountAuthenticator {
     // Authentication Service context

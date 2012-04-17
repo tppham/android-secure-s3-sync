@@ -1,4 +1,4 @@
-package com.example.android.samplesync;
+package com.isecpartners.samplesync;
 
 /*
  * Blob store interface lets you create stores, and use

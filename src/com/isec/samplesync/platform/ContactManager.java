@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.android.samplesync.platform;
+package com.isecpartners.samplesync.platform;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -31,9 +31,9 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.util.Log;
 
-import com.example.android.samplesync.Constants;
-import com.example.android.samplesync.R;
-import com.example.android.samplesync.client.User;
+import com.isecpartners.samplesync.Constants;
+import com.isecpartners.samplesync.R;
+import com.isecpartners.samplesync.client.User;
 
 import java.util.List;
 
