@@ -54,6 +54,15 @@ public class TestActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+ 
+        IBlobStore store = null;
+        try {
+            //store = new S3Client(SecretKey, KeyId);
+            store = new FileBlobStore("/sdcard/dir");
+        } catch (Exception e) {
+            Log.e(LogTag, "error building blob store: ", e);
+            return;
+        }
 
         // Demo code to generate a random key protector passphrase.
         try {
@@ -71,27 +80,26 @@ public class TestActivity extends Activity {
             String bucket = Passphrase.hexadecimalKey(8),
                    pathname = "test-for-fun.txt";
 
-            if (200 != S3Client.createBucket(SecretKey, KeyId, bucket)) {
+            if (!store.create(bucket)) {
                 toast("Could not create bucket " + bucket);
                 return;
             }
 
             makeTestFile(pathname);
 
-            if (200 != S3Client.createObject(SecretKey, KeyId, bucket, pathname,
-                                             readFile(pathname).getBytes("UTF-8")))
+            if (!store.put(bucket, pathname, readFile(pathname).getBytes("UTF-8")))
             {
                 toast("Could not create object " + pathname);
                 return;
             }
 
-            S3Client.ObjectResponse r = S3Client.getObject(SecretKey, KeyId, bucket, pathname);
-            if (200 != r.responseCode) {
+            byte[] dat = store.get(bucket, pathname);
+            if (dat == null) {
                 toast("Could not get object " + pathname);
                 return;
             }
 
-            String data = new String(S3Client.slurpStream(r.stream));
+            String data = new String(dat);
             toast("/" + bucket + "/" + pathname + ": '" + data + "'");
         }
         catch (Exception e) {
