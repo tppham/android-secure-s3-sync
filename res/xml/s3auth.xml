@@ -3,5 +3,5 @@
     android:accountType="com.isecpartners.samplesync.s3"
     android:icon="@drawable/icon"
     android:smallIcon="@drawable/icon"
-    android:label="S3 Account"
+    android:label="@string/label"
 />
