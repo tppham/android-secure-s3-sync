@@ -32,10 +32,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account acct, Bundle extras, String authority, ContentProviderClient provider, SyncResult res) {
         AccountManager mgr = AccountManager.get(mCtx);
-        String pw = GenericSync.getToken(mCtx, acct, TOKEN_TYPE, res);
-        if (pw != null) {
-            IBlobStore store = new Store(acct.name, pw);
-            GenericSync.onPerformSync(mCtx, TOKEN_TYPE, pw, store, res);
-        }
+        String pw = mgr.getPassword(acct);
+        IBlobStore store = new Store(acct.name, pw);
+        GenericSync.onPerformSync(mCtx, TOKEN_TYPE, pw, store, res);
     }
 }
