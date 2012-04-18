@@ -10,7 +10,7 @@ import android.util.Log;
  * A lot of boilerplate for such a simple purpose...
  */
 public class SyncService extends Service {
-    private static final String TAG = "SyncService";
+    private static final String TAG = "s3.SyncService";
     private static final Object sLock = new Object();
     private static SyncAdapter sAdapter = null;
 
