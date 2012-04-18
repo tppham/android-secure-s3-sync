@@ -2,6 +2,8 @@
 <resources
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="label">Secure S3 Sync</string>
+    <string name="s3label">Secure S3 Sync</string>
+    <string name="sdcardlabel">SDCard Sync</string>
 
     <string
         name="profile_action">Sample profile</string>

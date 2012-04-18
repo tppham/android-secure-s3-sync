@@ -73,7 +73,6 @@ public class GenericSync {
         try {
             return mgr.blockingGetAuthToken(acct, tokenType, true);
 
-        // XXX re-evaluate which of these are needed...
         } catch (final AuthenticatorException e) {
             Log.e(TAG, "getToken", e);
             res.stats.numParseExceptions++;
@@ -85,6 +84,5 @@ public class GenericSync {
         }
         return null;
     }
-
 }
 

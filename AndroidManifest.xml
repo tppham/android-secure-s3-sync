@@ -72,10 +72,38 @@
             android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true"
             >
-            <!--
-                No intent-filter here! This activity is only ever launched by
-                someone who explicitly knows the class name
-            -->
+        </activity>
+        <service
+            android:name=".sdcard.AuthService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/sdcardauth" />
+        </service>
+        <service
+            android:name=".sdcard.SyncService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sdcardsync" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+        <activity
+            android:name=".sdcard.AuthActivity"
+            android:label="SDCard Sign-in"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true"
+            >
         </activity>
         <activity
             android:name=".TestActivity"

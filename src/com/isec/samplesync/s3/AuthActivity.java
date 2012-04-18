@@ -48,6 +48,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         public void run() {
             // XXX stuff to do during login...
+            Log.v(TAG, "XXX should verify signin here! " + mAcct + " " + mPasswd);
             done(true);
         }
 
@@ -68,8 +69,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         Window w = getWindow();
         w.requestFeature(Window.FEATURE_LEFT_ICON);
-        w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
         setContentView(R.layout.s3login);
+        w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
 
         mMsgTxt = (TextView)findViewById(R.id.msg);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
