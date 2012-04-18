@@ -1,4 +1,4 @@
-package com.isecpartners.samplesync;
+package com.isecpartners.samplesync.sdcard;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,18 +6,26 @@ import java.io.FileOutputStream;
 
 import android.util.Log;
 
+import com.isecpartners.samplesync.IBlobStore;
+import com.isecpartners.samplesync.Utils;
+
+
 /**
  * A simplistic blob-store using local files.
- * Primarily for testing.
  */
-public class FileBlobStore implements IBlobStore {
+public class Store implements IBlobStore {
     private static final String LOG_TAG = "FileBlobStore";
     private String mDir;
+
+    public static boolean checkStore(String dir) {
+        File d = new File(dir);
+        return !d.exists() || d.isDirectory();
+    }
 
     /**
      * @param dir The directory for storing files.
      */
-    public FileBlobStore(String dir) {
+    public Store(String dir) {
         mDir = dir;
     };
 

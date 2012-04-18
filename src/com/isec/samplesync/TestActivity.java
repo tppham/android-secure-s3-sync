@@ -27,8 +27,6 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.isecpartners.samplesync.s3.Store;
-
 /**
  * Just for testing out our infrastructure code. Will not be used in the
  * real application.
@@ -58,8 +56,8 @@ public class TestActivity extends Activity {
  
         IBlobStore store = null;
         try {
-            store = new Store(SecretKey, KeyId);
-            //store = new FileBlobStore("/sdcard/dir");
+            //store = new com.isecpartners.samplesync.s3.Store(SecretKey, KeyId);
+            store = new com.isecpartners.samplesync.sdcard.Store("/sdcard/dir");
         } catch (Exception e) {
             Log.e(LogTag, "error building blob store: ", e);
             return;
