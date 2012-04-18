@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip" 
-                android:text="Sign into your S3 account" />
+                android:text="Sign in to your S3 account" />
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
