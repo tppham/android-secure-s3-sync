@@ -53,7 +53,7 @@
                 android:resource="@xml/s3auth" />
         </service>
         <service
-            android:name=".syncadapter.SyncService"
+            android:name=".s3.SyncService"
             android:exported="true">
             <intent-filter>
                 <action
@@ -61,7 +61,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
+                android:resource="@xml/s3sync" />
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
