@@ -67,7 +67,7 @@
                 android:resource="@xml/contacts" />
         </service>
         <activity
-            android:name=".s3.authActivity"
+            android:name=".s3.AuthActivity"
             android:label="S3 Sign-in"
             android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true"
