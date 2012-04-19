@@ -4,3 +4,7 @@
   - what happens when a password fails during synch?
   - do we need to send notification back somehow?
 
+- cant we use a single sync adapter/server and share it with
+  all of the account types?  we're told the account type so we
+  can mux on that.
+

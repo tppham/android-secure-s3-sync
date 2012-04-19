@@ -27,6 +27,17 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+// XXX
+import android.net.Uri;
+import android.content.ContentUris;
+import android.database.Cursor;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
+import android.provider.ContactsContract.RawContacts.Entity;
+
+
+
 /**
  * Just for testing out our infrastructure code. Will not be used in the
  * real application.
@@ -104,6 +115,44 @@ public class TestActivity extends Activity {
         catch (Exception e) {
             Log.e(LogTag, "onCreate", e);
         }
+        testDb();
+    }
+
+    String allRows(Cursor c) {
+        String msg = "";
+        int cols = c.getColumnCount();
+        for(int col = 0; col < cols; col++) {
+            if(col > 0)
+                msg += ", ";
+            try {
+                msg += c.getColumnName(col) + "=" + c.getString(col);
+            } catch(final Exception e) {
+                msg += c.getColumnName(col) + "=???";
+            }
+        }
+        return msg;
+    }
+
+    void dumpContacts() {
+        Cursor c = getContentResolver().query(Data.CONTENT_URI, null, null, null, null);
+        while(c.moveToNext()) {
+            Log.v(LogTag, "data: " + allRows(c));
+        }
+        c.close();
+    }
+
+    void testDb() {
+        Log.v(LogTag, "dumping...");
+        Cursor c = getContentResolver().query(RawContacts.CONTENT_URI,
+                null, null, null, null);
+                //RawContacts.CONTACT_ID + "=?",
+                //new String[]{String.valueOf(contactId)}, null);
+        while(c.moveToNext()) {
+            int id = c.getInt(3);
+            Log.v(LogTag, "contact: " + allRows(c));
+        }
+        c.close();
+        dumpContacts();
     }
 
 
