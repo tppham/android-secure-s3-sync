@@ -45,6 +45,32 @@ perform a synch by:
     - bundle up any new contacts and send to remote
     - update our local notes
 
+  XXX proposal:
+  - read through all contacts not belonging to a synch provider
+    - see if we have a matching contact 
+      - if it differs, update ours from the others data, mark as dirty
+      - otherwise create a new one, mark as dirty
+  - read through all contacts from remote host
+    - see if we have a matching contact
+      - if its already dirty, prefer the local copy
+        - if it differs, update ours from the others data, mark as dirty
+      - otherwise create a new one, mark as dirty
+      - for any updates to our local copy, make updates to the 
+        one that has no provider, if one exists, otherwise dont
+        make any no-provider changes.
+  - bundle up all dirty records and push to remote
+    XXX or just bundle up all records for simple first cut
+
+  we can use a synch field to track cross refs when we shadow
+  an external contact field.
+
+  data types we care about:
+    vnd.android.cursor.item/name
+    vnd.android.cursor.item/phone_v2
+    vnd.android.cursor.item/photo ?
+    others?
+
+
 
 ** Remote Storage
 
