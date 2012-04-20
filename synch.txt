@@ -63,3 +63,42 @@ an issue if we were just pushing up deltas instead of
 the full set of records...
 
 
+----
+XXX how to handle deletes?  We can keep a delete flag in
+the remotes section, but how do we track it locally without
+it showing up in the contacts app?  
+  - to start off with we can just strip all the info and
+    mark it with a weird color or icon or something...
+    and delete any matching local entry..
+  - or maybe we just delete the item matching the shadow once
+    and then unlink the shadow?
+
+XXX how to handle renames?  i think we can probably detect
+local renames fine with our shadow copies, but how do we track
+remote renames?  we'll have to make some ID system for tracking
+remote entries.
+
+
+
+------
+
+ContactsContract.CommonDataKinds.Phone
+  - vnd.android.cursor.item/phone_v2
+  - data1: string number
+  - data2: type (int)
+  - data3: if data2 is 0, then a string, else null
+
+ContactsContract.CommonDataKinds.Email
+  - vnd.android.cursor.item/email_v2
+  - same as phone
+
+ContactsContract.CommonDataKinds.StructuredName
+  - vnd.android.cursor.item/name
+  - data1 .. data9 : strings
+
+
+
+raw contact:
+  STARRED
+  ACCOUNT_NAME
+  
