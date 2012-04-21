@@ -1,0 +1,17 @@
+#!/bin/sh
+
+die() {
+    echo "error: $@"
+    exit 1
+}
+
+FLAG=-e
+
+adb $FLAG logcat -c
+adb $FLAG uninstall com.isecpartners.samplesync || die "uninstall"
+adb $FLAG install /home/newsham/isec/sync/android-secure-s3-sync/bin/TestActivity-debug.apk || die "install"
+#adb $FLAG shell am start -a android.intent.action.MAIN -n com.isecpartners.samplesync/com.isecpartners.samplesync.sdcard.AuthActivity
+adb $FLAG shell am start -a android.intent.action.MAIN -n com.isecpartners.samplesync/.TestActivity
+
+sleep 2; ./d.py
+#adb $FLAG logcat -s Sync
