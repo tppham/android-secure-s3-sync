@@ -8,3 +8,8 @@
   all of the account types?  we're told the account type so we
   can mux on that.
 
+- can we make the contact manager display our contacts by default?
+  - I think they only merge after we mark them as shown in the mgr
+
+- we shouldnt import from the local contacts by default. 
+  we should have a feature that lets us do that on demand.

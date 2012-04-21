@@ -102,3 +102,17 @@ raw contact:
   STARRED
   ACCOUNT_NAME
   
+
+
+-----
+References
+
+The Email.apk app has a SyncAdapter that can sync email, contacts
+and calendar items.
+  git clone git://git.omapzoom.org/platform/packages/apps/Email.git
+  PopImapSyncAdapterService.java
+  PopImapAuthenticatorService.java
+
+  - when its added, new contacts get added to it, rather than to the null sync
+  - when its added, old contacts get subsumed into it somehow..
+
