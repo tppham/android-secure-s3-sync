@@ -14,7 +14,6 @@ import android.provider.ContactsContract.CommonDataKinds;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 
-
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +34,18 @@ public class Sync {
 
     public void run() {
         Log.v(TAG, "run sync tests");
-        createTestAcct();
         //clean();
+        //createTestAcct();
+        //createTestAcct2();
+        createTestAcct3();
         //newShadows();
+        //changePhone(30, "808-555-3333", 1);
+        //changePhone(30, "808-111-2222", 1);
         dumpDb();
+
+        //com.isecpartners.samplesync.model.Contacts cs = new com.isecpartners.samplesync.model.Contacts(mCtx);
+        //Log.v(TAG, "" + cs);
+
         Log.v(TAG, "done sync tests");
     }
 
@@ -276,6 +283,70 @@ public class Sync {
         } catch(final Exception e) {
             Log.v(TAG, "apply batch failed: " + e);
         }
+    }
+
+    void createTestAcct2() {
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        newSyncAcct(ops, ACCOUNT_NAME, ACCOUNT_TYPE, "xxx");
+
+        CName n = new CName();
+        n.mime = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
+        n.d1 = "Merge Me"; // display
+        n.d2 = "Merge"; // first
+        n.d3 = "Me"; // last
+        n.put(ops, true, 0);
+
+        CPhone p = new CPhone();
+        p.mime = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
+        p.d1 = "808-222-3333";
+        p.d2 = CommonDataKinds.Phone.TYPE_MOBILE;
+        p.put(ops, true, 0);
+
+        try {
+            mCtx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch(final Exception e) {
+            Log.v(TAG, "apply batch failed: " + e);
+        }
+    }
+
+    void createTestAcct3() {
+        com.isecpartners.samplesync.model.Contact c = new com.isecpartners.samplesync.model.Contact();
+
+        c.add(new com.isecpartners.samplesync.model.Name("Another", "Test"));
+        c.add(new com.isecpartners.samplesync.model.Phone("111-555-1111", 1, null));
+        c.add(new com.isecpartners.samplesync.model.Phone("111-555-2222", 2, null));
+        c.add(new com.isecpartners.samplesync.model.Email("another@test.com", 1, null));
+        try {
+            c.put(mCtx, ACCOUNT_NAME, ACCOUNT_TYPE);
+        } catch(Exception e) {
+            Log.v(TAG, "add account put failed: " + e);
+        }
+    }
+
+    void changePhone(int id, String ph, int num) {
+        ContentValues vals = new ContentValues();
+        vals.put(Data.DATA1, ph);
+
+        // try to update existing
+        int cnt = mCtx.getContentResolver().update(Data.CONTENT_URI, 
+                vals,
+                Data.RAW_CONTACT_ID + "=?  AND " + Data.MIMETYPE + "=? AND " + Data.DATA2 + "=?",
+                new String[] { "" + id,
+                    CommonDataKinds.Phone.CONTENT_ITEM_TYPE , 
+                    "" + num, });
+        if(cnt > 0) {
+            Log.v(TAG, "updated " + ph);
+            return;
+        }
+
+        // insert a new record
+        vals = new ContentValues();
+        vals.put(Data.RAW_CONTACT_ID, id);
+        vals.put(Data.MIMETYPE, CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+        vals.put(Data.DATA1, ph);
+        vals.put(Data.DATA2, num);
+        Uri r = mCtx.getContentResolver().insert(Data.CONTENT_URI, vals);
+        Log.v(TAG, "added " + ph + ": " + r);
     }
 
     /* shadow a local contact into a sync contact */
