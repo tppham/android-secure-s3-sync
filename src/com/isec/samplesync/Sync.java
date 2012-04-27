@@ -35,8 +35,9 @@ public class Sync {
 
     public void run() {
         Log.v(TAG, "run sync tests");
-        clean();
-        newShadows();
+        createTestAcct();
+        //clean();
+        //newShadows();
         dumpDb();
         Log.v(TAG, "done sync tests");
     }
@@ -128,9 +129,9 @@ public class Sync {
     // also used for email..
     // data1 - phnum, data2 - type, data3 - descr if data2 == 0
     static class CPhone extends CData {
-        long sid;
-        String mime, d1, d3;
-        int d2;
+        public long sid;
+        public String mime, d1, d3;
+        public int d2;
 
         public CPhone() {}
 
@@ -164,8 +165,8 @@ public class Sync {
     /* contact name data. */
     // data1 through data9 are all strings 
     static class CName extends CData {
-        long sid;
-        String mime, d1, d2, d3, d4, d5, d6, d7, d8, d9;
+        public long sid;
+        public String mime, d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
         public CName() {}
 
@@ -241,6 +242,40 @@ public class Sync {
                     .withValue(RawContacts.ACCOUNT_TYPE, atype)
                     .withValue(RawContacts.SYNC1, s1)
                     .build());
+    }
+
+    void createTestAcct() {
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        newSyncAcct(ops, ACCOUNT_NAME, ACCOUNT_TYPE, "xxx");
+
+        CName n = new CName();
+        n.mime = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
+        n.d1 = "Youbie Nine"; // display
+        n.d2 = "Youbie"; // first
+        n.d3 = "Nine"; // last
+        n.put(ops, true, 0);
+
+        CPhone p = new CPhone();
+        p.mime = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
+        p.d1 = "808-596-7873";
+        p.d2 = CommonDataKinds.Phone.TYPE_HOME;
+        p.put(ops, true, 0);
+
+        p.mime = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
+        p.d1 = "808-555-1212";
+        p.d2 = CommonDataKinds.Phone.TYPE_MOBILE;
+        p.put(ops, true, 0);
+
+        p.mime = CommonDataKinds.Email.CONTENT_ITEM_TYPE;
+        p.d1 = "youbie@gmail.com";
+        p.d2 = CommonDataKinds.Email.TYPE_HOME;
+        p.put(ops, true, 0);
+
+        try {
+            mCtx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch(final Exception e) {
+            Log.v(TAG, "apply batch failed: " + e);
+        }
     }
 
     /* shadow a local contact into a sync contact */
