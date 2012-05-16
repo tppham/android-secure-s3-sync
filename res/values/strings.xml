@@ -9,4 +9,9 @@
         name="profile_action">Sample profile</string>
     <string
         name="view_profile">View Profile</string>
+    <string
+        name="result_succeeded">Scan Succeeded</string>
+    
+    <string
+        name="result_failed">Scan Failed</string>
 </resources>
