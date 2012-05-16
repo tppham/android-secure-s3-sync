@@ -69,9 +69,24 @@
         <activity
             android:name=".s3.AuthActivity"
             android:label="S3 Sign-in"
-            android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true"
             >
+        </activity>
+        <activity
+            android:name=".s3.BucketActivity"
+            android:label="S3 Sign-in"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".s3.MyActivity"
+            android:label="S3 Sync"
+            android:excludeFromRecents="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <service
             android:name=".sdcard.AuthService"
@@ -110,10 +125,7 @@
             android:label="S3 Client Test"
             android:excludeFromRecents="false"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            
         </activity>
     </application>
     <uses-sdk
