@@ -90,7 +90,7 @@ public class BucketActivity extends Activity{
 	             r.close();
 	             
 	            String bucketname = Passphrase.hexadecimalKey(8); 
-	            Log.v(TAG, "bucket: "+bucketname);
+	            //Log.v(TAG, "bucket: "+bucketname);
 	 	    	boolean result = s3.create(bucketname);
 	 	    	
 	 	    	if(result){
