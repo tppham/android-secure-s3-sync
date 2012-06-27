@@ -51,14 +51,14 @@ public class Phone extends Data {
     }
 
 
-    public hashCode() {
+    public int hashCode() {
         return strhash(mime) +
             3 * strhash(d1) +
             5 * d2 +
             7 * strhash(d3);
     }
 
-    public equals(Object obj) {
+    public boolean equals(Object obj) {
         if(obj instanceof Phone) {
             Phone n = (Phone)obj;
             return streq(n.mime, mime) &&

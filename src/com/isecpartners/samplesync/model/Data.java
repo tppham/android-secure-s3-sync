@@ -22,6 +22,7 @@ import java.util.List;
  */
 abstract class Data {
     private static final String TAG = "model.Data";
+    public String mime;
 
     /* batch ops for putting into the data table */
     public abstract void put(List<ContentProviderOperation> ops, boolean back, int id);

@@ -1,3 +1,8 @@
+package com.isecpartners.samplesync.model;
+
+import java.util.List;
+import java.util.LinkedList;
+
 /*
  * Synching algorithm.  Merging happens on three sets of
  * contacts, the "local" contacts fetched from the phone that
@@ -40,7 +45,7 @@ public class Synch {
      * with data of type kl, or with any match whatsoever if kl is null.
      */
     static boolean match(Contact x, Contact c, String mime) {
-        if(kl == null) { /* if any data matches */
+        if(mime == null) { /* if any data matches */
             for(Data xd : x.data) {
                 for(Data cd : c.data) {
                     if(xd == cd)
@@ -49,7 +54,7 @@ public class Synch {
             }
             return false;
     
-        } else { /* if the first kl in x.data matches one in kl */
+        } else { /* if the first mime match in x.data matches one in c.data */
             Data xd = firstDataMime(x.data, mime);
             return xd != null && xd == firstDataMime(c.data, mime);
         }
@@ -97,8 +102,9 @@ public class Synch {
         }
 
         // merge all "local" entries onto the list
+        Contact m;
         for(Contact c : local) {
-            if((m = bestMatch(c, all))) {
+            if((m = bestMatch(c, all)) != null) {
                 m.local = c;
                 c.master = m;
             } else { // not found
@@ -110,7 +116,7 @@ public class Synch {
 
         // merge all "remote" entries onto the list
         for(Contact c : remote) {
-            if((m = bestMatch(c, all))) {
+            if((m = bestMatch(c, all)) != null) {
                 m.remote = c;
                 c.master = m;
             } else { // not found
@@ -119,6 +125,7 @@ public class Synch {
                 all.add(c);
             }
         }
+        return all;
     }
 
     /* 
@@ -127,10 +134,10 @@ public class Synch {
      * and a list of data items that were added or deleted.
      */
     public static class Changes {
-        public boolean deleted;
+        public boolean delContact;
         public List<Data> addData, delData;
 
-        public Delta(boolean del, List<Data> a, List<Data> d) {
+        public Changes(boolean del, List<Data> a, List<Data> d) {
             delContact = del;
             addData = a;
             delData = d;
@@ -138,13 +145,13 @@ public class Synch {
     };
 
     /* return all elements in ds that arent in ds2 */
-    static <D> List<D> diff(List<D> ds, List<D>, ds2) {
+    static <D> List<D> diff(List<D> ds, List<D> ds2) {
         LinkedList<D> r = new LinkedList<D>();
-        for(d : ds) {
+        for(D d : ds) {
             if(!ds2.contains(d))
                 r.add(d);
         }
-        return r.isEmpty ? null : r;
+        return r.isEmpty() ? null : r;
     }
 
     /*
@@ -156,8 +163,8 @@ public class Synch {
         if(c2 == null)
             return new Changes(true, null, c.data); // delete
 
-        List<Data> adds = diff<Data>(c, c2);
-        List<Data> dels = diff<Data>(c2, c);
+        List<Data> adds = Synch.<Data>diff(c.data, c2.data);
+        List<Data> dels = Synch.<Data>diff(c2.data, c.data);
         if(adds == null && dels == null)
             return null;
         return new Changes(false, adds, dels); // alter data
@@ -165,7 +172,7 @@ public class Synch {
 
     /* sync changes from local sources */
     boolean syncLocal(Contact c) {
-        Delta d = changes(c.last, c.local);
+        Changes d = changes(c.last, c.local);
         if(d == null)
             return false;
 
@@ -173,14 +180,14 @@ public class Synch {
         c.last = mLast.push(c.last, d);
 
         /* then bring remote up to date */
-        Delta d2 = changes(c.remote, c.last);
+        Changes d2 = changes(c.remote, c.last);
         c.remote = mRemote.push(c.remote, d2);
         return true;
     }
 
     /* sync changes from remote sources */
     boolean syncRemote(Contact c) {
-        Delta d = changes(c.last, c.remote);
+        Changes d = changes(c.last, c.remote);
         if(d == null)
             return false;
 
@@ -188,7 +195,7 @@ public class Synch {
         c.last = mLast.push(c.last, d);
 
         /* then bring local up to date */
-        Delta d2 = changes(c.local, c.last);
+        Changes d2 = changes(c.local, c.last);
         c.local = mLocal.push(c.local, d2);
         return true;
     }

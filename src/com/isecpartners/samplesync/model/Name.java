@@ -62,7 +62,7 @@ public class Name extends Data {
         return "[Name: " + sid + " " + mime + " " + d1 + " " + d2 + " " + d3 + d4 + " " + d5 + " " + d6 + " " + d7 + " " + d8 + " " + d9 + "]";
     }
 
-    public hashCode() {
+    public int hashCode() {
         return strhash(mime) +
             3 * strhash(d1) +
             5 * strhash(d2) +
@@ -75,7 +75,7 @@ public class Name extends Data {
             23 * strhash(d9);
     }
 
-    public equals(Object obj) {
+    public boolean equals(Object obj) {
         if(obj instanceof Name) {
             Name n = (Name)obj;
             return streq(n.mime, mime) &&
