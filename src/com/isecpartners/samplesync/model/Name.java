@@ -13,11 +13,12 @@ import java.util.List;
  * data1 = display, data2,data3 = first,last.
  */
 public class Name extends Data {
+    public static final String mimeType = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
     public long sid;
     public String mime, d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
     public Name(String first, String last) {
-        mime = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
+        mime = mimeType;
         d1 = first + " " + last;
         d2 = first;
         d3 = last;
@@ -59,6 +60,36 @@ public class Name extends Data {
 
     public String toString() {
         return "[Name: " + sid + " " + mime + " " + d1 + " " + d2 + " " + d3 + d4 + " " + d5 + " " + d6 + " " + d7 + " " + d8 + " " + d9 + "]";
+    }
+
+    public hashCode() {
+        return strhash(mime) +
+            3 * strhash(d1) +
+            5 * strhash(d2) +
+            7 * strhash(d3) +
+            9 * strhash(d4) +
+            11 * strhash(d5) +
+            13 * strhash(d6) +
+            17 * strhash(d7) +
+            19 * strhash(d8) +
+            23 * strhash(d9);
+    }
+
+    public equals(Object obj) {
+        if(obj instanceof Name) {
+            Name n = (Name)obj;
+            return streq(n.mime, mime) &&
+                streq(n.d1, d1) &&
+                streq(n.d2, d2) &&
+                streq(n.d3, d3) &&
+                streq(n.d4, d4) &&
+                streq(n.d5, d5) &&
+                streq(n.d6, d6) &&
+                streq(n.d7, d7) &&
+                streq(n.d8, d8) &&
+                streq(n.d9, d9);
+        }
+        return false;
     }
 }
 

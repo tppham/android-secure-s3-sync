@@ -50,9 +50,9 @@ abstract class Data {
             RawContactsEntity.CONTACT_ID + "=" + id + " AND " + 
                 RawContactsEntity.MIMETYPE + " in (?, ?, ?)",
             new String[] {
-                CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                CommonDataKinds.Email.CONTENT_ITEM_TYPE,
-                CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
+                Phone.mimeType,
+                Email.mimeType,
+                Name.mimeType,
             }, null);
         Log.v("XXX", "getDatas: " + c.getCount());
         return c;
@@ -62,15 +62,27 @@ abstract class Data {
     public static Data get(Cursor c) {
         Data d = null;
         String mime = c.getString(1);
-        if(mime.equals(CommonDataKinds.Phone.CONTENT_ITEM_TYPE))
+        if(mime.equals(Phone.mimeType))
             d = new Phone(c);
-        else if(mime.equals(CommonDataKinds.Email.CONTENT_ITEM_TYPE))
+        else if(mime.equals(Email.mimeType))
             d = new Email(c);
-        else if(mime.equals(CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE))
+        else if(mime.equals(Name.mimeType))
             d = new Name(c);
         else
             Log.v(TAG, "unknown mime type - should never happen! " + mime);
         return d;
+    }
+
+    /* some helpers for equals/hashcode ... */
+    public static boolean streq(String a, String b) {
+        if(a == null )
+            return b == null;
+        return a.equals(b);
+    }
+    public static int strhash(String a) {
+        if (a == null)
+            return 0;
+        return a.hashCode();
     }
 };
 

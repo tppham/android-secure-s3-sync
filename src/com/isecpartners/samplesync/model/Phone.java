@@ -11,12 +11,13 @@ import java.util.List;
  * format: data1 - phnum, data2 - type, data3 - descr if data2 == 0
  */
 public class Phone extends Data {
+    public static final String mimeType = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
     public long sid;
     public String mime, d1, d3;
     public int d2;
 
     public Phone(String phnum, int ty, String descr) {
-        mime = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
+        mime = mimeType;
         d1 = phnum;
         d2 = ty;
         if(ty == 0)
@@ -47,6 +48,25 @@ public class Phone extends Data {
 
     public String toString() {
         return "[Phone: " + sid + " " + mime + " " + d1 + " " + d2 + " " + d3 + "]";
+    }
+
+
+    public hashCode() {
+        return strhash(mime) +
+            3 * strhash(d1) +
+            5 * d2 +
+            7 * strhash(d3);
+    }
+
+    public equals(Object obj) {
+        if(obj instanceof Phone) {
+            Phone n = (Phone)obj;
+            return streq(n.mime, mime) &&
+                streq(n.d1, d1) &&
+                n.d2 == d2 &&
+                streq(n.d3, d3);
+        }
+        return false;
     }
 }
 

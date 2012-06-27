@@ -8,9 +8,10 @@ import android.provider.ContactsContract.CommonDataKinds;
  * Same format as phone data.
  */
 public class Email extends Phone {
+    public static final String mimeType = CommonDataKinds.Email.CONTENT_ITEM_TYPE;
     public Email(String addr, int ty, String descr) {
         super(addr, ty, descr);
-        mime = CommonDataKinds.Email.CONTENT_ITEM_TYPE;
+        mime = mimeType;
     }
     public Email(Cursor c) { super(c); }
 
