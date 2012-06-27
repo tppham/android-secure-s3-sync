@@ -1,3 +1,7 @@
+package com.isecpartners.samplesync.model;
+
+import java.util.List;
+import android.util.Log;
 
 /*
  * A contact set represents a collection of contacts and their
@@ -17,14 +21,14 @@ public class ContactSet {
     /*
      * Apply changes d to contact c, returning the contact.
      */
-    public Contact push(Contact c, Synch.Changes d) {
+    public Contact push(Contact c, Synch.Changes ch) {
         if(c == null) 
             c = add();
-        for(Data d : d.addData)
+        for(Data d : ch.addData)
             addData(c, d);
-        for(Data d : d.delData)
+        for(Data d : ch.delData)
             delData(c, d);
-        if(d.delContact) {
+        if(ch.delContact) {
             del(c);
             c = null;
         }
@@ -33,7 +37,7 @@ public class ContactSet {
 
     public Contact add() {
         Log.v(TAG + name, "adding contact");
-        return c;
+        return null;
     }
 
     public void del(Contact c) {
