@@ -23,6 +23,7 @@ import android.util.Log; //XXX
 public class Contact {
     public long id;
     public List<Data> data;
+    public Contact local, remote, last, master; // xref to merged contacts
 
     public Contact() {
         data = new LinkedList<Data>();
