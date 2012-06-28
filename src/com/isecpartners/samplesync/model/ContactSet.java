@@ -64,7 +64,8 @@ public class ContactSet {
         return;
     }
 
-    public void commit() {
+    public boolean commit() {
+        return true;
     }
 }
 
