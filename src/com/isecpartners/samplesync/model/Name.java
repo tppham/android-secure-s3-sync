@@ -13,19 +13,19 @@ import java.util.List;
  * data1 = display, data2,data3 = first,last.
  */
 public class Name extends Data {
-    public static final String mimeType = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-    public long sid;
+    public static final String MIMETYPE = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
     public String mime, d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
     public Name(String first, String last) {
-        mime = mimeType;
+        super();
+        mime = MIMETYPE;
         d1 = first + " " + last;
         d2 = first;
         d3 = last;
     }
 
     public Name(Cursor c) {
-        sid = c.getLong(0);
+        super(c); // zero
         mime = c.getString(1);
         d1 = c.getString(2);
         d2 = c.getString(3);
@@ -38,28 +38,21 @@ public class Name extends Data {
         d9 = c.getString(10);
     }
 
-    public void put(List<ContentProviderOperation> ops, boolean back, int id) {
-        ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-        if(back)
-            b.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, id);
-        else
-            b.withValue(ContactsContract.Data.RAW_CONTACT_ID, id);
-        ops.add(b.withValue(ContactsContract.Data.MIMETYPE, mime)
-                    .withValue(ContactsContract.Data.DATA1, d1)
-                    .withValue(ContactsContract.Data.DATA2, d2)
-                    .withValue(ContactsContract.Data.DATA3, d3)
-                    .withValue(ContactsContract.Data.DATA4, d4)
-                    .withValue(ContactsContract.Data.DATA5, d5)
-                    .withValue(ContactsContract.Data.DATA6, d6)
-                    .withValue(ContactsContract.Data.DATA7, d7)
-                    .withValue(ContactsContract.Data.DATA8, d8)
-                    .withValue(ContactsContract.Data.DATA9, d9)
-                    .withValue(ContactsContract.Data.SYNC1, sid)
-                    .build());
+    public void buildFields(ContentProviderOperation.Builder b) {
+        b.withValue(ContactsContract.Data.MIMETYPE, mime)
+            .withValue(ContactsContract.Data.DATA1, d1)
+            .withValue(ContactsContract.Data.DATA2, d2)
+            .withValue(ContactsContract.Data.DATA3, d3)
+            .withValue(ContactsContract.Data.DATA4, d4)
+            .withValue(ContactsContract.Data.DATA5, d5)
+            .withValue(ContactsContract.Data.DATA6, d6)
+            .withValue(ContactsContract.Data.DATA7, d7)
+            .withValue(ContactsContract.Data.DATA8, d8)
+            .withValue(ContactsContract.Data.DATA9, d9);
     }
 
     public String toString() {
-        return "[Name: " + sid + " " + mime + " " + d1 + " " + d2 + " " + d3 + d4 + " " + d5 + " " + d6 + " " + d7 + " " + d8 + " " + d9 + "]";
+        return "[Name: " + mime + " " + d1 + " " + d2 + " " + d3 + d4 + " " + d5 + " " + d6 + " " + d7 + " " + d8 + " " + d9 + "]";
     }
 
     public int hashCode() {

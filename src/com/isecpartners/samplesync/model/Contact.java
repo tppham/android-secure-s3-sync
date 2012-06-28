@@ -7,10 +7,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.ArrayList;
-
-import android.content.OperationApplicationException;
-import android.os.RemoteException;
 
 import android.util.Log; //XXX
 
@@ -21,12 +17,16 @@ import android.util.Log; //XXX
  * track several types of data (ie: name, ph# and email addr).
  */
 public class Contact {
+    public static final long UNKNOWN_ID = -1;
     public long id;
     public List<Data> data;
-    public Contact local, remote, last, master; // xref to merged contacts
+
+    /* xref to merged contacts, used by Synch class only */
+    public Contact local, remote, last, master; 
 
     public Contact() {
         data = new LinkedList<Data>();
+        id = UNKNOWN_ID;
     }
 
     public Contact(long _id) {
@@ -52,24 +52,32 @@ public class Contact {
 
     public void add(Data d) { data.add(d); }
 
-    public void put(Context ctx, String aname, String atype) 
-        throws OperationApplicationException, RemoteException 
-    {
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
-        ops.add(ContentProviderOperation
+    // return a builder for inserting a contact into the db
+    public ContentProviderOperation.Builder buildInsert(String aname, String atype) {
+        return ContentProviderOperation
                     .newInsert(RawContacts.CONTENT_URI)
                     .withValue(RawContacts.ACCOUNT_NAME, aname)
-                    .withValue(RawContacts.ACCOUNT_TYPE, atype)
-                    // XXX a sync field?
-                    .build());
+                    .withValue(RawContacts.ACCOUNT_TYPE, atype);
+    }
 
+    // return a builder for deleting the contact from the db
+    public ContentProviderOperation.Builder buildDelete() {
+        assert(id != UNKNOWN_ID);
+        return ContentProviderOperation
+                    .newDelete(RawContacts.CONTENT_URI)
+                    .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(id) });
+    }
 
-        for(Data d : data)
-            d.put(ops, true, 0);
-
-        ctx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-        // XXX update id based on what we got?
+    // add a crossreference to the contact.  If the contact id is unknown
+    // use the relative defIdx instead.
+    public void buildRef(ContentProviderOperation.Builder b, int defIdx) {
+        if(id != UNKNOWN_ID) {
+            b.withValue(ContactsContract.Data.RAW_CONTACT_ID, id);
+        } else  {
+            assert(defIdx != UNKNOWN_ID);
+            b.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, defIdx);
+        }
     }
 
     public String toString() {
