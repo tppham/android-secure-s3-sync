@@ -19,6 +19,10 @@ import android.os.RemoteException;
  * We build up operations into mOps and then commit them all at once.
  */
 public class ContactSetDB extends ContactSet {
+    // XXX move elsewhere?
+    static final String TYPE_EXCHANGE = "com.android.exchange";
+    static final String TYPE_POP_IMAP = "com.android.email";
+
     protected Context mCtx;
     protected String mAcctName;
     protected String mAcctType;
@@ -43,9 +47,25 @@ public class ContactSetDB extends ContactSet {
         // XXX use mLast to pick a filter for the last or local set.
         // for last, load up only matches to the right acct name and type
         // for local, load up anything from goog, exchange or no provider.
-        Cursor c = mCtx.getContentResolver().query(RawContacts.CONTENT_URI,
-                new String[]{RawContacts.CONTACT_ID},
-                null, null, null);
+
+        Cursor c;
+        if(mLast) {
+            /* we want all entries matching our account */
+            c = mCtx.getContentResolver().query(RawContacts.CONTENT_URI,
+                    new String[]{ RawContacts.CONTACT_ID },
+                    RawContacts.ACCOUNT_TYPE + "=? AND " + RawContacts.ACCOUNT_NAME + "=?",
+                    new String[]{ mAcctType, mAcctName },
+                    null);
+        } else {
+            /* we want all entries with no account, or the google or exchange accounts */
+            c = mCtx.getContentResolver().query(RawContacts.CONTENT_URI,
+                    new String[]{ RawContacts.CONTACT_ID },
+                    RawContacts.ACCOUNT_TYPE + " is null OR " + RawContacts.ACCOUNT_TYPE + "=? OR " + RawContacts.ACCOUNT_TYPE + "=?",
+                    // XXX is this right?  verify account names.
+                    new String[]{ TYPE_EXCHANGE, TYPE_POP_IMAP },
+                    null);
+        }
+
         while(c.moveToNext())
             contacts.add(new Contact(mCtx, c.getLong(0)));
         c.close();

@@ -17,8 +17,13 @@ import java.util.List;
  * content provider, create the data in the content provider 
  * or perform updates to existing fields in the content provider.
  *
- * XXX in the near future they should also be able to serialize
- * to some blob that we can store.
+ * Important to know: the data elements are shared between
+ * contacts during synch operations.  Some fields such as the
+ * "id" field, are only relevant to the original contact they
+ * were read under.  These fields are not considered in equality
+ * testing, and are not serialized out to the database diretly
+ * (during serialization they're passed as parameters, not used
+ * from the instance fields).
  */
 abstract class Data {
     private static final String TAG = "model.Data";
