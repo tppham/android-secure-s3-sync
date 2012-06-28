@@ -1,6 +1,7 @@
 package com.isecpartners.samplesync.model;
 
 import java.util.List;
+import java.util.LinkedList;
 import android.util.Log;
 
 /*
@@ -13,9 +14,9 @@ public class ContactSet {
     protected String name;
     public List<Contact> contacts;
 
-    public ContactSet(String n, List<Contact> cs) { 
+    public ContactSet(String n) {
         name = n;
-        contacts = cs; 
+        contacts = new LinkedList<Contact>();
     }
 
     /*
@@ -32,27 +33,38 @@ public class ContactSet {
             del(c);
             c = null;
         }
+        commit();
         return c;
     }
 
     public Contact add() {
         Log.v(TAG + name, "adding contact");
-        return null;
+        Contact c = new Contact();
+        contacts.add(c);
+        return c;
     }
 
     public void del(Contact c) {
         Log.v(TAG + name, "deleting contact " + c);
+        contacts.remove(c);
         return;
     }
 
+    // note: d will be shared, not copied.
     public void addData(Contact c, Data d) {
         Log.v(TAG + name, "adding " + d + " to " + c);
+        // XXX consider copying (all but id)?
+        c.data.add(d);
         return;
     }
 
     public void delData(Contact c, Data d) {
         Log.v(TAG + name, "deleting " + d + " from " + c);
+        c.data.remove(d);
         return;
+    }
+
+    public void commit() {
     }
 }
 
