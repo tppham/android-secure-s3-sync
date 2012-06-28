@@ -31,8 +31,8 @@ public class ContactSetDB extends ContactSet {
     protected int mCIdx; // index of contact
     protected ArrayList<ContentProviderOperation> mOps;
 
-    public ContactSetDB(Context ctx, String acctName, String acctType, boolean last) {
-        super("local");
+    public ContactSetDB(String name, Context ctx, String acctName, String acctType, boolean last) {
+        super(name);
         mCtx = ctx;
         // XXX pick acctName and type based on mLast?
         mAcctName = acctName;
