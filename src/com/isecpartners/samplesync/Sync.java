@@ -18,6 +18,9 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.isecpartners.samplesync.model.ContactSetDB;
+import com.isecpartners.samplesync.model.Contact;
+
 /**
  * experimentation code for testing sync stuff...
  */
@@ -310,17 +313,18 @@ public class Sync {
     }
 
     void createTestAcct3() {
-        com.isecpartners.samplesync.model.Contact c = new com.isecpartners.samplesync.model.Contact();
+        ContactSetDB db = new ContactSetDB(mCtx, ACCOUNT_NAME, ACCOUNT_TYPE, true);
+        Contact c = db.add();
 
-        c.add(new com.isecpartners.samplesync.model.Name("Another", "Test"));
-        c.add(new com.isecpartners.samplesync.model.Phone("111-555-1111", 1, null));
-        c.add(new com.isecpartners.samplesync.model.Phone("111-555-2222", 2, null));
-        c.add(new com.isecpartners.samplesync.model.Email("another@test.com", 1, null));
-        try {
-            c.put(mCtx, ACCOUNT_NAME, ACCOUNT_TYPE);
-        } catch(Exception e) {
-            Log.v(TAG, "add account put failed: " + e);
-        }
+        db.addData(c, new com.isecpartners.samplesync.model.Name("Another", "Test"));
+        db.addData(c, new com.isecpartners.samplesync.model.Phone("111-555-1111", 1, null));
+        db.addData(c, new com.isecpartners.samplesync.model.Phone("111-555-2222", 2, null));
+        db.addData(c, new com.isecpartners.samplesync.model.Email("another@test.com", 1, null));
+
+        if(!db.commit())
+            Log.v(TAG, "add account put failed");
+        else
+            Log.v(TAG, "added");
     }
 
     void changePhone(int id, String ph, int num) {

@@ -67,9 +67,9 @@ public class Synch {
          * then fall back to a generic match of any data.
          */
         String[] mimes = new String[] {
-            Name.mimeType,
-            Phone.mimeType,
-            Email.mimeType,
+            Name.MIMETYPE,
+            Phone.MIMETYPE,
+            Email.MIMETYPE,
             null // null means any data
         };
         for(String mime : mimes) {
