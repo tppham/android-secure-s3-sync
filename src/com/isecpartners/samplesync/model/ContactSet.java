@@ -8,15 +8,27 @@ import android.util.Log;
  * A contact set represents a collection of contacts and their
  * source. It has the ability to fetch contacts and push updates
  * to them.
+ *
+ * This simple contact set doesn't do anything except maintain
+ * its internal list.  Other contact sets extend this to add more
+ * functionality.
  */
 public class ContactSet {
     protected final String TAG = "ContactSet_";
     protected String name;
+
     public List<Contact> contacts;
+    public boolean dirty;
 
     public ContactSet(String n) {
         name = n;
         contacts = new LinkedList<Contact>();
+        dirty = false;
+    }
+
+    public ContactSet(String n, List<Contact> cs) {
+        this(n);
+        contacts = cs;
     }
 
     /*
@@ -38,6 +50,7 @@ public class ContactSet {
     }
 
     public Contact add() {
+        dirty = true;
         Log.v(TAG + name, "adding contact");
         Contact c = new Contact();
         contacts.add(c);
@@ -45,6 +58,7 @@ public class ContactSet {
     }
 
     public void del(Contact c) {
+        dirty = true;
         Log.v(TAG + name, "deleting contact " + c);
         contacts.remove(c);
         return;
@@ -52,6 +66,7 @@ public class ContactSet {
 
     // note: d will be shared, not copied.
     public void addData(Contact c, Data d) {
+        dirty = true;
         Log.v(TAG + name, "adding " + d + " to " + c);
         // XXX consider copying (all but id)?
         c.data.add(d);
@@ -59,6 +74,7 @@ public class ContactSet {
     }
 
     public void delData(Contact c, Data d) {
+        dirty = true;
         Log.v(TAG + name, "deleting " + d + " from " + c);
         c.data.remove(d);
         return;
