@@ -39,11 +39,8 @@ public class Contact {
     /* build a contact with rows from c */
     public Contact(long id, Cursor c) {
         this(id);
-        Log.v("XXX", "start contact: " + id + " " + c.getCount());
-        while(c.moveToNext()) {
-            Log.v("XXX", "add data");
+        while(c.moveToNext())
             data.add(Data.get(c));
-        }
         c.close();
     }
 

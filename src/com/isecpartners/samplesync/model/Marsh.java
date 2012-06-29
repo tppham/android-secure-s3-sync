@@ -36,9 +36,9 @@ public class Marsh {
             throw new BadData("int8 is too large: " + x);
         try {
             buf.put((byte)x);
-        } catch(BufferOverflowException e) {
+        } catch(final BufferOverflowException e) {
             throw new BufferError("not enough room");
-        } catch(ReadOnlyBufferException e) {
+        } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
     }
@@ -49,7 +49,7 @@ public class Marsh {
             if(x < 0) // treat it as unsigned
                 x += 0x100;
             return x;
-        } catch(BufferUnderflowException e) {
+        } catch(final BufferUnderflowException e) {
             throw new BufferError("not enough data");
         }
     }
@@ -59,9 +59,9 @@ public class Marsh {
             throw new BadData("int16 is too large: " + x);
         try {
             buf.putShort((short)x);
-        } catch(BufferOverflowException e) {
+        } catch(final BufferOverflowException e) {
             throw new BufferError("not enough room");
-        } catch(ReadOnlyBufferException e) {
+        } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
     }
@@ -72,7 +72,7 @@ public class Marsh {
             if(x < 0) // treat it as unsigned
                 x += 0x10000;
             return x;
-        } catch(BufferUnderflowException e) {
+        } catch(final BufferUnderflowException e) {
             throw new BufferError("not enough data");
         }
     }
@@ -80,9 +80,9 @@ public class Marsh {
     public static void marshInt32(ByteBuffer buf, int x) throws Error, BufferOverflowException, ReadOnlyBufferException {
         try {
             buf.putInt(x);
-        } catch(BufferOverflowException e) {
+        } catch(final BufferOverflowException e) {
             throw new BufferError("not enough room");
-        } catch(ReadOnlyBufferException e) {
+        } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
     }
@@ -90,7 +90,7 @@ public class Marsh {
     public static int unmarshInt32(ByteBuffer buf) throws Error, BufferUnderflowException {
         try {
             return buf.getInt();
-        } catch(BufferUnderflowException e) {
+        } catch(final BufferUnderflowException e) {
             throw new BufferError("not enough data");
         }
     }
@@ -102,11 +102,11 @@ public class Marsh {
                 throw new BadData("string is too long");
             marshInt16(buf, bs.length);
             buf.put(bs);
-        } catch(UnsupportedEncodingException e) {
+        } catch(final UnsupportedEncodingException e) {
             throw new Error("utf8 error1 should never happen");
-        } catch(BufferOverflowException e) {
+        } catch(final BufferOverflowException e) {
             throw new BufferError("not enough room");
-        } catch(ReadOnlyBufferException e) {
+        } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
     }
@@ -117,9 +117,9 @@ public class Marsh {
         buf.get(bs);
         try {
             return new String(bs, "UTF-8");
-        } catch(UnsupportedEncodingException e) {
+        } catch(final UnsupportedEncodingException e) {
             throw new Error("utf8 error2 should never happen");
-        } catch(BufferUnderflowException e) {
+        } catch(final BufferUnderflowException e) {
             throw new BufferError("not enough data");
         }
     }

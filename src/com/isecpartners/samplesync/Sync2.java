@@ -15,6 +15,7 @@ import com.isecpartners.samplesync.model.Marsh;
 
 public class Sync2 {
     public static final String TAG = "Sync2";
+    public static final int MAXBUFSIZE  = 1024 * 1024;
     Context mCtx;
     boolean mPrefLocal;
 
@@ -25,40 +26,54 @@ public class Sync2 {
 
     // XXX use a blob store?
 
-    public void run() {
-        // XXX figure out account types
-        ContactSet last = ContactSetDB.last(mCtx, "XXX", "XXX");
-        ContactSet local = ContactSetDB.local(mCtx, null, null);
+    ContactSetBS loadFromDisk(String name, String fn) {
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+            FileChannel ch = new FileInputStream(new File(fn)).getChannel();
+            ch.read(buf);
+            buf.flip();
 
-        ContactSetBS remote;
-        if(false) {
-            // XXX read it in from some buffer
-            //remote = ContactSetBS.unmarshal(buf);
-        } else {
-            // create new one
-            remote = new ContactSetBS();
+            return ContactSetBS.unmarshal(name, buf);
+        } catch(final Marsh.Error e) {
+            Log.v(TAG, "error unmarshalling " + name + " data: " + e);
+        } catch(final IOException e) {
+            Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
         }
+        // XXX in the real program this should involve user
+        // interaction..  returning null might be best
+        return new ContactSetBS(name);
+    }
 
-        // XXX load remote contacts into remote...
-        //remote.loadContacts(); // XXX
+    void storeToDisk(String fn, ContactSetBS cs) {
+        Log.v(TAG, "" + cs.name + " dirty: " + cs.dirty);
+        if(!cs.dirty)
+            return;
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+            cs.marshal(buf);
+            buf.flip();
+
+            FileChannel ch = new FileOutputStream(new File(fn)).getChannel();
+            ch.write(buf);
+            ch.close();
+        } catch(final Marsh.Error e) {
+            Log.v(TAG, "error marshalling " + cs.name + " data to " + fn + ": " + e);
+        } catch(final IOException e) {
+            Log.v(TAG, "error saving " + cs.name + " data: " + e);
+        }
+    }
+
+    public void run() {
+        // XXX figure out account types to create new contacts as!
+        ContactSet local = new ContactSetDB("localdb", mCtx, null, null);
+        ContactSetBS last = loadFromDisk("last", "/sdcard/last.bin");
+        ContactSetBS remote = loadFromDisk("remote", "/sdcard/remote.bin");
 
         Synch s = new Synch(last, local, remote, mPrefLocal);
         s.sync();
 
-        Log.v(TAG, "remote dirty: " + remote.dirty);
-        try {
-            ByteBuffer buf = ByteBuffer.allocate(1024 * 1024);
-            remote.marshal(buf);
-            buf.flip();
-
-            FileChannel ch = new FileOutputStream(new File("/sdcard/remote.bin")).getChannel();
-            ch.write(buf);
-            ch.close();
-        } catch(Marsh.Error e) {
-            Log.v(TAG, "error marshalling data: " + e);
-        } catch(IOException e) {
-            Log.v(TAG, "error saving data: " + e);
-        }
+        storeToDisk("/sdcard/last.bin", last);
+        storeToDisk("/sdcard/remote.bin", remote);
     }
 }
 
