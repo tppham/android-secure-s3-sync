@@ -1,9 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
-import java.nio.BufferOverflowException;
-import java.nio.ReadOnlyBufferException;
 import java.util.List;
 
 import android.content.Context;
@@ -34,7 +31,7 @@ abstract class Data {
     private static final String TAG = "model.Data";
     public static final long UNKNOWN_ID = -1;
     public String mime; // indirectly marshalled -- see kind
-    public byte kind; // proxy for mime during marshalling
+    public int kind; // proxy for mime during marshalling
     public long id; // not considered during equality test, not marshalled
 
     /* add field valus to a db batch operation */
@@ -124,12 +121,12 @@ abstract class Data {
         return a.hashCode();
     }
 
-    public abstract void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error;
-    public abstract void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error, BufferUnderflowException;
+    public abstract void marshal(ByteBuffer buf, int version) throws Marsh.Error;
+    public abstract void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error;
 
-    public static Data unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+    public static Data unmarshal(ByteBuffer buf, int version) throws Marsh.Error {
         Data d;
-        byte kind = buf.get();
+        int kind = Marsh.unmarshInt8(buf);
         if(kind == Phone.KIND)
             d = new Phone();
         else if(kind == Email.KIND)

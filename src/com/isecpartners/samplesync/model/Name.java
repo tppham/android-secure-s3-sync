@@ -1,9 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
-import java.nio.BufferOverflowException;
-import java.nio.ReadOnlyBufferException;
 import java.util.List;
 
 import android.database.Cursor;
@@ -19,7 +16,7 @@ import android.content.ContentProviderOperation;
  */
 public class Name extends Data {
     public static final String MIMETYPE = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-    public static final byte KIND = 3;
+    public static final int KIND = 3;
     public String d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
     public Name() {
@@ -96,8 +93,8 @@ public class Name extends Data {
         return false;
     }
 
-    public void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
-        buf.put(kind);
+    public void marshal(ByteBuffer buf, int version) throws Marsh.Error {
+        Marsh.marshInt8(buf, kind);
         Marsh.marshString(buf, d1);
         Marsh.marshString(buf, d2);
         Marsh.marshString(buf, d3);
@@ -109,7 +106,7 @@ public class Name extends Data {
         Marsh.marshString(buf, d9);
     }
 
-    public void _unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+    public void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error {
         // kind already consumed
         d1 = Marsh.unmarshString(buf);
         d2 = Marsh.unmarshString(buf);

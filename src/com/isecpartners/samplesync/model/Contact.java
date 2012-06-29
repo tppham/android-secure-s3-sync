@@ -1,9 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
-import java.nio.BufferOverflowException;
-import java.nio.ReadOnlyBufferException;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -94,13 +91,13 @@ public class Contact {
         return s;
     }
 
-    public void marshal(ByteBuffer buf, int vers) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
+    public void marshal(ByteBuffer buf, int vers) throws Marsh.Error {
         Marsh.marshInt16(buf, data.size());
         for(Data d : data)
             d.marshal(buf, vers);
     }
 
-    public static Contact unmarshal(ByteBuffer buf, int vers) throws BufferUnderflowException, Marsh.Error {
+    public static Contact unmarshal(ByteBuffer buf, int vers) throws Marsh.Error {
         Contact c = new Contact();
         int cnt = Marsh.unmarshInt16(buf);
         for(int i = 0; i < cnt; i++)

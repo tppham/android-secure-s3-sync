@@ -1,9 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
-import java.nio.BufferOverflowException;
-import java.nio.ReadOnlyBufferException;
 import java.util.List;
 
 import android.content.ContentProviderOperation;
@@ -17,7 +14,7 @@ import android.provider.ContactsContract.CommonDataKinds;
  */
 public class Phone extends Data {
     public static final String MIMETYPE = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
-    public static final byte KIND = 1;
+    public static final int KIND = 1;
     public String d1, d3; // mime indirectly marshalled
     public int d2;
 
@@ -72,17 +69,17 @@ public class Phone extends Data {
         return false;
     }
 
-    public void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
-        buf.put(kind);
+    public void marshal(ByteBuffer buf, int version) throws Marsh.Error {
+        Marsh.marshInt8(buf, kind);
         Marsh.marshString(buf, d1);
-        buf.putInt(d2);
+        Marsh.marshInt32(buf, d2);
         Marsh.marshString(buf, d3);
     }
 
-    public void _unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+    public void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error {
         // kind already consumed
         d1 = Marsh.unmarshString(buf);
-        d2 = buf.getInt();
+        d2 = Marsh.unmarshInt32(buf);
         d3 = Marsh.unmarshString(buf);
     }
 }
