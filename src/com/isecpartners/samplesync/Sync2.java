@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.isecpartners.samplesync.model.ContactSet;
 import com.isecpartners.samplesync.model.ContactSetDB;
+import com.isecpartners.samplesync.model.ContactSetBS;
 import com.isecpartners.samplesync.model.Synch;
 
 public class Sync2 {
@@ -19,13 +20,17 @@ public class Sync2 {
 
     public void run() {
         // XXX figure out account types
-        ContactSetDB last = new ContactSetDB("last", mCtx, "", "", true);
-        ContactSetDB local = new ContactSetDB("local", mCtx, null, null, false);
-        ContactSet remote = new ContactSet("remote");
+        ContactSetDB last = ContactSetDB.last(mCtx, "XXX", "XXX");
+        ContactSetDB local = ContactSetDB.local(mCtx, null, null);
 
-        // XXX perhaps this should be implicit...
-        last.loadContacts();
-        local.loadContacts();
+        ContactSet remote;
+        if(false) {
+            // XXX read it in from some buffer
+            //remote = ContactSetBS.unmarshal(buf);
+        } else {
+            // create new one
+            remote = new ContactSetBS();
+        }
 
         // XXX load remote contacts into remote...
         //remote.loadContacts(); // XXX

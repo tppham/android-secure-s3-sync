@@ -9,7 +9,7 @@ import android.provider.ContactsContract.CommonDataKinds;
  */
 public class Email extends Phone {
     public static final String MIMETYPE = CommonDataKinds.Email.CONTENT_ITEM_TYPE;
-    public static final byte KIND = 2;
+    public static final int KIND = 2;
 
     public Email() {
         super();

@@ -31,7 +31,7 @@ public class ContactSetDB extends ContactSet {
     protected int mCIdx; // index of contact
     protected ArrayList<ContentProviderOperation> mOps;
 
-    public ContactSetDB(String name, Context ctx, String acctName, String acctType, boolean last) {
+    protected ContactSetDB(String name, Context ctx, String acctName, String acctType, boolean last) {
         super(name);
         mCtx = ctx;
         // XXX pick acctName and type based on mLast?
@@ -41,9 +41,19 @@ public class ContactSetDB extends ContactSet {
 
         mCIdx = (int)Contact.UNKNOWN_ID;
         mOps = new ArrayList<ContentProviderOperation>();
+
+        loadContacts();
     }
 
-    public void loadContacts() {
+    public static ContactSetDB local(Context ctx, String acctName, String acctType) {
+        return new ContactSetDB("local", ctx, acctName, acctType, false);
+    }
+
+    public static ContactSetDB last(Context ctx, String acctName, String acctType) {
+        return new ContactSetDB("last", ctx, acctName, acctType, true);
+    }
+
+    protected void loadContacts() {
         // XXX use mLast to pick a filter for the last or local set.
         // for last, load up only matches to the right acct name and type
         // for local, load up anything from goog, exchange or no provider.
