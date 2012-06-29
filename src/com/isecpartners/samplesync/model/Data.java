@@ -1,5 +1,11 @@
 package com.isecpartners.samplesync.model;
 
+import java.nio.ByteBuffer;
+import java.nio.BufferUnderflowException;
+import java.nio.BufferOverflowException;
+import java.nio.ReadOnlyBufferException;
+import java.util.List;
+
 import android.content.Context;
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
@@ -7,7 +13,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContactsEntity;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.util.Log;
-import java.util.List;
 
 
 /* 
@@ -28,8 +33,9 @@ import java.util.List;
 abstract class Data {
     private static final String TAG = "model.Data";
     public static final long UNKNOWN_ID = -1;
-    public String mime;
-    public long id; // not considered during equality test
+    public String mime; // indirectly marshalled -- see kind
+    public byte kind; // proxy for mime during marshalling
+    public long id; // not considered during equality test, not marshalled
 
     /* add field valus to a db batch operation */
     public abstract void buildFields(ContentProviderOperation.Builder b);
@@ -116,6 +122,24 @@ abstract class Data {
         if (a == null)
             return 0;
         return a.hashCode();
+    }
+
+    public abstract void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error;
+    public abstract void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error, BufferUnderflowException;
+
+    public static Data unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+        Data d;
+        byte kind = buf.get();
+        if(kind == Phone.KIND)
+            d = new Phone();
+        else if(kind == Email.KIND)
+            d = new Email();
+        else if(kind == Name.KIND)
+            d = new Name();
+        else
+            throw new Marsh.BadFormat("unknown kind " + kind + " encountered");
+        d._unmarshal(buf, version);
+        return d;
     }
 };
 

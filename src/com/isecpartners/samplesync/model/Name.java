@@ -1,11 +1,16 @@
 package com.isecpartners.samplesync.model;
 
+import java.nio.ByteBuffer;
+import java.nio.BufferUnderflowException;
+import java.nio.BufferOverflowException;
+import java.nio.ReadOnlyBufferException;
+import java.util.List;
+
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.content.ContentProviderOperation;
 
-import java.util.List;
 
 /*
  * Contact name data.
@@ -14,11 +19,17 @@ import java.util.List;
  */
 public class Name extends Data {
     public static final String MIMETYPE = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-    public String mime, d1, d2, d3, d4, d5, d6, d7, d8, d9;
+    public static final byte KIND = 3;
+    public String d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
-    public Name(String first, String last) {
+    public Name() {
         super();
         mime = MIMETYPE;
+        kind = KIND;
+    }
+
+    public Name(String first, String last) {
+        this();
         d1 = first + " " + last;
         d2 = first;
         d3 = last;
@@ -83,6 +94,32 @@ public class Name extends Data {
                 streq(n.d9, d9);
         }
         return false;
+    }
+
+    public void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
+        buf.put(kind);
+        Marsh.marshString(buf, d1);
+        Marsh.marshString(buf, d2);
+        Marsh.marshString(buf, d3);
+        Marsh.marshString(buf, d4);
+        Marsh.marshString(buf, d5);
+        Marsh.marshString(buf, d6);
+        Marsh.marshString(buf, d7);
+        Marsh.marshString(buf, d8);
+        Marsh.marshString(buf, d9);
+    }
+
+    public void _unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+        // kind already consumed
+        d1 = Marsh.unmarshString(buf);
+        d2 = Marsh.unmarshString(buf);
+        d3 = Marsh.unmarshString(buf);
+        d4 = Marsh.unmarshString(buf);
+        d5 = Marsh.unmarshString(buf);
+        d6 = Marsh.unmarshString(buf);
+        d7 = Marsh.unmarshString(buf);
+        d8 = Marsh.unmarshString(buf);
+        d9 = Marsh.unmarshString(buf);
     }
 }
 

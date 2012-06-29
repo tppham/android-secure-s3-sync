@@ -9,9 +9,9 @@ import android.util.Log;
  * source. It has the ability to fetch contacts and push updates
  * to them.
  *
- * This simple contact set doesn't do anything except maintain
- * its internal list.  Other contact sets extend this to add more
- * functionality.
+ * This simple contact set doesn't do anything during synch except 
+ * maintain its internal list.  Other contact sets extend this to add more
+ * functionality during synch.
  */
 public class ContactSet {
     protected final String TAG = "ContactSet_";
@@ -24,11 +24,6 @@ public class ContactSet {
         name = n;
         contacts = new LinkedList<Contact>();
         dirty = false;
-    }
-
-    public ContactSet(String n, List<Contact> cs) {
-        this(n);
-        contacts = cs;
     }
 
     /*
