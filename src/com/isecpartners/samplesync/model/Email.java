@@ -22,7 +22,10 @@ public class Email extends Phone {
         mime = MIMETYPE;
         kind = KIND;
     }
-    public Email(Cursor c) { super(c); }
+    public Email(Cursor c) { 
+        super(c); 
+        kind = KIND;
+    }
 
     public String toString() {
         return "[Email: " + mime + " " + d1 + " " + d2 + " " + d3 + "]";
