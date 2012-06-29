@@ -31,6 +31,11 @@ public class Marsh {
         public BadVersion(String msg) { super(msg); }
     }
 
+    public static void unmarshEof(ByteBuffer buf) throws Error {
+        if(buf.hasRemaining())
+            throw new Marsh.BadFormat("" + buf.remaining() + "extra bytes found");
+    }
+
     public static void marshInt8(ByteBuffer buf, int x) throws Error {
         if(x < 0 || x > 0xff)
             throw new BadData("int8 is too large: " + x);

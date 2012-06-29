@@ -34,6 +34,7 @@ public class Phone extends Data {
 
     public Phone(Cursor c) {
         super(c); // zero
+        kind = KIND;
         mime = c.getString(1);
         d1 = c.getString(2);
         d2 = c.getInt(3);

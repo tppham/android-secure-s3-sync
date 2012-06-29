@@ -33,7 +33,9 @@ public class Sync2 {
             ch.read(buf);
             buf.flip();
 
-            return ContactSetBS.unmarshal(name, buf);
+            ContactSetBS cs = ContactSetBS.unmarshal(name, buf);
+            Marsh.unmarshEof(buf);
+            return cs;
         } catch(final Marsh.Error e) {
             Log.v(TAG, "error unmarshalling " + name + " data: " + e);
         } catch(final IOException e) {
@@ -74,6 +76,9 @@ public class Sync2 {
 
         storeToDisk("/sdcard/last.bin", last);
         storeToDisk("/sdcard/remote.bin", remote);
+
+        // XXX try out the unmarshalling
+        loadFromDisk("xxx", "/sdcard/last.bin");
     }
 }
 
