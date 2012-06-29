@@ -41,8 +41,10 @@ public class Sync2 {
         } catch(final IOException e) {
             Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
         }
+
         // XXX in the real program this should involve user
         // interaction..  returning null might be best
+        Log.v(TAG, "making new empty contact set for " + name);
         return new ContactSetBS(name);
     }
 

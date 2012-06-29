@@ -2,6 +2,7 @@ package com.isecpartners.samplesync.model;
 
 import java.util.List;
 import java.util.LinkedList;
+import android.util.Log; // XXX temp hack
 
 /*
  * Synching algorithm.  Merging happens on three sets of
@@ -144,6 +145,13 @@ public class Synch {
         }
     };
 
+    /* copy the list */
+    static <D> List<D> copy(List<D> ds) {
+        if(ds == null)
+            return null;
+        return new LinkedList<D>(ds);
+    }
+
     /* return all elements in ds that arent in ds2 */
     static <D> List<D> diff(List<D> ds, List<D> ds2) {
         LinkedList<D> r = new LinkedList<D>();
@@ -158,10 +166,12 @@ public class Synch {
      * Return the delta to change c into c2, or null if they're the same.
      */
     static Changes changes(Contact c, Contact c2) {
+        if(c == null && c2 == null)
+            return null;
         if(c == null)
-            return new Changes(false, c2.data, null); // add
+            return new Changes(false, copy(c2.data), null); // add
         if(c2 == null)
-            return new Changes(true, null, c.data); // delete
+            return new Changes(true, null, copy(c.data)); // delete
 
         List<Data> adds = Synch.<Data>diff(c.data, c2.data);
         List<Data> dels = Synch.<Data>diff(c2.data, c.data);
@@ -181,7 +191,8 @@ public class Synch {
 
         /* then bring remote up to date */
         Changes d2 = changes(c.remote, c.last);
-        c.remote = mRemote.push(c.remote, d2);
+        if(d2 != null)
+            c.remote = mRemote.push(c.remote, d2);
         return true;
     }
 
@@ -196,7 +207,8 @@ public class Synch {
 
         /* then bring local up to date */
         Changes d2 = changes(c.local, c.last);
-        c.local = mLocal.push(c.local, d2);
+        if(d2 != null)
+            c.local = mLocal.push(c.local, d2);
         return true;
     }
 
