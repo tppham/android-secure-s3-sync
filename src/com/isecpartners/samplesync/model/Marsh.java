@@ -97,6 +97,10 @@ public class Marsh {
 
     public static void marshString(ByteBuffer buf, String s) throws Error, BufferOverflowException, ReadOnlyBufferException {
         try {
+            if(s == null) {
+                marshInt16(buf, 0);
+                return;
+            }
             byte[] bs = s.getBytes("UTF-8");
             if(bs.length > 0xffff)
                 throw new BadData("string is too long");
@@ -113,6 +117,8 @@ public class Marsh {
 
     public static String unmarshString(ByteBuffer buf) throws Error, BufferUnderflowException {
         int len = unmarshInt16(buf);
+        if(len == 0) // XXX this worries me.  we have no way to distinguish null and empty string right now.  this might bite us at some point.  I'm hoping that we never have empty non-null strings in our data sets and we can ignore this.
+            return null;
         byte[] bs = new byte[len];
         buf.get(bs);
         try {
