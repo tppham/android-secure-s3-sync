@@ -15,22 +15,26 @@ public class ContactSetBS extends ContactSet {
     public int version;
     public int id; // unique id, encodes the incept date
 
-    public ContactSetBS() {
-        super("remote");
+    public ContactSetBS(String name) {
+        super(name);
         version = VERSION;
         id = (int)(System.currentTimeMillis() / 1000); // rollover is not an issue, we dont care about ordering.
     }
 
     public void marshal(ByteBuffer buf) throws Marsh.Error {
-        Marsh.marshInt32(buf, VERSION); // a bit large, but might be useful slack space for future revs
-        Marsh.marshInt32(buf, id);
-        Marsh.marshInt16(buf, contacts.size());
-        for(Contact c : contacts)
-            c.marshal(buf, version);
+        Marsh.marshInt32(buf, version); // a bit large, but might be useful slack space for future revs
+        if(version == 1) {
+            Marsh.marshInt32(buf, id);
+            Marsh.marshInt16(buf, contacts.size());
+            for(Contact c : contacts)
+                c.marshal(buf, version);
+        } else {
+            throw new Marsh.BadVersion("unexpected version: " + version);
+        }
     }
 
     public static ContactSetBS unmarshal(String n, ByteBuffer buf) throws Marsh.Error {
-        ContactSetBS cs = new ContactSetBS();
+        ContactSetBS cs = new ContactSetBS(n);
         cs.version = Marsh.unmarshInt32(buf);
         if(cs.version == 1) {
             cs.id = Marsh.unmarshInt32(buf);

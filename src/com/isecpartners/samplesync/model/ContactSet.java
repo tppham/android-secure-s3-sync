@@ -15,7 +15,7 @@ import android.util.Log;
  */
 public class ContactSet {
     protected final String TAG = "ContactSet_";
-    protected String name;
+    public String name;
 
     public List<Contact> contacts;
     public boolean dirty;
@@ -32,10 +32,14 @@ public class ContactSet {
     public Contact push(Contact c, Synch.Changes ch) {
         if(c == null) 
             c = add();
-        for(Data d : ch.addData)
-            addData(c, d);
-        for(Data d : ch.delData)
-            delData(c, d);
+        if(ch.addData != null) {
+            for(Data d : ch.addData)
+                addData(c, d);
+        }
+        if(ch.delData != null) {
+            for(Data d : ch.delData)
+                delData(c, d);
+        }
         if(ch.delContact) {
             del(c);
             c = null;

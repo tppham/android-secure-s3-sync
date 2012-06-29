@@ -74,7 +74,6 @@ abstract class Data {
                 Email.MIMETYPE,
                 Name.MIMETYPE,
             }, null);
-        Log.v("XXX", "getDatas: " + c.getCount());
         return c;
     }
 
