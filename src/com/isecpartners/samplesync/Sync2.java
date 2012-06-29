@@ -1,13 +1,20 @@
 package com.isecpartners.samplesync;
 
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.FileChannel;
+
 import android.content.Context;
+import android.util.Log;
 
 import com.isecpartners.samplesync.model.ContactSet;
 import com.isecpartners.samplesync.model.ContactSetDB;
 import com.isecpartners.samplesync.model.ContactSetBS;
 import com.isecpartners.samplesync.model.Synch;
+import com.isecpartners.samplesync.model.Marsh;
 
 public class Sync2 {
+    public static final String TAG = "Sync2";
     Context mCtx;
     boolean mPrefLocal;
 
@@ -20,10 +27,10 @@ public class Sync2 {
 
     public void run() {
         // XXX figure out account types
-        ContactSetDB last = ContactSetDB.last(mCtx, "XXX", "XXX");
-        ContactSetDB local = ContactSetDB.local(mCtx, null, null);
+        ContactSet last = ContactSetDB.last(mCtx, "XXX", "XXX");
+        ContactSet local = ContactSetDB.local(mCtx, null, null);
 
-        ContactSet remote;
+        ContactSetBS remote;
         if(false) {
             // XXX read it in from some buffer
             //remote = ContactSetBS.unmarshal(buf);
@@ -38,7 +45,20 @@ public class Sync2 {
         Synch s = new Synch(last, local, remote, mPrefLocal);
         s.sync();
 
-        // XXX save remote contacts back out to remote...
+        Log.v(TAG, "remote dirty: " + remote.dirty);
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(1024 * 1024);
+            remote.marshal(buf);
+            buf.flip();
+
+            FileChannel ch = new FileOutputStream(new File("/sdcard/remote.bin")).getChannel();
+            ch.write(buf);
+            ch.close();
+        } catch(Marsh.Error e) {
+            Log.v(TAG, "error marshalling data: " + e);
+        } catch(IOException e) {
+            Log.v(TAG, "error saving data: " + e);
+        }
     }
 }
 
