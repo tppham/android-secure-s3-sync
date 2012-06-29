@@ -10,27 +10,31 @@ class Error(Exception) :
 
 class ContactSet(object) :
     VERSION = 1
-    def __init__(self) :
+    def __init__(self, *args) :
         self.version = self.VERSION
         self.id = 0
-        self.contacts = []
+        self.contacts = list(args)
 
     def __str__(self) :
         cs = '\n  '.join(str(c) for c in self.contacts)
         return '[ContactSet VER=%d ID=%d:\n  %s]' % (self.version, self.id, cs)
 
 class Contact(object) :
-    def __init__(self) :
-        self.data = []
+    def __init__(self, *args) :
+        self.data = list(args)
     def __str__(self) :
         ds = '\n    '.join(str(d) for d in self.data)
         return '[Contact:\n    %s]' % (ds)
 
 class Data(object) :
     PHONE, EMAIL, NAME = 1,2,3
-    def __init__(self) :
-        self.kind = 0
-        self.fields = ()
+    def __init__(self, *args) :
+        if args :
+            self.kind = args[0]
+            self.fields = args[1:]
+        else :
+            self.kind = 0
+            self.fields = ()
     def __str__(self) :
         fs = ', '.join(repr(f) for f in self.fields)
         return '[Data: %s]' % (fs)
