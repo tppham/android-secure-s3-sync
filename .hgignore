@@ -6,3 +6,5 @@ local.properties
 project.properties
 *.swp
 *~
+*.pyc
+*.pyo
