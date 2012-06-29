@@ -1,12 +1,17 @@
 package com.isecpartners.samplesync.model;
 
+import java.nio.ByteBuffer;
+import java.nio.BufferUnderflowException;
+import java.nio.BufferOverflowException;
+import java.nio.ReadOnlyBufferException;
+import java.util.List;
+import java.util.LinkedList;
+
 import android.content.Context;
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
-import java.util.List;
-import java.util.LinkedList;
 
 import android.util.Log; //XXX
 
@@ -18,11 +23,11 @@ import android.util.Log; //XXX
  */
 public class Contact {
     public static final long UNKNOWN_ID = -1;
-    public long id;
+    public long id; // not marshalled
     public List<Data> data;
 
     /* xref to merged contacts, used by Synch class only */
-    public Contact local, remote, last, master; 
+    public Contact local, remote, last, master;  // not marshalled
 
     public Contact() {
         data = new LinkedList<Data>();
@@ -87,5 +92,19 @@ public class Contact {
             s += d + " ";
         s += "]";
         return s;
+    }
+
+    public void marshal(ByteBuffer buf, int vers) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
+        Marsh.marshInt16(buf, data.size());
+        for(Data d : data)
+            d.marshal(buf, vers);
+    }
+
+    public static Contact unmarshal(ByteBuffer buf, int vers) throws BufferUnderflowException, Marsh.Error {
+        Contact c = new Contact();
+        int cnt = Marsh.unmarshInt16(buf);
+        for(int i = 0; i < cnt; i++)
+            c.data.add(Data.unmarshal(buf, vers));
+        return c;
     }
 }

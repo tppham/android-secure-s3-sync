@@ -1,10 +1,15 @@
 package com.isecpartners.samplesync.model;
 
+import java.nio.ByteBuffer;
+import java.nio.BufferUnderflowException;
+import java.nio.BufferOverflowException;
+import java.nio.ReadOnlyBufferException;
+import java.util.List;
+
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
-import java.util.List;
 
 /*
  * Phone number data.
@@ -12,12 +17,18 @@ import java.util.List;
  */
 public class Phone extends Data {
     public static final String MIMETYPE = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
-    public String mime, d1, d3;
+    public static final byte KIND = 1;
+    public String d1, d3; // mime indirectly marshalled
     public int d2;
 
-    public Phone(String phnum, int ty, String descr) {
+    public Phone() {
         super();
         mime = MIMETYPE;
+        kind = KIND;
+    }
+        
+    public Phone(String phnum, int ty, String descr) {
+        this();
         d1 = phnum;
         d2 = ty;
         if(ty == 0)
@@ -25,7 +36,7 @@ public class Phone extends Data {
     }
 
     public Phone(Cursor c) {
-        super(); // zero
+        super(c); // zero
         mime = c.getString(1);
         d1 = c.getString(2);
         d2 = c.getInt(3);
@@ -43,7 +54,6 @@ public class Phone extends Data {
         return "[Phone: " + mime + " " + d1 + " " + d2 + " " + d3 + "]";
     }
 
-
     public int hashCode() {
         return strhash(mime) +
             3 * strhash(d1) +
@@ -60,6 +70,20 @@ public class Phone extends Data {
                 streq(n.d3, d3);
         }
         return false;
+    }
+
+    public void marshal(ByteBuffer buf, int version) throws BufferOverflowException, ReadOnlyBufferException, Marsh.Error {
+        buf.put(kind);
+        Marsh.marshString(buf, d1);
+        buf.putInt(d2);
+        Marsh.marshString(buf, d3);
+    }
+
+    public void _unmarshal(ByteBuffer buf, int version) throws BufferUnderflowException, Marsh.Error {
+        // kind already consumed
+        d1 = Marsh.unmarshString(buf);
+        d2 = buf.getInt();
+        d3 = Marsh.unmarshString(buf);
     }
 }
 
