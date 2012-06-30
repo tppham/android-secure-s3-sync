@@ -96,6 +96,7 @@ abstract class Data {
     public ContentProviderOperation.Builder buildInsert(Contact c, int defIdx) {
         ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
         c.buildRef(b, defIdx);
+        buildFields(b);
         return b;
     }
 
