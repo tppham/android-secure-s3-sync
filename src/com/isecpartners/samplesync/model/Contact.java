@@ -70,6 +70,7 @@ public class Contact {
 
     // add a crossreference to the contact.  If the contact id is unknown
     // use the relative defIdx instead.
+    // XXX this is for a data entry and should prob be in the data class
     public void buildRef(ContentProviderOperation.Builder b, int defIdx) {
         if(id != UNKNOWN_ID) {
             b.withValue(ContactsContract.Data.RAW_CONTACT_ID, id);

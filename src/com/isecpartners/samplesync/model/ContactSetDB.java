@@ -73,6 +73,7 @@ public class ContactSetDB extends ContactSet {
     public void addData(Contact c, Data data) {
         super.addData(c, data);
 
+        ContentProviderOperation.Builder b = data.buildInsert(c, mCIdx);
         mOps.add(data.buildInsert(c, mCIdx).build());
         return;
     }

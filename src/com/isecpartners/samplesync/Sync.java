@@ -313,7 +313,7 @@ public class Sync {
     }
 
     void createTestAcct3() {
-        ContactSetDB db = new ContactSetDB(mCtx, ACCOUNT_NAME, ACCOUNT_TYPE, true);
+        ContactSetDB db = new ContactSetDB("local", mCtx, ACCOUNT_NAME, ACCOUNT_TYPE);
         Contact c = db.add();
 
         db.addData(c, new com.isecpartners.samplesync.model.Name("Another", "Test"));
