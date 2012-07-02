@@ -70,7 +70,7 @@ public class ContactSetDB extends ContactSet {
         return;
     }
     
-    public void addData(Contact c, Data data) {
+    public void addData(Contact c, CData data) {
         super.addData(c, data);
 
         ContentProviderOperation.Builder b = data.buildInsert(c, mCIdx);
@@ -78,7 +78,7 @@ public class ContactSetDB extends ContactSet {
         return;
     }
 
-    public void delData(Contact c, Data data) {
+    public void delData(Contact c, CData data) {
         super.delData(c, data);
 
         mOps.add(data.buildDelete().build());

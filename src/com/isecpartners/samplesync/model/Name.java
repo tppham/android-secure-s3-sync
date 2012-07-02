@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.content.ContentProviderOperation;
 
@@ -14,7 +14,7 @@ import android.content.ContentProviderOperation;
  * Uses data1 through data9, all strings for different names.
  * data1 = display, data2,data3 = first,last.
  */
-public class Name extends Data {
+public class Name extends CData {
     public static final String MIMETYPE = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
     public static final int KIND = 3;
     public String d1, d2, d3, d4, d5, d6, d7, d8, d9;
@@ -48,16 +48,16 @@ public class Name extends Data {
     }
 
     public void buildFields(ContentProviderOperation.Builder b) {
-        b.withValue(ContactsContract.Data.MIMETYPE, mime)
-            .withValue(ContactsContract.Data.DATA1, d1)
-            .withValue(ContactsContract.Data.DATA2, d2)
-            .withValue(ContactsContract.Data.DATA3, d3)
-            .withValue(ContactsContract.Data.DATA4, d4)
-            .withValue(ContactsContract.Data.DATA5, d5)
-            .withValue(ContactsContract.Data.DATA6, d6)
-            .withValue(ContactsContract.Data.DATA7, d7)
-            .withValue(ContactsContract.Data.DATA8, d8)
-            .withValue(ContactsContract.Data.DATA9, d9);
+        b.withValue(Data.MIMETYPE, mime)
+            .withValue(Data.DATA1, d1)
+            .withValue(Data.DATA2, d2)
+            .withValue(Data.DATA3, d3)
+            .withValue(Data.DATA4, d4)
+            .withValue(Data.DATA5, d5)
+            .withValue(Data.DATA6, d6)
+            .withValue(Data.DATA7, d7)
+            .withValue(Data.DATA8, d8)
+            .withValue(Data.DATA9, d9);
     }
 
     public String toString() {

@@ -34,8 +34,8 @@ public class Synch {
     boolean mPreferLocal;
 
     /* return the first d from ds that has mime type mime, or null. */
-    static Data firstDataMime(Contact c, String mime) {
-        for(Data d : c.data) {
+    static CData firstDataMime(Contact c, String mime) {
+        for(CData d : c.data) {
             if(d.mime.compareTo(mime) == 0)
                 return d;
         }
@@ -47,8 +47,8 @@ public class Synch {
      */
     static boolean match(Contact x, Contact c, String mime) {
         if(mime == null) { /* if any data matches */
-            for(Data xd : x.data) {
-                for(Data cd : c.data) {
+            for(CData xd : x.data) {
+                for(CData cd : c.data) {
                     if(xd.equals(cd))
                         return true;
                 }
@@ -56,7 +56,7 @@ public class Synch {
             return false;
     
         } else { /* if the first mime match in x.data matches one in c.data */
-            Data xd = firstDataMime(x, mime);
+            CData xd = firstDataMime(x, mime);
             return xd != null && xd.equals(firstDataMime(c, mime));
         }
     }
@@ -136,9 +136,9 @@ public class Synch {
      */
     public static class Changes {
         public boolean delContact;
-        public List<Data> addData, delData;
+        public List<CData> addData, delData;
 
-        public Changes(boolean del, List<Data> a, List<Data> d) {
+        public Changes(boolean del, List<CData> a, List<CData> d) {
             delContact = del;
             addData = a;
             delData = d;
@@ -174,8 +174,8 @@ public class Synch {
         if(c2 == null)
             return new Changes(false, copy(c.data), null); // add, +c
 
-        List<Data> adds = Synch.<Data>diff(c.data, c2.data); // +(c - c2)
-        List<Data> dels = Synch.<Data>diff(c2.data, c.data); // -(c2 - c)
+        List<CData> adds = Synch.<CData>diff(c.data, c2.data); // +(c - c2)
+        List<CData> dels = Synch.<CData>diff(c2.data, c.data); // -(c2 - c)
         if(adds == null && dels == null)
             return null;
         return new Changes(false, adds, dels); // alter data

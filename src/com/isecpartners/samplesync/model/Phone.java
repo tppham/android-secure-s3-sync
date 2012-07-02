@@ -5,14 +5,14 @@ import java.util.List;
 
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds;
 
 /*
  * Phone number data.
  * format: data1 - phnum, data2 - type, data3 - descr if data2 == 0
  */
-public class Phone extends Data {
+public class Phone extends CData {
     public static final String MIMETYPE = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
     public static final int KIND = 1;
     public String d1, d3; // mime indirectly marshalled
@@ -42,10 +42,10 @@ public class Phone extends Data {
     }
 
     public void buildFields(ContentProviderOperation.Builder b) {
-        b.withValue(ContactsContract.Data.MIMETYPE, mime)
-            .withValue(ContactsContract.Data.DATA1, d1)
-            .withValue(ContactsContract.Data.DATA2, d2)
-            .withValue(ContactsContract.Data.DATA3, d3);
+        b.withValue(Data.MIMETYPE, mime)
+            .withValue(Data.DATA1, d1)
+            .withValue(Data.DATA2, d2)
+            .withValue(Data.DATA3, d3);
     }
 
     public String toString() {
