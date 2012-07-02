@@ -34,8 +34,8 @@ public class Synch {
     boolean mPreferLocal;
 
     /* return the first d from ds that has mime type mime, or null. */
-    static Data firstDataMime(List<Data> ds, String mime) {
-        for(Data d : ds) {
+    static Data firstDataMime(Contact c, String mime) {
+        for(Data d : c.data) {
             if(d.mime.compareTo(mime) == 0)
                 return d;
         }
@@ -49,15 +49,15 @@ public class Synch {
         if(mime == null) { /* if any data matches */
             for(Data xd : x.data) {
                 for(Data cd : c.data) {
-                    if(xd == cd)
+                    if(xd.equals(cd))
                         return true;
                 }
             }
             return false;
     
         } else { /* if the first mime match in x.data matches one in c.data */
-            Data xd = firstDataMime(x.data, mime);
-            return xd != null && xd == firstDataMime(c.data, mime);
+            Data xd = firstDataMime(x, mime);
+            return xd != null && xd.equals(firstDataMime(c, mime));
         }
     }
 
@@ -224,6 +224,16 @@ public class Synch {
      */
     public boolean sync() {
         List<Contact> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
+
+        { //XXX
+            for(Contact c : all) {
+                Log.v("XXX", "all: " + c);
+                Log.v("XXX", "   last: " + c.last);
+                Log.v("XXX", "   loca: " + c.local);
+                Log.v("XXX", "   remo: " + c.local);
+            }
+        }
+
         boolean b, updated = false;
         for(Contact c : all) {
             if(mPreferLocal)
