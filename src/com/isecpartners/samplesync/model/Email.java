@@ -27,6 +27,8 @@ public class Email extends Phone {
         kind = KIND;
     }
 
+    public int getMatchScore() { return 5; }
+
     public String toString() {
         return "[Email: " + mime + " " + quote(d1) + " " + d2 + " " + quote(d3) + "]";
     }
