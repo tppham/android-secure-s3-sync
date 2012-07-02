@@ -121,6 +121,12 @@ abstract class Data {
         return a.hashCode();
     }
 
+    public static String quote(String s) {
+        if(s == null)
+            return "null";
+        return "\"" + s + "\"";
+    }
+
     public abstract void marshal(ByteBuffer buf, int version) throws Marsh.Error;
     public abstract void _unmarshal(ByteBuffer buf, int version) throws Marsh.Error;
 

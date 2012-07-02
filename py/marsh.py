@@ -74,15 +74,15 @@ class Buf(object) :
         return self.put16(x >> 16).put16(x)
     def getStr(self) :
         n = self.get16()
-        if n :
+        if n != 0xffff :
             return ''.join(chr(self.get8()) for m in xrange(n)).decode('utf8')
     def putStr(self, x) :
-        if x :
+        if x is not None :
             self.put16(len(x))
             for ch in x.encode('utf8') :
                 self.put8(ord(ch))
         else :
-            self.put16(0)
+            self.put16(0xffff)
         return self
 
     def getContactSet(self) :

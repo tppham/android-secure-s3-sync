@@ -28,7 +28,7 @@ public class Email extends Phone {
     }
 
     public String toString() {
-        return "[Email: " + mime + " " + d1 + " " + d2 + " " + d3 + "]";
+        return "[Email: " + mime + " " + quote(d1) + " " + d2 + " " + quote(d3) + "]";
     }
 }
 

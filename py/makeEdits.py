@@ -3,7 +3,7 @@
 from marsh import *
 
 def main() :
-    cs = load("remote.bin")
+    cs = load("orig/remote.bin")
     print 'original:'
     print cs
     print
