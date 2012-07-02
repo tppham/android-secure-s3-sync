@@ -73,6 +73,18 @@ public class Sync2 {
         ContactSetBS last = loadFromDisk("last", "/sdcard/last.bin");
         ContactSetBS remote = loadFromDisk("remote", "/sdcard/remote.bin");
 
+        if(last.id != remote.id) {
+            if(last.contacts.isEmpty()) {
+                // lock on to the remote's ID the first time we run
+                last.id = remote.id;
+            } else {
+                // disallow any changes in remote ID after the first run
+                Log.v(TAG, "Remote has different ID!  we can't synch to it!");
+                // XXX synch failed, notify user
+                return;
+            }
+        }
+
         Synch s = new Synch(last, local, remote, mPrefLocal);
         s.sync();
 
