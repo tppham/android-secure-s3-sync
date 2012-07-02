@@ -45,7 +45,7 @@ public class ContactSetDB extends ContactSet {
     protected void loadContacts() {
         /* we want all entries with no account, or the google or exchange accounts */
         Cursor c = mCtx.getContentResolver().query(RawContacts.CONTENT_URI,
-                    new String[]{ RawContacts.CONTACT_ID },
+                    new String[]{ RawContacts._ID },
                     RawContacts.ACCOUNT_TYPE + " is null OR " + RawContacts.ACCOUNT_TYPE + "=? OR " + RawContacts.ACCOUNT_TYPE + "=?",
                     // XXX is this right?  verify account names.
                     new String[]{ TYPE_EXCHANGE, TYPE_POP_IMAP },

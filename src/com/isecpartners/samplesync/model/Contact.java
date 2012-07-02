@@ -20,7 +20,7 @@ import android.util.Log; //XXX
  */
 public class Contact {
     public static final long UNKNOWN_ID = -1;
-    public long id; // not marshalled
+    public long id; // row id (not contact id!).  not marshalled
     public List<CData> data;
 
     /* xref to merged contacts, used by Synch class only */
