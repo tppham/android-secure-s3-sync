@@ -1,10 +1,7 @@
 
-This directory has a model for contacts.
-
-XXX the intent is to abstract a way to get, put and update
-content data from the contacts contact provider, and to
-abstract getting and putting the data into blobs that are
-stored remotely.
-XXX we might abstract the merging process here, too?
+This directory has a model for sets of contacts and an algorithm
+for synching changes between sets.
+A contact set is a list of contacts with their associated data,
+and a way to load and update them.
 
 

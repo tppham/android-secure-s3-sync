@@ -90,10 +90,21 @@ abstract class CData {
         return d;
     }
 
+    // add a crossreference to the contact.  If the contact id is unknown
+    // use the relative defIdx instead.
+    static void buildRef(ContentProviderOperation.Builder b, Contact c, int defIdx) {
+        if(c.id != c.UNKNOWN_ID) {
+            b.withValue(Data.RAW_CONTACT_ID, c.id);
+        } else  {
+            assert(defIdx != UNKNOWN_ID);
+            b.withValueBackReference(Data.RAW_CONTACT_ID, defIdx);
+        }
+    }
+
     // return a builder for a data insertion that references the contact
     public ContentProviderOperation.Builder buildInsert(Contact c, int defIdx) {
         ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(Data.CONTENT_URI);
-        c.buildRef(b, defIdx);
+        buildRef(b, c, defIdx);
         buildFields(b);
         return b;
     }
@@ -101,7 +112,6 @@ abstract class CData {
     // return a builder for a data deletion
     public ContentProviderOperation.Builder buildDelete() {
         assert(id != UNKNOWN_ID);
-        Log.v("XXX", "delete data: " + id);
         return ContentProviderOperation
                     .newDelete(Data.CONTENT_URI)
                     .withSelection(Data._ID + "=?", new String[]{ String.valueOf(id) });
