@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import android.content.Context;
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 
 import android.util.Log; //XXX
@@ -21,13 +21,13 @@ import android.util.Log; //XXX
 public class Contact {
     public static final long UNKNOWN_ID = -1;
     public long id; // not marshalled
-    public List<Data> data;
+    public List<CData> data;
 
     /* xref to merged contacts, used by Synch class only */
     public Contact local, remote, last, master;  // not marshalled
 
     public Contact() {
-        data = new LinkedList<Data>();
+        data = new LinkedList<CData>();
         id = UNKNOWN_ID;
     }
 
@@ -40,16 +40,16 @@ public class Contact {
     public Contact(long id, Cursor c) {
         this(id);
         while(c.moveToNext())
-            data.add(Data.get(c));
+            data.add(CData.get(c));
         c.close();
     }
 
     /* Fetch a contact from the content provider */
     public Contact(Context ctx, long id) {
-        this(id, Data.getDatas(ctx, id));
+        this(id, CData.getDatas(ctx, id));
     }
 
-    public void add(Data d) { data.add(d); }
+    public void add(CData d) { data.add(d); }
 
 
     // return a builder for inserting a contact into the db
@@ -63,6 +63,7 @@ public class Contact {
     // return a builder for deleting the contact from the db
     public ContentProviderOperation.Builder buildDelete() {
         assert(id != UNKNOWN_ID);
+        Log.v("XXX", "delete contact: " + id);
         return ContentProviderOperation
                     .newDelete(RawContacts.CONTENT_URI)
                     .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(id) });
@@ -73,17 +74,19 @@ public class Contact {
     // XXX this is for a data entry and should prob be in the data class
     public void buildRef(ContentProviderOperation.Builder b, int defIdx) {
         if(id != UNKNOWN_ID) {
-            b.withValue(ContactsContract.Data.RAW_CONTACT_ID, id);
+            Log.v("XXX", "contact ref: " + id);
+            b.withValue(Data.RAW_CONTACT_ID, id);
         } else  {
             assert(defIdx != UNKNOWN_ID);
-            b.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, defIdx);
+            Log.v("XXX", "contact ref relative: " + defIdx);
+            b.withValueBackReference(Data.RAW_CONTACT_ID, defIdx);
         }
     }
 
     public String toString() {
         String s = "";
         s += "[Contact " + id + ": ";
-        for(Data d : data)
+        for(CData d : data)
             s += d + " ";
         s += "]";
         return s;
@@ -91,7 +94,7 @@ public class Contact {
 
     public void marshal(ByteBuffer buf, int vers) throws Marsh.Error {
         Marsh.marshInt16(buf, data.size());
-        for(Data d : data)
+        for(CData d : data)
             d.marshal(buf, vers);
     }
 
@@ -99,7 +102,7 @@ public class Contact {
         Contact c = new Contact();
         int cnt = Marsh.unmarshInt16(buf);
         for(int i = 0; i < cnt; i++)
-            c.data.add(Data.unmarshal(buf, vers));
+            c.data.add(CData.unmarshal(buf, vers));
         return c;
     }
 }

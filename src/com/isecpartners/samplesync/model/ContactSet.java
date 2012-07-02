@@ -33,11 +33,11 @@ public class ContactSet {
         if(c == null) 
             c = add();
         if(ch.addData != null) {
-            for(Data d : ch.addData)
+            for(CData d : ch.addData)
                 addData(c, d);
         }
         if(ch.delData != null) {
-            for(Data d : ch.delData)
+            for(CData d : ch.delData)
                 delData(c, d);
         }
         if(ch.delContact) {
@@ -64,7 +64,7 @@ public class ContactSet {
     }
 
     // note: d will be shared, not copied.
-    public void addData(Contact c, Data d) {
+    public void addData(Contact c, CData d) {
         dirty = true;
         Log.v(TAG + name, "adding " + d + " to " + c);
         // XXX consider copying (all but id)?
@@ -72,7 +72,7 @@ public class ContactSet {
         return;
     }
 
-    public void delData(Contact c, Data d) {
+    public void delData(Contact c, CData d) {
         dirty = true;
         Log.v(TAG + name, "deleting " + d + " from " + c);
         c.data.remove(d);
