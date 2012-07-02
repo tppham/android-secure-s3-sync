@@ -152,7 +152,7 @@ public class Synch {
         return new LinkedList<D>(ds);
     }
 
-    /* return all elements in ds that arent in ds2 */
+    /* return all elements in ds that arent in ds2 (ie: ds - ds2)*/
     static <D> List<D> diff(List<D> ds, List<D> ds2) {
         LinkedList<D> r = new LinkedList<D>();
         for(D d : ds) {
@@ -163,18 +163,19 @@ public class Synch {
     }
 
     /*
-     * Return the delta to change c into c2, or null if they're the same.
+     * Return the delta to change c2 into c (ie: c - c2).
+     * Returns null if they are the same (ie: c - c2 = 0).
      */
     static Changes changes(Contact c, Contact c2) {
         if(c == null && c2 == null)
             return null;
         if(c == null)
-            return new Changes(false, copy(c2.data), null); // add
+            return new Changes(true, null, copy(c2.data)); // delete, -c2
         if(c2 == null)
-            return new Changes(true, null, copy(c.data)); // delete
+            return new Changes(false, copy(c.data), null); // add, +c
 
-        List<Data> adds = Synch.<Data>diff(c.data, c2.data);
-        List<Data> dels = Synch.<Data>diff(c2.data, c.data);
+        List<Data> adds = Synch.<Data>diff(c.data, c2.data); // +(c - c2)
+        List<Data> dels = Synch.<Data>diff(c2.data, c.data); // -(c2 - c)
         if(adds == null && dels == null)
             return null;
         return new Changes(false, adds, dels); // alter data
@@ -182,33 +183,33 @@ public class Synch {
 
     /* sync changes from local sources */
     boolean syncLocal(Contact c) {
-        Changes d = changes(c.last, c.local);
+        Changes d = changes(c.local, c.last); // d = local - last
         if(d == null)
             return false;
 
         /* bring last up to date */
-        c.last = mLast.push(c.last, d);
+        c.last = mLast.push(c.last, d); // last += d
 
         /* then bring remote up to date */
-        Changes d2 = changes(c.remote, c.last);
+        Changes d2 = changes(c.last, c.remote); // d2 = last - remote
         if(d2 != null)
-            c.remote = mRemote.push(c.remote, d2);
+            c.remote = mRemote.push(c.remote, d2); // remote += d2
         return true;
     }
 
     /* sync changes from remote sources */
     boolean syncRemote(Contact c) {
-        Changes d = changes(c.last, c.remote);
+        Changes d = changes(c.remote, c.last); // d = remote - last
         if(d == null)
             return false;
 
         /* bring last up to date */
-        c.last = mLast.push(c.last, d);
+        c.last = mLast.push(c.last, d); // last += d
 
         /* then bring local up to date */
-        Changes d2 = changes(c.local, c.last);
+        Changes d2 = changes(c.last, c.local); // d2 = last - local
         if(d2 != null)
-            c.local = mLocal.push(c.local, d2);
+            c.local = mLocal.push(c.local, d2); // local += d2
         return true;
     }
 
