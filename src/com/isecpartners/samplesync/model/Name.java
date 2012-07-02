@@ -17,6 +17,7 @@ import android.content.ContentProviderOperation;
 public class Name extends CData {
     public static final String MIMETYPE = CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
     public static final int KIND = 3;
+
     public String d1, d2, d3, d4, d5, d6, d7, d8, d9;
 
     public Name() {
@@ -46,6 +47,8 @@ public class Name extends CData {
         d8 = c.getString(9);
         d9 = c.getString(10);
     }
+
+    public int getMatchScore() { return 10; }
 
     public void buildFields(ContentProviderOperation.Builder b) {
         b.withValue(Data.MIMETYPE, mime)

@@ -15,6 +15,7 @@ import android.provider.ContactsContract.CommonDataKinds;
 public class Phone extends CData {
     public static final String MIMETYPE = CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
     public static final int KIND = 1;
+
     public String d1, d3; // mime indirectly marshalled
     public int d2;
 
@@ -40,6 +41,8 @@ public class Phone extends CData {
         d2 = c.getInt(3);
         d3 = c.getString(4);
     }
+
+    public int getMatchScore() { return 5; }
 
     public void buildFields(ContentProviderOperation.Builder b) {
         b.withValue(Data.MIMETYPE, mime)

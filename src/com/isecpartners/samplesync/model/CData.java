@@ -43,6 +43,8 @@ abstract class CData {
         id = c.getLong(0);
     }
 
+    public abstract int getMatchScore();
+
 
     /* 
      * Fetch data from the content provider for a raw contact id.

@@ -44,44 +44,41 @@ public class Synch {
         return null;
     }
 
-    /* return true if x matches c either by some data match
-     * with data of type kl, or with any match whatsoever if kl is null.
-     */
-    static boolean match(Contact x, Contact c, String mime) {
-        if(mime == null) { /* if any data matches */
-            for(CData xd : x.data) {
-                for(CData cd : c.data) {
-                    if(xd.equals(cd))
-                        return true;
-                }
+    /* return a score for how well x matches c */
+    static int match(Contact x, Contact c) {
+        if(x.data.isEmpty() && c.data.isEmpty())
+            return 1;
+
+        int sum = 0;
+        for(CData xd : x.data) {
+            for(CData cd : c.data) {
+                if(xd.equals(cd))
+                    sum += xd.getMatchScore();
             }
-            return false;
-    
-        } else { /* if the first mime match in x.data matches one in c.data */
-            CData xd = firstDataMime(x, mime);
-            return xd != null && xd.equals(firstDataMime(c, mime));
         }
+        return sum;
     }
 
-    /* return the most specific match to x from cs */
+    /*
+     * Return the most specific match to x from unmatched entries in cs.
+     * Caller should mark all cs as unmatched before starting.
+     */
     static Contact bestMatch(Contact x, List<Contact> cs) {
-        /* 
-         * try to find match with primary name, phone or email first
-         * then fall back to a generic match of any data.
-         */
-        String[] mimes = new String[] {
-            Name.MIMETYPE,
-            Phone.MIMETYPE,
-            Email.MIMETYPE,
-            null // null means any data
-        };
-        for(String mime : mimes) {
-            for(Contact c : cs) {
-                if(match(x, c, mime))
-                    return c;
+        int bestScore = 0;
+        Contact bestMatch = null;
+
+        for(Contact c : cs) {
+            if(!c.matched) {
+                int score = match(x, c);
+                if(score > bestScore) {
+                    bestScore = score;
+                    bestMatch = c;
+                }
             }
         }
-        return null;
+        if(bestMatch != null)
+            bestMatch.matched = true;
+        return bestMatch;
     }
 
     /*
@@ -97,6 +94,11 @@ public class Synch {
     static List<Contact> merge(List<Contact> last, List<Contact> local, List<Contact> remote) {
         LinkedList<Contact> all = new LinkedList<Contact>();
 
+        // XXX for performance maybe we should sort all three
+        // lists based on some metric before merging, then the
+        // rest of merging can be linear.
+        // If last and remote are kept sorted then only local needs sorting.
+
         // put all "last" entries onto the list
         for(Contact c : last) {
             c.last = c;
@@ -106,6 +108,8 @@ public class Synch {
 
         // merge all "local" entries onto the list
         Contact m;
+        for(Contact c : all) 
+            c.matched = false;
         for(Contact c : local) {
             if((m = bestMatch(c, all)) != null) {
                 m.local = c;
@@ -118,6 +122,8 @@ public class Synch {
         }
 
         // merge all "remote" entries onto the list
+        for(Contact c : all) 
+            c.matched = false;
         for(Contact c : remote) {
             if((m = bestMatch(c, all)) != null) {
                 m.remote = c;

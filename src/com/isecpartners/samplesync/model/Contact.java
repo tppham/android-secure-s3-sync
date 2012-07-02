@@ -23,6 +23,7 @@ public class Contact {
 
     /* xref to merged contacts, used by Synch class only */
     public Contact local, remote, last, master;  // not marshalled
+    boolean matched; // not marshalled
 
     public Contact() {
         data = new LinkedList<CData>();
