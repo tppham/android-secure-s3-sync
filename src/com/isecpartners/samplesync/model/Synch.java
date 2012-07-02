@@ -2,7 +2,7 @@ package com.isecpartners.samplesync.model;
 
 import java.util.List;
 import java.util.LinkedList;
-import android.util.Log; // XXX temp hack
+import android.util.Log;
 
 /*
  * Synching algorithm.  Merging happens on three sets of
@@ -30,6 +30,8 @@ import android.util.Log; // XXX temp hack
  * a blob and sent to the remote storage.
  */
 public class Synch {
+    final static String TAG = "model.Synch";
+
     ContactSet mLast, mLocal, mRemote;
     boolean mPreferLocal;
 
@@ -226,12 +228,12 @@ public class Synch {
     public boolean sync() {
         List<Contact> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
 
-        { //XXX
+        { // XXX extra logging for now, consider removing later
             for(Contact c : all) {
-                Log.v("XXX", "all: " + c);
-                Log.v("XXX", "   last: " + c.last);
-                Log.v("XXX", "   loca: " + c.local);
-                Log.v("XXX", "   remo: " + c.local);
+                Log.v(TAG, "all: " + c);
+                Log.v(TAG, "   last: " + c.last);
+                Log.v(TAG, "   loca: " + c.local);
+                Log.v(TAG, "   remo: " + c.local);
             }
         }
 
