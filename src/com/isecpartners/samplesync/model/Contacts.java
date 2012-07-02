@@ -8,6 +8,8 @@ import java.util.LinkedList;
 
 /*
  * A list of contacts.
+ * XXX we're not usingthis anymore (except in stale code).
+ * this should be removed.  ContactSet replaces this...
  */
 public class Contacts {
     public List<Contact> contacts;
