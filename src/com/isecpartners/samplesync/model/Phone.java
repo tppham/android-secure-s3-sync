@@ -49,7 +49,7 @@ public class Phone extends Data {
     }
 
     public String toString() {
-        return "[Phone: " + mime + " " + d1 + " " + d2 + " " + d3 + "]";
+        return "[Phone: " + mime + " " + quote(d1) + " " + d2 + " " + quote(d3) + "]";
     }
 
     public int hashCode() {

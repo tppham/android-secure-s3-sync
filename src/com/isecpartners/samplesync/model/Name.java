@@ -61,7 +61,7 @@ public class Name extends Data {
     }
 
     public String toString() {
-        return "[Name: " + mime + " " + d1 + " " + d2 + " " + d3 + d4 + " " + d5 + " " + d6 + " " + d7 + " " + d8 + " " + d9 + "]";
+        return "[Name: " + quote(mime) + " " + quote(d1) + " " + quote(d2) + " " + quote(d3) + " " + quote(d4) + " " + quote(d5) + " " + quote(d6) + " " + quote(d7) + " " + quote(d8) + " " + quote(d9) + "]";
     }
 
     public int hashCode() {
