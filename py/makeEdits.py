@@ -1,9 +1,16 @@
 #!/usr/bin/env python
+"""
+Load in the "remote" data, make edits to it, and save it.
+"""
 
 from marsh import *
+import s3Dat
 
-def main() :
-    cs = load("orig/remote.bin")
+def main(useFile=False) :
+    if useFile :
+        cs = load("orig/remote.bin")
+    else :
+        cs = s3Dat.load()
     print 'original:'
     print cs
     print
@@ -30,9 +37,11 @@ def main() :
     print
     print
     print cs
-    save("remote2.bin", cs)
+    if useFile :
+        save("remote2.bin", cs)
+    else :
+        s3Dat.save(cs)
 
 if __name__ == '__main__' :
     main()
-
 
