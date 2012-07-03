@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.isecpartners.samplesync.GenericSync;
 import com.isecpartners.samplesync.IBlobStore;
@@ -36,10 +34,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String pw = mgr.getPassword(acct);
         
         Log.v(TAG, "XXX should sync here with s3 store: " + acct.name + " " + pw);
-        Log.v(TAG, "creating AWSS3Client object " + acct.name + " " + pw);
-        
-        AWSCredentials credentials = new BasicAWSCredentials( acct.name, pw);
-        IBlobStore store = new S3Store(credentials);
+        IBlobStore store = new S3Store(acct.name, pw);
         GenericSync.onPerformSync(mCtx, TOKEN_TYPE, pw, store, res);
     }
 }
