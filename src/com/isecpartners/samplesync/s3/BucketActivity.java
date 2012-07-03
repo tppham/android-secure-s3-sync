@@ -12,7 +12,6 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.isecpartners.samplesync.Passphrase;
 import com.isecpartners.samplesync.R;
 import com.isecpartners.samplesync.S3Sync;
-import com.isecpartners.samplesync.Sync;
 
 import android.R.layout;
 import android.accounts.Account;
