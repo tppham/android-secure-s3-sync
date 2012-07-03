@@ -67,6 +67,8 @@ public class Sync2 {
         if(bs == null)
             return load(name, null);
         ByteBuffer buf = ByteBuffer.allocate(bs.length);
+        buf.put(bs);
+        buf.flip();
         return load(name, buf);
     }
 
