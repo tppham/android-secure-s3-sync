@@ -59,27 +59,40 @@ public class Synch {
         return sum;
     }
 
+    // a merged contact
+    static class Merge {
+        public Contact master, last, local, remote;
+        public boolean matched;
+        public Merge(Contact x) { master = x; }
+    }
+
     /*
-     * Return the most specific match to x from unmatched entries in cs.
+     * Return the most specific match to x from unmatched entries in ms.
+     * If no matches are found, add x to ms and return it.
      * Caller should mark all cs as unmatched before starting.
      */
-    static Contact bestMatch(Contact x, List<Contact> cs) {
+    static Merge bestMatch(Contact x, List<Merge> ms) {
         int bestScore = 0;
-        Contact bestMatch = null;
+        Merge bestMatch = null;
 
-        for(Contact c : cs) {
-            if(!c.matched) {
-                int score = match(x, c);
+        for(Merge m : ms) {
+            if(!m.matched) {
+                int score = match(x, m.master);
                 if(score > bestScore) {
                     bestScore = score;
-                    bestMatch = c;
+                    bestMatch = m;
                 }
             }
         }
-        if(bestMatch != null)
-            bestMatch.matched = true;
+
+        if(bestMatch == null) {
+            bestMatch = new Merge(x);
+            ms.add(bestMatch);
+        }
+        bestMatch.matched = true;
         return bestMatch;
     }
+
 
     /*
      * Merge contacts from different sources onto a single list,
@@ -91,8 +104,8 @@ public class Synch {
      * "remote", "local" and "last" which point to any merged entries
      * from the local, remote or last lists.
      */
-    static List<Contact> merge(List<Contact> last, List<Contact> local, List<Contact> remote) {
-        LinkedList<Contact> all = new LinkedList<Contact>();
+    static List<Merge> merge(List<Contact> last, List<Contact> local, List<Contact> remote) {
+        List<Merge> all = new LinkedList<Merge>();
 
         // XXX for performance maybe we should sort all three
         // lists based on some metric before merging, then the
@@ -100,39 +113,27 @@ public class Synch {
         // If last and remote are kept sorted then only local needs sorting.
 
         // put all "last" entries onto the list
+        for(Merge m : all)  // note: empty list, nop
+            m.matched = false;
         for(Contact c : last) {
-            c.last = c;
-            c.master = c;
-            all.add(c);
+            Merge m = bestMatch(c, all); // always returns c.
+            m.last = c;
         }
 
         // merge all "local" entries onto the list
-        Contact m;
-        for(Contact c : all) 
-            c.matched = false;
+        for(Merge m : all) 
+            m.matched = false;
         for(Contact c : local) {
-            if((m = bestMatch(c, all)) != null) {
-                m.local = c;
-                c.master = m;
-            } else { // not found
-                c.local = c; 
-                c.master = m;
-                all.add(c);
-            }
+            Merge m = bestMatch(c, all);
+            m.local = c;
         }
 
         // merge all "remote" entries onto the list
-        for(Contact c : all) 
-            c.matched = false;
+        for(Merge m : all) 
+            m.matched = false;
         for(Contact c : remote) {
-            if((m = bestMatch(c, all)) != null) {
-                m.remote = c;
-                c.master = m;
-            } else { // not found
-                c.remote = c; 
-                c.master = c;
-                all.add(c);
-            }
+            Merge m = bestMatch(c, all);
+            m.remote = c;
         }
         return all;
     }
@@ -190,34 +191,34 @@ public class Synch {
     }
 
     /* sync changes from local sources */
-    boolean syncLocal(Contact c) {
-        Changes d = changes(c.local, c.last); // d = local - last
+    boolean syncLocal(Merge m) {
+        Changes d = changes(m.local, m.last); // d = local - last
         if(d == null)
             return false;
 
         /* bring last up to date */
-        c.last = mLast.push(c.last, d); // last += d
+        m.last = mLast.push(m.last, d); // last += d
 
         /* then bring remote up to date */
-        Changes d2 = changes(c.last, c.remote); // d2 = last - remote
+        Changes d2 = changes(m.last, m.remote); // d2 = last - remote
         if(d2 != null)
-            c.remote = mRemote.push(c.remote, d2); // remote += d2
+            m.remote = mRemote.push(m.remote, d2); // remote += d2
         return true;
     }
 
     /* sync changes from remote sources */
-    boolean syncRemote(Contact c) {
-        Changes d = changes(c.remote, c.last); // d = remote - last
+    boolean syncRemote(Merge m) {
+        Changes d = changes(m.remote, m.last); // d = remote - last
         if(d == null)
             return false;
 
         /* bring last up to date */
-        c.last = mLast.push(c.last, d); // last += d
+        m.last = mLast.push(m.last, d); // last += d
 
         /* then bring local up to date */
-        Changes d2 = changes(c.last, c.local); // d2 = last - local
+        Changes d2 = changes(m.last, m.local); // d2 = last - local
         if(d2 != null)
-            c.local = mLocal.push(c.local, d2); // local += d2
+            m.local = mLocal.push(m.local, d2); // local += d2
         return true;
     }
 
@@ -232,23 +233,23 @@ public class Synch {
      * Return true if any changes were encountered.
      */
     public boolean sync() {
-        List<Contact> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
+        List<Merge> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
 
         { // XXX extra logging for now, consider removing later
-            for(Contact c : all) {
-                Log.v(TAG, "all: " + c);
-                Log.v(TAG, "   last: " + c.last);
-                Log.v(TAG, "   loca: " + c.local);
-                Log.v(TAG, "   remo: " + c.local);
+            for(Merge m : all) {
+                Log.v(TAG, "all: " + m.master);
+                Log.v(TAG, "   last: " + m.last);
+                Log.v(TAG, "   loca: " + m.local);
+                Log.v(TAG, "   remo: " + m.remote);
             }
         }
 
         boolean b, updated = false;
-        for(Contact c : all) {
+        for(Merge m : all) {
             if(mPreferLocal)
-                b = syncLocal(c) || syncRemote(c);
+                b = syncLocal(m) || syncRemote(m);
             else
-                b = syncRemote(c) || syncLocal(c);
+                b = syncRemote(m) || syncLocal(m);
             if(b)
                 updated = true;
         }
