@@ -128,9 +128,21 @@ TODO
 
 
   - the s3 auth activity needs some cleanup
+    - would be nice having other options besides just text entry
+      or QR code.  perhaps reading off of /sdcard?
+      fetching from a web page or directly from AWS with creds?
+    - we should probably register for some URL type so that
+      we can get QR codes directed to us even outside of our app
+      s3sync://name:pw/bucketname ?
+    - s3 accounts need better names.  the s3 key id is unreadable
     - make it a dialog?
     - check creds in the background.  let user know if they worked
     - remove cruft
 
   - the s3 store needs cleanup.. some old code and some TODO items
+
+  - s3 auth activity should prompt user for a bucket name to use
+    and provide a suitable default entry
+
+  - need preferences.  per account?  can we store extra info in accts?
 

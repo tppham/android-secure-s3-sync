@@ -7,6 +7,8 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
+// XXX this needs to go away and references to it should
+// go instead t othe GenericSync
 public class S3Sync {
 	
 	 private static final String TAG = "S3Sync";
