@@ -1,5 +1,25 @@
 
 
+Safety:
+-------
+This code is still alpha quality.  If you use it on a real
+device, you should be safe.  Backup your contacts database
+before you start and from time to time.  The "normal"
+location is /data/data/com.android.providers.contacts/databases/contacts2.db 
+so you can backup with:
+
+  adb pull /data/data/com.android.providers.contacts/databases/contacts2.db saved.db
+
+If you ever need to restore you can:
+
+  adb push saved.db /sdcard/
+  adb shell cat /sdcard/saved.db ">" /data/data/com.android.providers.contacts/databases/contacts2.db 
+
+and you should have your old contacts back.
+If you are using the sync app and restore your contacts you
+should probably also stop using the current synch account and
+set up a fresh one.  (XXX more details when they're available)
+
 
 
 ---------------
@@ -105,4 +125,12 @@ TODO
       user can select which 
     - program should show user which account types he's currently using
   - give user option to prefer local or reomte during conflict resolution
+
+
+  - the s3 auth activity needs some cleanup
+    - make it a dialog?
+    - check creds in the background.  let user know if they worked
+    - remove cruft
+
+  - the s3 store needs cleanup.. some old code and some TODO items
 
