@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import S3
 import marsh
 
@@ -21,16 +22,33 @@ def put(s3, n, k, v) :
 def get(s3, n, k) :
     return s3.get(n, k).object.data
 
-def load() :
-    d = get(getS3(), 'synchtest', 'synch')
+def load(bucket='synchtest', key='synch') :
+    d = get(getS3(), bucket, key)
     b = marsh.Buf(d)
     cs = b.getContactSet()
     b.getEof()
     return cs
 
-def test() :
+def save(cs, bucket='synchtest', key='synch') :
+    d = get(getS3(), bucket, key)
+    b = marsh.Buf()
+    b.putContacts(cs)
+    return put(getS3(), bucket, key, str(b))
+
+def saveRaw(fn) :
+    bucket='synchtest'
+    key='synch'
+    d = get(getS3(), bucket, key)
+    print 'writing to', fn
+    file(fn, 'wb').write(d)
+
+def dump() :
     cs = load()
     print cs
 
 if __name__ == '__main__' :
-    test()
+    if len(sys.argv) > 1 :
+        saveRaw(sys.argv[1])
+    else :
+        dump()
+
