@@ -21,10 +21,6 @@ public class Contact {
     public long id; // row id (not contact id!).  not marshalled
     public List<CData> data;
 
-    /* xref to merged contacts, used by Synch class only */
-    public Contact local, remote, last, master;  // not marshalled
-    boolean matched; // not marshalled
-
     public Contact() {
         data = new LinkedList<CData>();
         id = UNKNOWN_ID;
