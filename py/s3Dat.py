@@ -32,7 +32,7 @@ def load(bucket='synchtest', key='synch') :
 def save(cs, bucket='synchtest', key='synch') :
     d = get(getS3(), bucket, key)
     b = marsh.Buf()
-    b.putContacts(cs)
+    b.putContactSet(cs)
     return put(getS3(), bucket, key, str(b))
 
 def saveRaw(fn) :
