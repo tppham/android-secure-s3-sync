@@ -1,18 +1,24 @@
 package com.isecpartners.samplesync;
 
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.FileChannel;
+import java.io.IOException;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException; // XXX review?
+import android.accounts.OperationCanceledException; // XXX review?
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.Context;
 import android.content.SyncResult;
 import android.util.Log;
 
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import java.io.IOException;
+import com.isecpartners.samplesync.model.ContactSet;
+import com.isecpartners.samplesync.model.ContactSetDB;
+import com.isecpartners.samplesync.model.ContactSetBS;
+import com.isecpartners.samplesync.model.Synch;
+import com.isecpartners.samplesync.model.Marsh;
 
 /**
  * Generic sync handler that doesn't care which type of
@@ -20,18 +26,123 @@ import java.io.IOException;
  */
 public class GenericSync {
     private static final String TAG = "GenericSync";
+    private static final boolean mPrefLocal = true; // XXX config!
+    public static final int MAXBUFSIZE  = 1024 * 1024;
 
+    static ContactSetBS load(String name, ByteBuffer buf) {
+        if(buf != null) {
+            try {
+                ContactSetBS cs = ContactSetBS.unmarshal(name, buf);
+                Marsh.unmarshEof(buf);
+                return cs;
+            } catch(final Marsh.Error e) {
+                Log.v(TAG, "error unmarshalling " + name + " data: " + e);
+            } 
+        }
+
+        // XXX in the real program this should involve user
+        // interaction..  returning null might be best
+        Log.v(TAG, "making new empty contact set for " + name);
+        return new ContactSetBS(name);
+    }
+
+    static ContactSetBS loadFromStore(String name, IBlobStore store) {
+        // XXX should be trivial to refactor the IBlobStore
+        // interface and implementations to return a ByteBuffer.
+        byte[] bs = store.get("synchtest", "synch");
+        if(bs == null)
+            return load(name, null);
+        ByteBuffer buf = ByteBuffer.allocate(bs.length);
+        buf.put(bs);
+        buf.flip();
+        return load(name, buf);
+    }
+
+    static ContactSetBS loadFromDisk(String name, String fn) {
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+            FileChannel ch = new FileInputStream(new File(fn)).getChannel();
+            ch.read(buf);
+            buf.flip();
+            return load(name, buf);
+        } catch(final IOException e) {
+            Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
+            return load(name, null);
+        }
+    }
+
+    static ByteBuffer save(ContactSetBS cs) {
+        Log.v(TAG, "" + cs.name + " dirty: " + cs.dirty);
+        if(!cs.dirty)
+            return null;
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+            cs.marshal(buf);
+            buf.flip();
+            return buf;
+        } catch(final Marsh.Error e) {
+            Log.v(TAG, "error marshalling " + cs.name + " data");
+            return null;
+        } 
+    }
+
+    static void saveToStore(IBlobStore s, ContactSetBS cs) {
+        ByteBuffer buf = save(cs);
+        if(buf != null) {
+            // XXX create bucket?
+            // XXX blob store should take bytebuffer
+            byte[] bs = new byte[buf.remaining()];
+            buf.get(bs);
+            s.put("synchtest", "synch", bs);
+        }
+    }
+
+    static void saveToDisk(String fn, ContactSetBS cs) {
+        try {
+            ByteBuffer buf = save(cs);
+            if(buf != null) {
+                FileChannel ch = new FileOutputStream(new File(fn)).getChannel();
+                ch.write(buf);
+                ch.close();
+            }
+        } catch(final IOException e) {
+            Log.v(TAG, "error saving " + cs.name + " data: " + e);
+        }
+    }
+
+    // XXX update syncResult!
+    // XXX we should have some handle on the account so we can
+    // record some per-account info like last synch time...
+    // XXX we need a handle on preferences, like prefLocal!
     // XXX re-evaluate exception list
     private static void _onPerformSync(Context ctx, IBlobStore store, SyncResult res) throws Exception {
-        /*
-         * XXX: 
-            - fetch new contacts from remote (using local metadata)
-                - add to contacts list, update metadata
-            - list existing contacts, find new ones (using our metadata)
-                - send to remote, update local metadata
-         */
-    	
     	Log.v(TAG, "_onPerformSync");
+
+        // XXX figure out account types to create new contacts as!
+        ContactSet local = new ContactSetDB("localdb", ctx, null, null);
+        // XXX last should be stored elsewhere!
+        ContactSetBS last = loadFromDisk("last", "/sdcard/last.bin");
+        ContactSetBS remote = loadFromStore("remote", store);
+
+        if(last.id != remote.id) {
+            if(last.contacts.isEmpty()) {
+                // lock on to the remote's ID the first time we run
+                last.id = remote.id;
+            } else {
+                // disallow any changes in remote ID after the first run
+                Log.v(TAG, "Remote has different ID!  we can't synch to it!");
+                // XXX synch failed, notify user
+                return;
+            }
+        }
+
+        Synch s = new Synch(last, local, remote, mPrefLocal);
+        if(s.sync()) {
+            // XXX notify user of synch
+            // update last synch time
+            saveToDisk("/sdcard/last.bin", last);
+            saveToStore(store, remote);
+        }
     }
 
     /* a synch is requested. */
@@ -44,24 +155,18 @@ public class GenericSync {
             _onPerformSync(ctx, store, res);
 
         // XXX re-evaluate which of these are needed...
-        } catch (final AuthenticatorException e) {
-            Log.e(TAG, "onPerformSync", e);
-            res.stats.numParseExceptions++;
         } catch (final OperationCanceledException e) {
             Log.e(TAG, "onPerformSync", e);
         } catch (final IOException e) {
             Log.e(TAG, "onPerformSync", e);
             res.stats.numIoExceptions++;
-        } catch (final AuthenticationException e) {
-            Log.e(TAG, "onPerformSync", e);
-            mgr.invalidateAuthToken(acctType, token);
-            res.stats.numAuthExceptions++;
-        } catch (final ParseException e) {
-            Log.e(TAG, "onPerformSync", e);
-            res.stats.numParseExceptions++;
-        } catch (final JSONException e) {
-            Log.e(TAG, "onPerformSync", e);
-            res.stats.numParseExceptions++;
+        //} catch (final AuthenticationException e) {
+        //    Log.e(TAG, "onPerformSync", e);
+        //    mgr.invalidateAuthToken(acctType, token);
+        //    res.stats.numAuthExceptions++;
+        //} catch (final ParseException e) {
+        //    Log.e(TAG, "onPerformSync", e);
+        //    res.stats.numParseExceptions++;
         } catch (final Exception e) {
             Log.e(TAG, "onPerformSync", e);
             res.stats.numIoExceptions++; // XXX?
