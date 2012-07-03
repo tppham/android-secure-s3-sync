@@ -146,3 +146,6 @@ TODO
 
   - need preferences.  per account?  can we store extra info in accts?
 
+  - move the storage of last.bin to somewhere more appropriate.
+    also we need one per account if we want to support multiple 
+    synch accounts at once
