@@ -34,7 +34,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String pw = mgr.getPassword(acct);
         
         Log.v(TAG, "XXX should sync here with s3 store: " + acct.name + " " + pw);
-        IBlobStore store = new S3Store(acct.name, pw);
+        IBlobStore store = new Store(acct.name, pw);
         GenericSync.onPerformSync(mCtx, TOKEN_TYPE, pw, store, res);
     }
 }

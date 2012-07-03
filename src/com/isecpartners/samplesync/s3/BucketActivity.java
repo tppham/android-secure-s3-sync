@@ -79,7 +79,7 @@ public class BucketActivity extends Activity{
 	    }
 	    
 	    public void onCreateBucket(View v){
-	    	S3Store s3 = new S3Store(credentials);
+	    	Store s3 = new Store(credentials);
 	    	
 	    	 try {
 	    		 
@@ -106,7 +106,7 @@ public class BucketActivity extends Activity{
 	    }
 	    
 	    public void onListBucket(View v){
-	    	final S3Store s3 = new S3Store(credentials); 
+	    	final Store s3 = new Store(credentials); 
 	    	
 	    	 try {
 	    		 LinearLayout.LayoutParams p = new 
