@@ -66,7 +66,6 @@ public class TestActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //new Sync(this).run();
         new Sync2(this).run();
  
 /*

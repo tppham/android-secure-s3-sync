@@ -36,39 +36,31 @@ The user sets up an account and sets up synch on that account
 with normal android settings.  When a synch is requested we
 perform a synch by:
 
-  XXX to be determined... something like:
-  - pull down all new contacts since last time
-    - add them to the contact database and update our local notes
-  - enumerate contacts and bundle them
-    - go through our notes and see if any of them are not present
-      on the remode
-    - bundle up any new contacts and send to remote
-    - update our local notes
+  - loading up the current local contacts
+  - loading up a stored copy of the contacts as of last synch
+  - loading up a reomte copy of the contacts
+  - merging all three contact lists onto a single list, matched
+    up as best as possible.
+  - for each contact in the list synch it by:
+    - determining if there are both local and remote edits,
+      - if so, prefer one to the other to resolve conflict
+    - compute the change between new contact and last contact
+    - apply the change to the last contact to bring it up to date
+    - compute the change between the updated last contact and
+      the old (remote or local) contact
+    - apply the change to that contact
+      - when changes are applied to locals, they are pushed to the db
+  - when done, take the updated list of remote contacts and store
+    it back on the remote
 
-  XXX proposal:
-  - read through all contacts not belonging to a synch provider
-    - see if we have a matching contact 
-      - if it differs, update ours from the others data, mark as dirty
-      - otherwise create a new one, mark as dirty
-  - read through all contacts from remote host
-    - see if we have a matching contact
-      - if its already dirty, prefer the local copy
-        - if it differs, update ours from the others data, mark as dirty
-      - otherwise create a new one, mark as dirty
-      - for any updates to our local copy, make updates to the 
-        one that has no provider, if one exists, otherwise dont
-        make any no-provider changes.
-  - bundle up all dirty records and push to remote
-    XXX or just bundle up all records for simple first cut
-
-  we can use a synch field to track cross refs when we shadow
-  an external contact field.
-
-  data types we care about:
-    vnd.android.cursor.item/name
-    vnd.android.cursor.item/phone_v2
-    vnd.android.cursor.item/photo ?
-    others?
+All synching is done using an internal in memory model of
+the contacts databases.  We only care about certain data
+types:  name, phone (v2), email.
+XXX in the future we should add more, like address, too.
+All other contact information is ignored.  Further, we only
+ever look at and synch with contacts that are generated
+under no account, under an exchange synch account or under a google
+synch account.  All other contacts are ignored.
 
 
 
@@ -82,5 +74,35 @@ During sync the S3 blob store is created with the appropriate
 credentials and the blob store's get and put methods are used
 to fetch and store data.
 
-XXX data encryption and data formatting...
+Remote data marshalling is done through the model ContactSetBS,
+CData and Marsh modules.  The data format is a simple binary
+encoding of the mine type and data1..data9 fields of each data
+item.  See Marsh.java for more information.
+
+XXX data encryption 
+
+
+
+
+
+TODO
+  - give notification during synch
+    - any conflicts that were found and resolved
+    - number of contacts that were added, edited or deleted
+    - any failure
+      - mismatch ID with remote and last - start new synch store?
+      - bad data format - user must start new synch store
+      - version mismatch  - user must update or start new synch store
+  - allow user to wipe the synch state and start fresh.
+  - allow the user to start a new remote data synch store
+
+  - allow user to manually run a synch
+    - and display the logs as it happens?
+
+  - show user last synch time
+  - give user option to select how to create new contacts from remote
+    - should these new contacts be synched to exchange/google or not
+      user can select which 
+    - program should show user which account types he's currently using
+  - give user option to prefer local or reomte during conflict resolution
 
