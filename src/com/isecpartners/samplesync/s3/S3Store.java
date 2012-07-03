@@ -11,7 +11,7 @@ import java.util.List;
 
 import android.util.Log;
 import com.amazonaws.*;
-import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -24,8 +24,8 @@ public class S3Store implements IBlobStore {
 	public static final String TAG = "s3.S3Store";
 	private AmazonS3Client s3client;
 	
-	public S3Store(AWSCredentials credentials){
-		s3client = new AmazonS3Client(credentials);
+	public S3Store(String name, String pw) {
+		s3client = new AmazonS3Client(new BasicAWSCredentials(name, pw));
 	}
 
 	public boolean create(String store) {
