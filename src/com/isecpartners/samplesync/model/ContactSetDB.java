@@ -1,11 +1,14 @@
 package com.isecpartners.samplesync.model;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
 
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
@@ -29,6 +32,7 @@ public class ContactSetDB extends ContactSet {
 
     protected int mCIdx; // index of last contact we created
     protected ArrayList<ContentProviderOperation> mOps;
+    protected List<Fixup> mFixups;
 
     public ContactSetDB(String name, Context ctx, String acctName, String acctType) {
         super(name);
@@ -38,6 +42,7 @@ public class ContactSetDB extends ContactSet {
 
         mCIdx = (int)Contact.UNKNOWN_ID;
         mOps = new ArrayList<ContentProviderOperation>();
+        mFixups = new LinkedList<Fixup>();
 
         loadContacts();
     }
@@ -59,6 +64,7 @@ public class ContactSetDB extends ContactSet {
     public Contact add() {
         Contact c = super.add();
         mCIdx = mOps.size(); // where the contact xref is in the list
+        mFixups.add(new Fixup(c, null, mCIdx));
         mOps.add(c.buildInsert(mAcctName, mAcctType).build());
         return c;
     }
@@ -73,6 +79,7 @@ public class ContactSetDB extends ContactSet {
     public void addData(Contact c, CData data) {
         super.addData(c, data);
 
+        mFixups.add(new Fixup(null, data, mOps.size()));
         ContentProviderOperation.Builder b = data.buildInsert(c, mCIdx);
         mOps.add(data.buildInsert(c, mCIdx).build());
         return;
@@ -93,17 +100,56 @@ public class ContactSetDB extends ContactSet {
             return true;
 
         boolean ok = false;
+        ContentProviderResult[] r;
         try {
-            mCtx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, mOps);
+            r = mCtx.getContentResolver().applyBatch(ContactsContract.AUTHORITY, mOps);
+            for(Fixup f : mFixups) /* capture the results of any insertions */
+                f.apply(r);
             ok = true;
-        } catch(final RemoteException e) {
-            Log.v(TAG + name, "commit error: " + e);
-        } catch(final OperationApplicationException e) {
+        } catch(final Exception e) {
             Log.v(TAG + name, "commit error: " + e);
         }
+
         mCIdx = (int)Contact.UNKNOWN_ID;
         mOps = new ArrayList<ContentProviderOperation>();
+        mFixups = new LinkedList<Fixup>();
         return ok;
+    }
+
+    // Capture the result of an insertion so we can record the
+    // resulting _ID.
+    class Fixup {
+        Contact mContact;
+        CData mData;
+        int mIdx;
+
+        public Fixup(Contact c, CData d, int idx) {
+            mContact = c;
+            mData = d;
+            mIdx = idx;
+        }
+
+        // The ID is the last component of the URI path.  fetch and parse it.
+        int getId(Uri uri) throws IllegalArgumentException {
+            String path = uri.getEncodedPath();
+            int pos = path.lastIndexOf('/');
+            if(pos == -1)
+                throw new IllegalArgumentException("unexpected uri format: " + uri);
+            String sn = path.substring(pos+1);
+            return Integer.parseInt(sn); // throws NumberFormatException
+        }
+
+        // apply the fixup -- fetch the id and save it into the model
+        public void apply(ContentProviderResult[] rs) throws IllegalArgumentException {
+            int id = getId(rs[mIdx].uri);
+            if(mContact != null) {
+                mContact.id = id;
+                Log.v(TAG+name, "insert id " + id + " for contact " + mContact);
+            } else {
+                mData.id = id;
+                Log.v(TAG+name, "insert id " + id + " for data " + mData);
+            }
+        }
     }
 }
 
