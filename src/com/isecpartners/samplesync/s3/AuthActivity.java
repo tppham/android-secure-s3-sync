@@ -26,6 +26,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.zxing.integration.android.*;
 import com.isecpartners.samplesync.R;
 
+import java.io.*; // XXX temp hack for prefill!  remove me!
+
 /**
  * A GUI for entering S3 credentials.  
  * The AccountAuthenticatorActivity allows us to pass results
@@ -76,6 +78,21 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return true;
         }
 
+    /*
+     * XXX as a temp hack, prefill in the account and password information
+     * from the first two lines of /sdcard/secrets.txt.
+     * To make testing on an emulator a lot easier.
+     */
+    void prefillHackXXX() {
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("/sdcard/secrets.txt"));
+            mAcctIn.setText(in.readLine());
+            mPasswdIn.setText(in.readLine());
+            in.close();
+        } catch(Exception e) {
+        }
+    }
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -91,6 +108,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         mMsgTxt = (TextView)findViewById(R.id.err_msg);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
         mPasswdIn = (EditText)findViewById(R.id.passwd_edit);
+
+        prefillHackXXX();
     }
 
 //    @Override

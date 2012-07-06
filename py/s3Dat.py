@@ -35,12 +35,13 @@ def save(cs, bucket='synchtest', key='synch') :
     b.putContactSet(cs)
     return put(getS3(), bucket, key, str(b))
 
-def saveRaw(fn) :
-    bucket='synchtest'
-    key='synch'
+def saveRaw(fn, bucket='synchtest', key='synch') :
     d = get(getS3(), bucket, key)
     print 'writing to', fn
     file(fn, 'wb').write(d)
+
+def clear(bucket='synchtest', key='synch') :
+    getS3().delete(bucket, key);
 
 def dump() :
     cs = load()
@@ -48,7 +49,13 @@ def dump() :
 
 if __name__ == '__main__' :
     if len(sys.argv) > 1 :
-        saveRaw(sys.argv[1])
+        if sys.argv[1] == 'clear' :
+            print 'clearing'
+            clear()
+        else :
+            print 'saving', sys.argv[1]
+            saveRaw(sys.argv[1])
     else :
+        print 'dumping'
         dump()
 
