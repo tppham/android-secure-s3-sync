@@ -28,3 +28,4 @@ sync adapters see:
 
 http://www.c99.org/2010/01/23/writing-an-android-sync-provider-part-1/
 http://developer.android.com/resources/samples/SampleSyncAdapter/index.html
+http://developer.android.com/guide/topics/providers/contacts-provider.html
