@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
@@ -29,6 +30,15 @@ public class AddContact extends Activity {
         run();
     }
 
+    static int getId(Uri uri) throws IllegalArgumentException {
+        String path = uri.getEncodedPath();
+        int pos = path.lastIndexOf('/');
+        if(pos == -1)
+            throw new IllegalArgumentException("unexpected uri format: " + uri);
+        String sn = path.substring(pos+1);
+        return Integer.parseInt(sn); // throws NumberFormatException
+    }
+
     protected void run() {
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         ContentProviderOperation.Builder b;
@@ -48,8 +58,11 @@ public class AddContact extends Activity {
         ContentProviderResult[] r;
         try {
             r = getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-            for(int i = 0; i < r.length; i++)
-                Log.v(TAG, "result " + i + ": " + r[i]);
+            for(int i = 0; i < r.length; i++) {
+                int id = getId(r[i].uri);
+                Log.v(TAG, "result " + i + ": id=" + id + " creator=" + r[i].CREATOR + " count=" + r[i].count + " uri=" + r[i].uri);
+                Log.v(TAG, "contents " + String.format("%x", r[i].describeContents()));
+            }
         } catch(Exception e) {
             Log.v(TAG, "apply batch failed: " + e);
         }
