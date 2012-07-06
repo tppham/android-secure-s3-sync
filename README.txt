@@ -25,6 +25,39 @@ set up a fresh one.  (XXX more details when they're available)
 ---------------
 * Design
 
+
+** Philosophy
+
+Android's Contacts Provider allows multiple different sources
+to contribute contact information into a central database.
+It aggregates this data and provides it to the user.  It also
+allows "synch providers" to synch some of this data to remote
+sources.  By design, android synch providers are only responsible
+for synching data that they own to accounts they control.  
+For example, a google.com synch provider can synch all the
+data created through your user@gmail.com account.
+Unfortunately this means that when you disassociate with an
+account, all of those contacts are no longer available to you!
+
+This application works differently.  It intentionally violates
+the standard android rules for operating on contacts data.
+It reads contacts from several popular sources (unowned
+contacts and those created by google and exchange providers)
+and backs them up remotely.  It then synchs the remote data
+to your contacts database.  It intentionally violates the android
+rules by performing edits on contacts that are owned by
+other providers in order to bring them into synch. 
+When you disassociate with an account, you still have all
+of your contacts saved remotely.
+[XXX description needs work and updating to reflect reality
+and discuss any cons]
+XXX there are tihngs that can go wrong..  wont disassociating
+make the sync think that all the accounts were deleted?
+If these deletions are synched to the remote then we lost the data.
+
+
+
+
 ** Android
 
 The two major components to hook into the android system are
