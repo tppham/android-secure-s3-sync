@@ -77,16 +77,22 @@
             android:label="S3 Sign-in"
             android:excludeFromRecents="true"
             >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".s3.MyActivity"
             android:label="S3 Sync"
             android:excludeFromRecents="true"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        </activity>
+        <activity
+            android:name=".s3.test.Sync"
+            android:label="S3 Sync Test"
+            android:excludeFromRecents="true"
+            >
         </activity>
         <service
             android:name=".sdcard.AuthService"

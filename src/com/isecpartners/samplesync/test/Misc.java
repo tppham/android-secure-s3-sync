@@ -1,4 +1,4 @@
-package com.isecpartners.samplesync;
+package com.isecpartners.samplesync.test;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.LinkedList;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -35,7 +36,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.RawContacts.Entity;
-import java.util.LinkedList;
 
 
 
@@ -43,9 +43,9 @@ import java.util.LinkedList;
  * Just for testing out our infrastructure code. Will not be used in the
  * real application.
  */
-public class TestActivity extends Activity {
+public class Misc extends Activity {
 
-    static String LogTag = "TestActivity";
+    static String LogTag = "test.Misc";
 
     // TODO XXX: Get these dynamically, probably from a Service that
     // remembers them after asking the user in a KeyInputActivity.
@@ -66,8 +66,6 @@ public class TestActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new Sync2(this).run();
- 
 /*
         IBlobStore store = null;
         try {

@@ -116,3 +116,4 @@ and calendar items.
   - when its added, new contacts get added to it, rather than to the null sync
   - when its added, old contacts get subsumed into it somehow..
 
+http://developer.android.com/guide/topics/providers/contacts-provider.html

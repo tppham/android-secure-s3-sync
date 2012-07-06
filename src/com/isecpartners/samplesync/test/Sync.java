@@ -1,12 +1,15 @@
-package com.isecpartners.samplesync;
+package com.isecpartners.samplesync.test;
 
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.FileChannel;
 
+import android.app.Activity;
+import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
 
+import com.isecpartners.samplesync.*;
 import com.isecpartners.samplesync.model.ContactSet;
 import com.isecpartners.samplesync.model.ContactSetDB;
 import com.isecpartners.samplesync.model.ContactSetBS;
@@ -14,18 +17,20 @@ import com.isecpartners.samplesync.model.Synch;
 import com.isecpartners.samplesync.model.Marsh;
 
 /*
+ * Test out the synch process.
  * To run this, you need to create /sdcard/secrets.txt
  * with two lines, one with your s3 key id, and one with your s3 key.
  */
-public class Sync2 {
-    public static final String TAG = "Sync2";
+public class Sync extends Activity {
+    public static final String TAG = "test.Sync";
     public static final int MAXBUFSIZE  = 1024 * 1024;
     Context mCtx;
     boolean mPrefLocal;
     String keyId, keyVal;
 
-    public Sync2(Context ctx) {
-        mCtx = ctx;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCtx = this;
         mPrefLocal = true;
     }
 
@@ -138,7 +143,9 @@ public class Sync2 {
         return null;
     }
 
-    public void run() {
+    protected void onStart() {
+        super.onStart();
+
         IBlobStore store = getStore();
         if(store == null)
             return;
