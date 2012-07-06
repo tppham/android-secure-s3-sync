@@ -182,3 +182,23 @@ TODO
   - move the storage of last.bin to somewhere more appropriate.
     also we need one per account if we want to support multiple 
     synch accounts at once
+
+  - track local and remote IDs in "last", for easier matchup.
+    add code to assign remote IDs uniquely.
+
+  - add versioning using the s3 store key as a version number
+    and some well known name to point to the head.
+
+  - XXX figure out what we can do about atomicity with s3
+  - we have to honor the "delete" flag.. look into that
+
+  - we need to track what providers we synch, and detect when
+    a provider goes away.. when one goes away we need special
+    handling, possibly involving user interaction
+    - ask the user if he wants to keep the contacts or discard them
+    - if we wants to keep them, we need to discard them from
+      the "last" set before doing a real synch, so that they get
+      added back
+    - if he doesnt want to keep them, then they will go away
+      during a normal synch
+
