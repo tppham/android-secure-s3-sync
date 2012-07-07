@@ -74,6 +74,10 @@ public class Contact {
     }
 
     public void marshal(ByteBuffer buf, int vers) throws Marsh.Error {
+        // XXX we dont really need both fields for the "remote" store,
+        // only for the "last" store.. perhaps a switch for this.
+        Marsh.marshInt64(buf, locid);
+        Marsh.marshInt64(buf, remid);
         Marsh.marshInt16(buf, data.size());
         for(CData d : data)
             d.marshal(buf, vers);
@@ -81,6 +85,10 @@ public class Contact {
 
     public static Contact unmarshal(ByteBuffer buf, int vers) throws Marsh.Error {
         Contact c = new Contact();
+        // XXX we dont really need both fields for the "remote" store,
+        // only for the "last" store.. perhaps a switch for this.
+        c.locid = Marsh.unmarshInt64(buf);
+        c.remid = Marsh.unmarshInt64(buf);
         int cnt = Marsh.unmarshInt16(buf);
         for(int i = 0; i < cnt; i++)
             c.data.add(CData.unmarshal(buf, vers));

@@ -21,10 +21,12 @@ class ContactSet(object) :
 
 class Contact(object) :
     def __init__(self, *args) :
+        self.locid = -1
+        self.remid = -1
         self.data = list(args)
     def __str__(self) :
         ds = '\n    '.join(str(d) for d in self.data)
-        return '[Contact:\n    %s]' % (ds)
+        return '[Contact: locid=%x remid=%x\n    %s]' % (self.locid, self.remid, ds)
 
 class Data(object) :
     PHONE, EMAIL, NAME = 1,2,3
@@ -72,6 +74,10 @@ class Buf(object) :
         return self.get16() << 16 | self.get16()
     def put32(self, x) :
         return self.put16(x >> 16).put16(x)
+    def get64(self) :
+        return self.get32() << 32 | self.get32()
+    def put32(self, x) :
+        return self.put32(x >> 32).put32(x)
     def getStr(self) :
         n = self.get16()
         if n != 0xffff :
@@ -107,11 +113,15 @@ class Buf(object) :
 
     def getContact(self) :
         c = Contact()
+        c.locid = self.get64();
+        c.remid = self.get64();
         cnt = self.get16()
         for n in xrange(cnt) :
             c.data.append(self.getData())
         return c
     def putContact(self, c) :
+        self.put64(self.locid);
+        self.put64(self.remid);
         self.put16(len(c.data))
         for d in c.data :
             self.putData(d)
