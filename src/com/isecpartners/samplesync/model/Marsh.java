@@ -100,6 +100,24 @@ public class Marsh {
         }
     }
 
+    public static void marshInt64(ByteBuffer buf, long x) throws Error, BufferOverflowException, ReadOnlyBufferException {
+        try {
+            buf.putLong(x);
+        } catch(final BufferOverflowException e) {
+            throw new BufferError("not enough room");
+        } catch(final ReadOnlyBufferException e) {
+            throw new Error("" + e);
+        }
+    }
+
+    public static long unmarshInt64(ByteBuffer buf) throws Error, BufferUnderflowException {
+        try {
+            return buf.getLong();
+        } catch(final BufferUnderflowException e) {
+            throw new BufferError("not enough data");
+        }
+    }
+
     public static void marshString(ByteBuffer buf, String s) throws Error, BufferOverflowException, ReadOnlyBufferException {
         try {
             if(s == null) {
