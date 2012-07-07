@@ -18,17 +18,18 @@ import android.provider.ContactsContract.RawContacts;
  */
 public class Contact {
     public static final long UNKNOWN_ID = -1;
-    public long id; // row id (not contact id!).  not marshalled
+    public long locid, remid; // row id (not contact id!).
     public List<CData> data;
 
     public Contact() {
         data = new LinkedList<CData>();
-        id = UNKNOWN_ID;
+        locid = UNKNOWN_ID;
+        remid = UNKNOWN_ID;
     }
 
     public Contact(long _id) {
         this();
-        id = _id;
+        locid = _id;
     }
 
     /* build a contact with rows from c */
@@ -57,15 +58,15 @@ public class Contact {
 
     // return a builder for deleting the contact from the db
     public ContentProviderOperation.Builder buildDelete() {
-        assert(id != UNKNOWN_ID);
+        assert(locid != UNKNOWN_ID);
         return ContentProviderOperation
                     .newDelete(RawContacts.CONTENT_URI)
-                    .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(id) });
+                    .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(locid) });
     }
 
     public String toString() {
         String s = "";
-        s += "[Contact " + id + ": ";
+        s += "[Contact " + locid + "/" + remid + ": ";
         for(CData d : data)
             s += d + " ";
         s += "]";

@@ -143,10 +143,10 @@ public class ContactSetDB extends ContactSet {
         public void apply(ContentProviderResult[] rs) throws IllegalArgumentException {
             int id = getId(rs[mIdx].uri);
             if(mContact != null) {
-                mContact.id = id;
+                mContact.locid = id;
                 Log.v(TAG+name, "insert id " + id + " for contact " + mContact);
             } else {
-                mData.id = id;
+                mData.locid = id;
                 Log.v(TAG+name, "insert id " + id + " for data " + mData);
             }
         }

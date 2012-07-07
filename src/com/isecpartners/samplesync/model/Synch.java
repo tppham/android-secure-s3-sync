@@ -2,6 +2,8 @@ package com.isecpartners.samplesync.model;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
 import android.util.Log;
 
 /*
@@ -35,21 +37,23 @@ public class Synch {
     ContactSet mLast, mLocal, mRemote;
     boolean mPreferLocal;
 
-    /* return the first d from ds that has mime type mime, or null. */
-    static CData firstDataMime(Contact c, String mime) {
-        for(CData d : c.data) {
-            if(d.mime.compareTo(mime) == 0)
-                return d;
-        }
-        return null;
-    }
-
-    /* return a score for how well x matches c */
-    static int match(Contact x, Contact c) {
-        if(x.data.isEmpty() && c.data.isEmpty())
-            return 1;
-
+    /* return a score for how well x matches m */
+    static int match(Contact x, Merge m) {
+        Contact c = m.master;
         int sum = 0;
+
+        // if both are empty they might as well be considered the same
+        if(x.data.isEmpty() && c.data.isEmpty()) 
+            sum += 1;
+
+        // ID matches are our best bet, but lets not give them
+        // more weight than many data matches.
+        if(x.remid != x.UNKNOWN_ID && x.remid == c.remid)
+            sum += 50;
+        if(x.locid != x.UNKNOWN_ID && x.locid == c.locid)
+            sum += 50;
+
+        // give a little weight to each datum match
         for(CData xd : x.data) {
             for(CData cd : c.data) {
                 if(xd.equals(cd))
@@ -77,7 +81,7 @@ public class Synch {
 
         for(Merge m : ms) {
             if(!m.matched) {
-                int score = match(x, m.master);
+                int score = match(x, m);
                 if(score > bestScore) {
                     bestScore = score;
                     bestMatch = m;
@@ -222,6 +226,50 @@ public class Synch {
         return true;
     }
 
+    long allocID(Set<Long> alloced, long nextID) {
+        while(true) {
+            nextID ++;
+            if(nextID == 0 || nextID == -1)
+                nextID = 1;
+            if(!alloced.contains(nextID))
+                break;
+        }
+        alloced.add(nextID);
+        return nextID;
+    }
+
+    /*
+     * At this point all local data items should have proper
+     * IDs, but remote IDs may not have been assigned yet.
+     * Create new IDs for each remote contact that doesn't have one,
+     * and make sure our "last" set has all the ID information.
+     */
+    void allocateIDs(List<Merge> ms) {
+        // take note of which remote IDs are already used
+        Set<Long> alloced = new TreeSet<Long>();
+        long nextID = 0;
+        for(Merge m : ms) {
+            if(m.remote.remid != m.remote.UNKNOWN_ID)
+                alloced.add(m.remote.remid);
+        }
+
+        for(Merge m : ms) {
+            // sanity - locals dont track remotes and vice versa.
+            assert(m.local.remid == m.local.UNKNOWN_ID);
+            assert(m.remote.locid == m.remote.UNKNOWN_ID);
+
+            // allocate IDs for any new remote entries
+            if(m.remote.remid == m.remote.UNKNOWN_ID) {
+                nextID = allocID(alloced, nextID);
+                m.remote.remid = nextID;
+            }
+
+            // make sure "last" is up to date
+            m.last.locid = m.local.locid;
+            m.last.remid = m.remote.remid;
+        }
+    }
+
     /*
      * Sync data.
      * Use "last" as a comparison points for "local" and "remote" to
@@ -253,6 +301,9 @@ public class Synch {
             if(b)
                 updated = true;
         }
+
+        if(updated)
+            allocateIDs(all);
         return updated;
     }
 
