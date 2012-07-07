@@ -30,17 +30,17 @@ abstract class CData {
     public static final long UNKNOWN_ID = -1;
     public String mime; // indirectly marshalled -- see kind
     public int kind; // proxy for mime during marshalling
-    public long id; // not considered during equality test, not marshalled
+    public long locid; // not considered during equality test, not marshalled
 
     /* add field valus to a db batch operation */
     public abstract void buildFields(ContentProviderOperation.Builder b);
 
     public CData() {
-        id = UNKNOWN_ID;
+        locid = UNKNOWN_ID;
     }    
 
     public CData(Cursor c) {
-        id = c.getLong(0);
+        locid = c.getLong(0);
     }
 
     public abstract int getMatchScore();
@@ -95,8 +95,8 @@ abstract class CData {
     // add a crossreference to the contact.  If the contact id is unknown
     // use the relative defIdx instead.
     static void buildRef(ContentProviderOperation.Builder b, Contact c, int defIdx) {
-        if(c.id != c.UNKNOWN_ID) {
-            b.withValue(Data.RAW_CONTACT_ID, c.id);
+        if(c.locid != c.UNKNOWN_ID) {
+            b.withValue(Data.RAW_CONTACT_ID, c.locid);
         } else  {
             assert(defIdx != UNKNOWN_ID);
             b.withValueBackReference(Data.RAW_CONTACT_ID, defIdx);
@@ -113,10 +113,10 @@ abstract class CData {
 
     // return a builder for a data deletion
     public ContentProviderOperation.Builder buildDelete() {
-        assert(id != UNKNOWN_ID);
+        assert(locid != UNKNOWN_ID);
         return ContentProviderOperation
                     .newDelete(Data.CONTENT_URI)
-                    .withSelection(Data._ID + "=?", new String[]{ String.valueOf(id) });
+                    .withSelection(Data._ID + "=?", new String[]{ String.valueOf(locid) });
     }
 
 
