@@ -107,14 +107,15 @@ public class Synch {
      * itself).  Each element on the returned list has fields
      * "remote", "local" and "last" which point to any merged entries
      * from the local, remote or last lists.
+     *
+     * This process is inefficient, but hopefully the problem size is
+     * small.  If this turns out to be a bottleneck, we can do a fast
+     * merge based on locid/remid (using a precomputed map) and then
+     * use the slower method for any remaining items.  This will be
+     * very fast in the common case.
      */
     static List<Merge> merge(List<Contact> last, List<Contact> local, List<Contact> remote) {
         List<Merge> all = new LinkedList<Merge>();
-
-        // XXX for performance maybe we should sort all three
-        // lists based on some metric before merging, then the
-        // rest of merging can be linear.
-        // If last and remote are kept sorted then only local needs sorting.
 
         // put all "last" entries onto the list
         for(Merge m : all)  // note: empty list, nop
@@ -294,8 +295,7 @@ public class Synch {
      */
     public boolean sync() {
         List<Merge> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
-
-        dump(all);
+        dump(all); // XXX
 
         boolean b, updated = false;
         List<Merge> done = new LinkedList<Merge>();
@@ -312,15 +312,8 @@ public class Synch {
         }
 
 
-        if(updated) {
-            dump(done);
-            for(Merge m : done) {
-                if(!(m.local != null && m.remote != null && m.last != null))
-                    Log.e(TAG, "assert m.local != null && m.remote != null && m.last != null");
-            }
-
+        if(updated)
             allocateIDs(done);
-        }
         return updated;
     }
 
