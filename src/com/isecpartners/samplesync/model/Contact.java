@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import android.content.Context;
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
-import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
+import android.util.Log;
 
 /*
  * A model of a contact.  This correspondes to a RawContact stored in
@@ -17,6 +17,7 @@ import android.provider.ContactsContract.RawContacts;
  * track several types of data (ie: name, ph# and email addr).
  */
 public class Contact {
+    public static final String TAG = "model.Contact";
     public static final long UNKNOWN_ID = -1;
     public long locid, remid; // row id (not contact id!).
     public List<CData> data;
@@ -58,7 +59,8 @@ public class Contact {
 
     // return a builder for deleting the contact from the db
     public ContentProviderOperation.Builder buildDelete() {
-        assert(locid != UNKNOWN_ID);
+        if(!(locid != UNKNOWN_ID))
+            Log.e(TAG, "assert locid != UNKNOWN_ID");
         return ContentProviderOperation
                     .newDelete(RawContacts.CONTENT_URI)
                     .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(locid) });

@@ -1,8 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-
 import android.database.Cursor;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds;

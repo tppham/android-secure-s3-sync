@@ -3,13 +3,10 @@ package com.isecpartners.samplesync.s3;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -37,10 +34,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "s3.AuthActivity";
     public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.s3";
 
-    private final Handler mCb = new Handler();
     private AccountManager mAcctMgr;
-    private Thread mSigninThread;
-
     private AmazonS3Client s3Client = null;
     
     private TextView mMsgTxt;
@@ -85,7 +79,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
      */
     void prefillHackXXX() {
         try {
-            BufferedReader in = new BufferedReader(new FileReader("/sdcard/secrets.txt"));
+        	String sdcard = Environment.getExternalStorageDirectory().getPath();
+            BufferedReader in = new BufferedReader(new FileReader(sdcard + "/secrets.txt"));
             mAcctIn.setText(in.readLine());
             mPasswdIn.setText(in.readLine());
             in.close();

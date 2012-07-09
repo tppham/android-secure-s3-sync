@@ -202,11 +202,15 @@ public class Synch {
 
         /* bring last up to date */
         m.last = mLast.push(m.last, d); // last += d
+        if(!(m.last != null))
+            Log.e(TAG, "assert m.last != null");
 
         /* then bring remote up to date */
         Changes d2 = changes(m.last, m.remote); // d2 = last - remote
         if(d2 != null)
             m.remote = mRemote.push(m.remote, d2); // remote += d2
+        if(!(m.remote != null))
+            Log.e(TAG, "assert m.remote != null");
         return true;
     }
 
@@ -218,11 +222,15 @@ public class Synch {
 
         /* bring last up to date */
         m.last = mLast.push(m.last, d); // last += d
+        if(!(m.last != null))
+            Log.e(TAG, "assert m.last != null");
 
         /* then bring local up to date */
         Changes d2 = changes(m.last, m.local); // d2 = last - local
         if(d2 != null)
             m.local = mLocal.push(m.local, d2); // local += d2
+        if(!(m.local != null))
+            Log.e(TAG, "assert m.local != null");
         return true;
     }
 
@@ -249,14 +257,18 @@ public class Synch {
         Set<Long> alloced = new TreeSet<Long>();
         long nextID = 0;
         for(Merge m : ms) {
+        	if(m.remote == null)
+        		m.remote.remid ++;
             if(m.remote.remid != m.remote.UNKNOWN_ID)
                 alloced.add(m.remote.remid);
         }
 
         for(Merge m : ms) {
             // sanity - locals dont track remotes and vice versa.
-            assert(m.local.remid == m.local.UNKNOWN_ID);
-            assert(m.remote.locid == m.remote.UNKNOWN_ID);
+            if(!(m.local.remid == m.local.UNKNOWN_ID))
+                Log.e(TAG, "assert m.local.remid == m.local.UNKNOWN_ID");
+            if(!(m.remote.locid == m.remote.UNKNOWN_ID))
+                Log.e(TAG, "assert m.remote.locid == m.remote.UNKNOWN_ID");
 
             // allocate IDs for any new remote entries
             if(m.remote.remid == m.remote.UNKNOWN_ID) {
@@ -267,6 +279,16 @@ public class Synch {
             // make sure "last" is up to date
             m.last.locid = m.local.locid;
             m.last.remid = m.remote.remid;
+        }
+    }
+
+    // XXX extra logging for now, consider removing later
+    void dump(List<Merge> all) {
+        for(Merge m : all) {
+            Log.v(TAG, "all: " + m.master);
+            Log.v(TAG, "   last: " + m.last);
+            Log.v(TAG, "   loca: " + m.local);
+            Log.v(TAG, "   remo: " + m.remote);
         }
     }
 
@@ -283,14 +305,7 @@ public class Synch {
     public boolean sync() {
         List<Merge> all = merge(mLast.contacts, mLocal.contacts, mRemote.contacts);
 
-        { // XXX extra logging for now, consider removing later
-            for(Merge m : all) {
-                Log.v(TAG, "all: " + m.master);
-                Log.v(TAG, "   last: " + m.last);
-                Log.v(TAG, "   loca: " + m.local);
-                Log.v(TAG, "   remo: " + m.remote);
-            }
-        }
+        dump(all);
 
         boolean b, updated = false;
         for(Merge m : all) {
@@ -302,8 +317,15 @@ public class Synch {
                 updated = true;
         }
 
-        if(updated)
+        if(updated) {
+            dump(all);
+            for(Merge m : all) {
+                if(!(m.local != null && m.remote != null && m.last != null))
+                    Log.e(TAG, "assert m.local != null && m.remote != null && m.last != null");
+            }
+
             allocateIDs(all);
+        }
         return updated;
     }
 

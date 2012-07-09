@@ -87,16 +87,18 @@ public class Store implements IBlobStore {
      */
     public boolean put(String store, String name, byte [] data)
     {
+        FileOutputStream w = null;
         try {
             File d = new File(mDir, store);
             File f = new File(d, name);
-            FileOutputStream w = new FileOutputStream(f);
+            w = new FileOutputStream(f);
             w.write(data);
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, "put " + name, e);
             return false;
+        } finally {
+            if(w != null) try { w.close(); } catch(final Exception e) {};
         }
     }
 }

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.isecpartners.samplesync.GenericSync;
 import com.isecpartners.samplesync.IBlobStore;
 

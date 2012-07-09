@@ -9,7 +9,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException; // XXX review?
 import android.accounts.OperationCanceledException; // XXX review?
-import android.content.AbstractThreadedSyncAdapter;
 import android.content.Context;
 import android.content.SyncResult;
 import android.util.Log;
@@ -60,15 +59,20 @@ public class GenericSync {
 
     static ContactSetBS loadFromDisk(String name, String fn) {
         try {
-            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
-            FileChannel ch = new FileInputStream(new File(fn)).getChannel();
-            ch.read(buf);
-            buf.flip();
-            return load(name, buf);
+            FileInputStream is = new FileInputStream(new File(fn));
+            try {
+                FileChannel ch = is.getChannel();
+                ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+                ch.read(buf);
+                buf.flip();
+                return load(name, buf);
+            } finally {
+                is.close();
+            }
         } catch(final IOException e) {
             Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
             return load(name, null);
-        }
+        } 
     }
 
     static ByteBuffer save(ContactSetBS cs) {
@@ -101,13 +105,17 @@ public class GenericSync {
         try {
             ByteBuffer buf = save(cs);
             if(buf != null) {
-                FileChannel ch = new FileOutputStream(new File(fn)).getChannel();
-                ch.write(buf);
-                ch.close();
+                FileOutputStream os = new FileOutputStream(new File(fn));
+                try {
+                    FileChannel ch = os.getChannel();
+                    ch.write(buf);
+                } finally {
+                    os.close();
+                }
             }
         } catch(final IOException e) {
             Log.v(TAG, "error saving " + cs.name + " data: " + e);
-        }
+        } 
     }
 
     // XXX update syncResult!

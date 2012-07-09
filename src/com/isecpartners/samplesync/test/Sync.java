@@ -35,9 +35,10 @@ public class Sync extends Activity {
     }
 
     boolean readSecrets() { // XXX hack, get them from elsewhere
+        BufferedReader in = null;
         try {
             String fn = "/sdcard/secrets.txt";
-            BufferedReader in = new BufferedReader(new FileReader(fn));
+            in = new BufferedReader(new FileReader(fn));
             keyId = in.readLine();
             keyVal = in.readLine();
             Log.v(TAG, "creds - id: " + keyId + ", key: " + keyVal);
@@ -45,6 +46,8 @@ public class Sync extends Activity {
         } catch(final IOException e) {
             Log.v(TAG, "error loading secrets: " + e);
             return false;
+        } finally {
+            if(in != null) try { in.close(); } catch(final Exception e) {};
         }
     }
 
@@ -78,15 +81,19 @@ public class Sync extends Activity {
     }
 
     ContactSetBS loadFromDisk(String name, String fn) {
+        FileInputStream is = null;
         try {
+            is = new FileInputStream(new File(fn));
+            FileChannel ch = is.getChannel();
             ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
-            FileChannel ch = new FileInputStream(new File(fn)).getChannel();
             ch.read(buf);
             buf.flip();
             return load(name, buf);
         } catch(final IOException e) {
             Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
             return load(name, null);
+        } finally {
+            if(is != null) try { is.close(); } catch(final IOException e) {};
         }
     }
 
@@ -117,17 +124,21 @@ public class Sync extends Activity {
     }
 
     void saveToDisk(String fn, ContactSetBS cs) {
+        FileOutputStream os = null;
         try {
             ByteBuffer buf = save(cs);
             if(buf != null) {
-                FileChannel ch = new FileOutputStream(new File(fn)).getChannel();
+                os = new FileOutputStream(new File(fn));
+                FileChannel ch = os.getChannel();
                 ch.write(buf);
-                ch.close();
             }
         } catch(final IOException e) {
             Log.v(TAG, "error saving " + cs.name + " data: " + e);
+        } finally {
+            if(os != null) try { os.close(); } catch(final IOException e) {};
         }
     }
+
 
     IBlobStore getStore() {
         try {

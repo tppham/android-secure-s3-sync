@@ -1,8 +1,6 @@
 package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-
 import android.content.Context;
 import android.content.ContentProviderOperation;
 import android.database.Cursor;
@@ -98,7 +96,8 @@ abstract class CData {
         if(c.locid != c.UNKNOWN_ID) {
             b.withValue(Data.RAW_CONTACT_ID, c.locid);
         } else  {
-            assert(defIdx != UNKNOWN_ID);
+            if(!(defIdx != UNKNOWN_ID))
+                Log.e(TAG, "assert defIdx != UNKNOWN_ID");
             b.withValueBackReference(Data.RAW_CONTACT_ID, defIdx);
         }
     }
@@ -113,7 +112,8 @@ abstract class CData {
 
     // return a builder for a data deletion
     public ContentProviderOperation.Builder buildDelete() {
-        assert(locid != UNKNOWN_ID);
+        if(!(locid != UNKNOWN_ID))
+            Log.e(TAG, "assert locid != UNKNOWN_ID");
         return ContentProviderOperation
                     .newDelete(Data.CONTENT_URI)
                     .withSelection(Data._ID + "=?", new String[]{ String.valueOf(locid) });
