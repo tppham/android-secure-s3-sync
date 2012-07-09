@@ -202,15 +202,11 @@ public class Synch {
 
         /* bring last up to date */
         m.last = mLast.push(m.last, d); // last += d
-        if(!(m.last != null))
-            Log.e(TAG, "assert m.last != null");
 
         /* then bring remote up to date */
         Changes d2 = changes(m.last, m.remote); // d2 = last - remote
         if(d2 != null)
             m.remote = mRemote.push(m.remote, d2); // remote += d2
-        if(!(m.remote != null))
-            Log.e(TAG, "assert m.remote != null");
         return true;
     }
 
@@ -222,15 +218,11 @@ public class Synch {
 
         /* bring last up to date */
         m.last = mLast.push(m.last, d); // last += d
-        if(!(m.last != null))
-            Log.e(TAG, "assert m.last != null");
 
         /* then bring local up to date */
         Changes d2 = changes(m.last, m.local); // d2 = last - local
         if(d2 != null)
             m.local = mLocal.push(m.local, d2); // local += d2
-        if(!(m.local != null))
-            Log.e(TAG, "assert m.local != null");
         return true;
     }
 
@@ -257,8 +249,6 @@ public class Synch {
         Set<Long> alloced = new TreeSet<Long>();
         long nextID = 0;
         for(Merge m : ms) {
-        	if(m.remote == null)
-        		m.remote.remid ++;
             if(m.remote.remid != m.remote.UNKNOWN_ID)
                 alloced.add(m.remote.remid);
         }
@@ -308,6 +298,7 @@ public class Synch {
         dump(all);
 
         boolean b, updated = false;
+        List<Merge> done = new LinkedList<Merge>();
         for(Merge m : all) {
             if(mPreferLocal)
                 b = syncLocal(m) || syncRemote(m);
@@ -315,16 +306,20 @@ public class Synch {
                 b = syncRemote(m) || syncLocal(m);
             if(b)
                 updated = true;
+
+            if(m.last != null && m.local != null && m.remote != null)
+                done.add(m);
         }
 
+
         if(updated) {
-            dump(all);
-            for(Merge m : all) {
+            dump(done);
+            for(Merge m : done) {
                 if(!(m.local != null && m.remote != null && m.last != null))
                     Log.e(TAG, "assert m.local != null && m.remote != null && m.last != null");
             }
 
-            allocateIDs(all);
+            allocateIDs(done);
         }
         return updated;
     }
