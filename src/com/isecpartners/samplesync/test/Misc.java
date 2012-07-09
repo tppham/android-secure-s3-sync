@@ -1,42 +1,15 @@
 package com.isecpartners.samplesync.test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Base64;
 import android.widget.Toast;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.LinkedList;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-// XXX
-import android.net.Uri;
-import android.content.ContentUris;
-import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.RawContacts.Entity;
-
 
 
 /**

@@ -13,8 +13,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
-import android.content.OperationApplicationException;
-import android.os.RemoteException;
 
 /*
  * A contact set for interacting with the contact provider DB.
@@ -80,7 +78,6 @@ public class ContactSetDB extends ContactSet {
         super.addData(c, data);
 
         mFixups.add(new Fixup(null, data, mOps.size()));
-        ContentProviderOperation.Builder b = data.buildInsert(c, mCIdx);
         mOps.add(data.buildInsert(c, mCIdx).build());
         return;
     }

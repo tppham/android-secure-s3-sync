@@ -4,10 +4,9 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -57,7 +56,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             mMsgTxt.setText("You must enter a directory");
             return;
         }
-        acct = "/sdcard/" + acct;
+        String sdcard = Environment.getExternalStorageDirectory().getPath();
+        acct = sdcard + acct;
         if(!Store.checkStore(acct)) {
             mMsgTxt.setText("Can't use that directory");
             return;

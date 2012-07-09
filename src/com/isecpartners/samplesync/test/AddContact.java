@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.RawContacts.Entity;
 import android.util.Log;
 
 /*
@@ -60,7 +58,7 @@ public class AddContact extends Activity {
             r = getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
             for(int i = 0; i < r.length; i++) {
                 int id = getId(r[i].uri);
-                Log.v(TAG, "result " + i + ": id=" + id + " creator=" + r[i].CREATOR + " count=" + r[i].count + " uri=" + r[i].uri);
+                Log.v(TAG, "result " + i + ": id=" + id + " count=" + r[i].count + " uri=" + r[i].uri);
                 Log.v(TAG, "contents " + String.format("%x", r[i].describeContents()));
             }
         } catch(Exception e) {

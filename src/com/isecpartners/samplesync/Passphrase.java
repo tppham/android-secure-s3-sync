@@ -1,7 +1,6 @@
 package com.isecpartners.samplesync;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,9 +30,12 @@ public class Passphrase {
         // to do manually what the implementation should do itself:
         byte [] seed = new byte [RandomSize];
         FileInputStream fis = new FileInputStream(RandomPathname);
-
-        if (RandomSize != fis.read(seed))
-            throw new IOException("Could not read " + RandomPathname);
+        try {
+            if (RandomSize != fis.read(seed))
+                throw new IOException("Could not read " + RandomPathname);
+        } finally {
+            fis.close();
+        }
 
         r.setSeed(seed);
 

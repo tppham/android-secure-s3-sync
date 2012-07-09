@@ -15,7 +15,6 @@ import com.isecpartners.samplesync.S3Sync;
 
 import android.R.layout;
 import android.accounts.Account;
-import android.accounts.OnAccountsUpdateListener;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
