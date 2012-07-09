@@ -76,7 +76,7 @@ class Buf(object) :
         return self.put16(x >> 16).put16(x)
     def get64(self) :
         return self.get32() << 32 | self.get32()
-    def put32(self, x) :
+    def put64(self, x) :
         return self.put32(x >> 32).put32(x)
     def getStr(self) :
         n = self.get16()
@@ -120,8 +120,8 @@ class Buf(object) :
             c.data.append(self.getData())
         return c
     def putContact(self, c) :
-        self.put64(self.locid);
-        self.put64(self.remid);
+        self.put64(c.locid);
+        self.put64(c.remid);
         self.put16(len(c.data))
         for d in c.data :
             self.putData(d)
