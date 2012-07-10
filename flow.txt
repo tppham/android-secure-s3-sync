@@ -102,21 +102,26 @@ notify acct deleted:
    - go to synch
 
 notify acct corrupt:
+   The synch programs local metadata for the account is missing, unreadable or corrupt
    - tell user the account is corrupt, ask them to delete the account
 
 notify synch data missing:
+  The previously saved synch data cannot be found
   - notify that the remote synch data is no longer present
     - give them option to ignore, wipe or delete the account
 
 notify synch data corrupt:
+  The previously saved synch data is corrupt
   - tell user the data has been corrupted
     - give them option to ignore, wipe or delete the account
 
 notify synch data requires newer version:
+  The previously saved synch data was saved by a newer version of the program
   - tell the user the data requires a new version
     - give them the option to ignore, wipe or delete the account
 
 notify synch data save error:
+  The synch data could not be saved
   - tell user the data couldnt be saved
     - XXX go to account prefs for new creds?
       - XXX if successful, try to save unsaved data again
