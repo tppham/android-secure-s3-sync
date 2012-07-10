@@ -224,6 +224,12 @@ TODO
    than "remote".  We could make a more dense encoding of remote if we
    make it skip those items.
 
+ - account needs preference panel
+   - conflict resoltuion - prefer local or prefer remote
+   - list of accounts to synch
+   - let user change password?
+   - show info: last synch time
+
 polish:
   - icon for app
   - icon for providers
