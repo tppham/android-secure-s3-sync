@@ -51,7 +51,7 @@ public class ContactSetDB extends ContactSet {
                     new String[]{ RawContacts._ID, 
                                 RawContacts.ACCOUNT_TYPE,
                                 RawContacts.ACCOUNT_NAME },
-                    Rawcontacts.DELETED + " = 0 AND "
+                    RawContacts.DELETED + " = 0 AND "
                         + "(" + RawContacts.ACCOUNT_TYPE + " is null OR " 
                         + RawContacts.ACCOUNT_TYPE + "=? OR " 
                         + RawContacts.ACCOUNT_TYPE + "=?)",
