@@ -80,6 +80,14 @@ synch:
      - if missing, notify "synch data missing"
      - if corrupt, notify "synch data corrupt"
      - if version mismatch, notify "synch data requires newer version"
+   - load "local"
+   - perform synch
+   - save "last"
+     - on error, notify "acct save error"
+   - save "remote"
+     - on auth error, notify "synch data save failed"
+       XXX and save a copy of the remote data locally somewhere?
+   - update account last synch time
 
 notify acct deleted:
    - for each account that was deleted, tell the user that the
@@ -103,6 +111,15 @@ notify synch data corrupt:
 notify synch data requires newer version:
   - tell the user the data requires a new version
     - give them the option to ignore, wipe or delete the account
+
+notify synch data save error:
+  - tell user the data couldnt be saved
+    - XXX go to account prefs for new creds?
+      - XXX if successful, try to save unsaved data again
+      - on error repeat?  XXX have other steps check for unsaved data
+        to try to save it later?
+        XXX this could be a major problem if the device is offline for
+        some reason.. we need to figure out how to handle this gracefully
 
 wipe:
   - erase the last updated time
