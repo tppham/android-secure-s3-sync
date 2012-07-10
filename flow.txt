@@ -68,6 +68,10 @@ prefs:
      - save last synch time
 
 synch:
+   - if any unsaved data from last time
+     save unsaved data to remote
+     - on auth error, notify "synch data save failed"
+
    - load preferences for account
    - check if all accounts we synch still exist
      - if any do not, give the user a notification "acct deleted"
@@ -122,8 +126,8 @@ notify synch data save error:
         some reason.. we need to figure out how to handle this gracefully
 
 wipe:
-  - erase the last updated time
   - create new remote storage
     - on auth error, invalidate account creds
+  - erase the last updated time
   - create new last storage
 
