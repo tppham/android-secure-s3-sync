@@ -45,10 +45,10 @@ public class GenericSync {
         return new ContactSetBS(name);
     }
 
-    static ContactSetBS loadFromStore(String name, IBlobStore store) {
+    static ContactSetBS loadFromStore(String name, IBlobStore store, String bucket) {
         // XXX should be trivial to refactor the IBlobStore
         // interface and implementations to return a ByteBuffer.
-        byte[] bs = store.get("synchtest", "synch");
+        byte[] bs = store.get(bucket, "synch");
         if(bs == null)
             return load(name, null);
         ByteBuffer buf = ByteBuffer.allocate(bs.length);
@@ -90,14 +90,14 @@ public class GenericSync {
         } 
     }
 
-    static void saveToStore(IBlobStore s, ContactSetBS cs) {
+    static void saveToStore(IBlobStore s, String bucket, ContactSetBS cs) {
         ByteBuffer buf = save(cs);
         if(buf != null) {
             // XXX create bucket?
             // XXX blob store should take bytebuffer
             byte[] bs = new byte[buf.remaining()];
             buf.get(bs);
-            s.put("synchtest", "synch", bs);
+            s.put(bucket, "synch", bs);
         }
     }
 
@@ -131,7 +131,7 @@ public class GenericSync {
         ContactSet local = new ContactSetDB("localdb", ctx, null, null);
         // XXX last should be stored elsewhere!
         ContactSetBS last = loadFromDisk("last", lastPath);
-        ContactSetBS remote = loadFromStore("remote", store);
+        ContactSetBS remote = loadFromStore("remote", store, name);
 
         if(last.id != remote.id) {
             if(last.contacts.isEmpty()) {
@@ -150,7 +150,7 @@ public class GenericSync {
             // XXX notify user of synch
             // update last synch time
             saveToDisk(lastPath, last);
-            saveToStore(store, remote);
+            saveToStore(store, name, remote);
         }
     }
 

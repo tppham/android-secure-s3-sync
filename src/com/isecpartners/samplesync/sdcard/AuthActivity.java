@@ -53,18 +53,20 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onSignIn(View view) {
         String acct = mAcctIn.getText().toString();
         if(acct.equals("")) {
-            mMsgTxt.setText("You must enter a directory");
+            mMsgTxt.setText("You must enter an account name");
             return;
         }
         String sdcard = Environment.getExternalStorageDirectory().getPath();
-        String path = sdcard + "/" + acct;
+        String path = sdcard + "/SDSynch";
         if(!Store.checkStore(path)) {
+            // XXX error no longer makes sense
             mMsgTxt.setText("Can't use that directory");
             return;
         }
 
         Account a = new Account(acct, ACCOUNT_TYPE);
-        mAcctMgr.addAccountExplicitly(a, path, null);
+        mAcctMgr.addAccountExplicitly(a, "", null);
+        mAcctMgr.setUserData(a, "path", path);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();
