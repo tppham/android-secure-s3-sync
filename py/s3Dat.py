@@ -22,25 +22,27 @@ def put(s3, n, k, v) :
 def get(s3, n, k) :
     return s3.get(n, k).object.data
 
-def load(bucket='synchtest', key='synch') :
+defBucket = 'mycontacts'
+defKey = 'synch'
+def load(bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
     b = marsh.Buf(d)
     cs = b.getContactSet()
     b.getEof()
     return cs
 
-def save(cs, bucket='synchtest', key='synch') :
+def save(cs, bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
     b = marsh.Buf()
     b.putContactSet(cs)
     return put(getS3(), bucket, key, str(b))
 
-def saveRaw(fn, bucket='synchtest', key='synch') :
+def saveRaw(fn, bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
     print 'writing to', fn
     file(fn, 'wb').write(d)
 
-def clear(bucket='synchtest', key='synch') :
+def clear(bucket=defBucket, key=defKey) :
     getS3().delete(bucket, key);
 
 def dump() :

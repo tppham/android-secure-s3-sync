@@ -28,6 +28,9 @@ public class GenericSync {
     private static final boolean mPrefLocal = true; // XXX config!
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
+    // XXX we can merge load/loadFromStore and save/saveToStore
+    // now that this is our only kind of load/save
+
     static ContactSetBS load(String name, ByteBuffer buf) {
         if(buf != null) {
             try {
@@ -57,24 +60,6 @@ public class GenericSync {
         return load(name, buf);
     }
 
-    static ContactSetBS loadFromDisk(String name, String fn) {
-        try {
-            FileInputStream is = new FileInputStream(new File(fn));
-            try {
-                FileChannel ch = is.getChannel();
-                ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
-                ch.read(buf);
-                buf.flip();
-                return load(name, buf);
-            } finally {
-                is.close();
-            }
-        } catch(final IOException e) {
-            Log.v(TAG, "error loading " + name + " data from " + fn + ": " + e);
-            return load(name, null);
-        } 
-    }
-
     static ByteBuffer save(ContactSetBS cs) {
         Log.v(TAG, "" + cs.name + " dirty: " + cs.dirty);
         if(!cs.dirty)
@@ -97,25 +82,10 @@ public class GenericSync {
             // XXX blob store should take bytebuffer
             byte[] bs = new byte[buf.remaining()];
             buf.get(bs);
+            if(!s.create(bucket)) // XXX elsewhere?  better error reporting!
+                Log.v(TAG, "couldn't create bucket: " + bucket);
             s.put(bucket, "synch", bs);
         }
-    }
-
-    static void saveToDisk(String fn, ContactSetBS cs) {
-        try {
-            ByteBuffer buf = save(cs);
-            if(buf != null) {
-                FileOutputStream os = new FileOutputStream(new File(fn));
-                try {
-                    FileChannel ch = os.getChannel();
-                    ch.write(buf);
-                } finally {
-                    os.close();
-                }
-            }
-        } catch(final IOException e) {
-            Log.v(TAG, "error saving " + cs.name + " data: " + e);
-        } 
     }
 
     // XXX update syncResult!
@@ -124,13 +94,18 @@ public class GenericSync {
     // XXX we need a handle on preferences, like prefLocal!
     // XXX re-evaluate exception list
     private static void _onPerformSync(Context ctx, String name, IBlobStore store, SyncResult res) throws Exception {
+        name = name.toLowerCase(); // XXX might destroy uniqueness! fixme!
+                                    // XXX the issue here is that s3 wants lowercase bucket names in its API
     	Log.v(TAG, "_onPerformSync");
-        String lastPath = "/sdcard/" + name + ".bin"; // XXX! use private location!
 
+        // note: the sdcard store is really a generic file store,
+        // we use it to store "last" sets.
+        String lastPath = ctx.getDir("last", Context.MODE_PRIVATE).getPath();
+        IBlobStore lastStore = new com.isecpartners.samplesync.sdcard.Store(lastPath);
+        
         // XXX figure out account types to create new contacts as!
         ContactSet local = new ContactSetDB("localdb", ctx, null, null);
-        // XXX last should be stored elsewhere!
-        ContactSetBS last = loadFromDisk("last", lastPath);
+        ContactSetBS last = loadFromStore("last", lastStore, name);
         ContactSetBS remote = loadFromStore("remote", store, name);
 
         if(last.id != remote.id) {
@@ -149,7 +124,7 @@ public class GenericSync {
         if(s.sync()) {
             // XXX notify user of synch
             // update last synch time
-            saveToDisk(lastPath, last);
+            saveToStore(lastStore, name, last);
             saveToStore(store, name, remote);
         }
     }

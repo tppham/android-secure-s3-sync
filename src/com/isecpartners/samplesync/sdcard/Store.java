@@ -92,8 +92,6 @@ public class Store implements IBlobStore {
      */
     public boolean put(String store, String name, byte [] data)
     {
-        if(!create(store))
-            return false;
         FileOutputStream w = null;
         try {
             File d = new File(mDir, store);
