@@ -202,3 +202,10 @@ TODO
     - if he doesnt want to keep them, then they will go away
       during a normal synch
 
+
+ - on account creation
+   - confirm that the account name is unique
+   - confirm that we can authenticate (bucketlist?)
+   - create a new empty store for "last"
+   report any errors to user
+

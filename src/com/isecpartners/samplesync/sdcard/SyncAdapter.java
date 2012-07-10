@@ -1,6 +1,7 @@
 package com.isecpartners.samplesync.sdcard;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -27,9 +28,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     /* a synch is requested. */
     @Override
     public void onPerformSync(Account acct, Bundle extras, String authority, ContentProviderClient provider, SyncResult res) {
-        //AccountManager mgr = AccountManager.get(mCtx);
-        Log.v(TAG, "XXX should sync here with sdcard store: " + acct.name);
-        IBlobStore store = new Store(acct.name);
-        GenericSync.onPerformSync(mCtx, TOKEN_TYPE, "", store, res);
+        Log.v(TAG, "sync with sdcard store: " + acct.name);
+        AccountManager mgr = AccountManager.get(mCtx);
+        String path = mgr.getPassword(acct);
+        IBlobStore store = new Store(path);
+        GenericSync.onPerformSync(mCtx, acct.name, TOKEN_TYPE, path, store, res);
     }
 }

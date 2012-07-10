@@ -30,10 +30,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account acct, Bundle extras, String authority, ContentProviderClient provider, SyncResult res) {
         AccountManager mgr = AccountManager.get(mCtx);
-        String pw = mgr.getPassword(acct);
+        String keyid = mgr.getUserData(acct, "keyID");
+        String key = mgr.getPassword(acct);
         
-        Log.v(TAG, "XXX should sync here with s3 store: " + acct.name + " " + pw);
-        IBlobStore store = new Store(acct.name, pw);
-        GenericSync.onPerformSync(mCtx, TOKEN_TYPE, pw, store, res);
+        Log.v(TAG, "sync here with s3 store: " + acct.name + " " +  keyid + " " + key);
+        IBlobStore store = new Store(keyid, key);
+        GenericSync.onPerformSync(mCtx, acct.name, TOKEN_TYPE, key, store, res);
     }
 }

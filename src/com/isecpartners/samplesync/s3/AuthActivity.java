@@ -38,10 +38,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private AmazonS3Client s3Client = null;
     
     private TextView mMsgTxt;
-    private EditText mAcctIn, mPasswdIn;
-    private String mAcct, mPasswd;
+    private EditText mNameIn, mAcctIn, mPasswdIn;
+    private String mName, mAcct, mPasswd;
 
-        public void signinThread(String acct, String passwd) {
+        // XXX this should be a background thread which validates
+        // that the acct and password work!
+        public void signinThread(String name, String acct, String passwd) {
+            mName = name;
             mAcct = acct;
             mPasswd = passwd;
         }
@@ -101,6 +104,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
 
         mMsgTxt = (TextView)findViewById(R.id.err_msg);
+        mNameIn = (EditText)findViewById(R.id.name_edit);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
         mPasswdIn = (EditText)findViewById(R.id.passwd_edit);
 
@@ -132,6 +136,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onSignIn(View view) {
     	findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
     	
+        String name = mNameIn.getText().toString();
         String acct = mAcctIn.getText().toString();
         String passwd = mPasswdIn.getText().toString();
         
@@ -142,17 +147,15 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 //        acct = aws.getAccessKeyID();
 //        passwd = aws.getSecretKey();
 
-        if(acct.equals("") || passwd.equals("")) {
-            mMsgTxt.setText("You must enter an account and password");
-            mAcctIn.setText("");
-            mPasswdIn.setText("");
+        if(name.equals("") || acct.equals("") || passwd.equals("")) {
+            mMsgTxt.setText("You must enter a name, account and password");
             findViewById(R.id.signin_progress).setVisibility(View.GONE);
             return;
         }
         
-        signinThread(acct, passwd);
+        signinThread(name, acct, passwd);
         boolean ok = SetLoginCredentials();
-        onSigninDone(mAcct, mPasswd, ok);
+        onSigninDone(mName, mAcct, mPasswd, ok);
     }
     
    
@@ -169,6 +172,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     /**
      *  read the contents of the QR code and 
      * parse them to get Access Key ID and Secret Access Key 
+     * XXX this needs to be fixed up to also support the account name!
      */
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
     	findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
@@ -188,9 +192,10 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                   return;
               }
               
-             signinThread(access_key, secret_key);
+             // XXX fetch account name from result
+             signinThread("XXXdummy", access_key, secret_key);
              boolean ok = SetLoginCredentials();
-             onSigninDone(mAcct, mPasswd, ok);
+             onSigninDone(mName, mAcct, mPasswd, ok);
              finish();
         	  
         	  
@@ -203,7 +208,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     /**
      * Callback (through mCb) from SigninThread when completed.
      */
-    public void onSigninDone(String acct, String passwd, boolean ok) {
+    public void onSigninDone(String name, String acct, String passwd, boolean ok) {
         Log.v(TAG, "onSigninDone: " + ok);
         findViewById(R.id.signin_progress).setVisibility(View.GONE);
 
@@ -214,8 +219,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        Account a = new Account(acct, ACCOUNT_TYPE);
+        Account a = new Account(name, ACCOUNT_TYPE);
         mAcctMgr.addAccountExplicitly(a, passwd, null);
+        mAcctMgr.setUserData(a, "keyID", acct);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();
