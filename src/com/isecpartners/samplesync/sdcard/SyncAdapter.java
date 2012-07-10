@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.isecpartners.samplesync.GenericSync;
 import com.isecpartners.samplesync.IBlobStore;
+import com.isecpartners.samplesync.FileStore;
 
 /**
  * Android calls through this interface to request a sync.
@@ -31,7 +32,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, "sync with sdcard store: " + acct.name);
         AccountManager mgr = AccountManager.get(mCtx);
         String path = mgr.getUserData(acct, "path");
-        IBlobStore store = new Store(path);
+        IBlobStore store = new FileStore(path);
         GenericSync.onPerformSync(mCtx, acct.name, TOKEN_TYPE, path, store, res);
     }
 }
