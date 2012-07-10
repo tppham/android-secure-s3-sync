@@ -48,22 +48,27 @@ public class ContactSetDB extends ContactSet {
     protected void loadContacts() {
         /* we want all entries with no account, or the google or exchange accounts */
         Cursor c = mCtx.getContentResolver().query(RawContacts.CONTENT_URI,
-                    new String[]{ RawContacts._ID },
+                    new String[]{ RawContacts._ID, 
+                                RawContacts.ACCOUNT_TYPE,
+                                RawContacts.ACCOUNT_NAME },
                     RawContacts.ACCOUNT_TYPE + " is null OR " + RawContacts.ACCOUNT_TYPE + "=? OR " + RawContacts.ACCOUNT_TYPE + "=?",
                     // XXX is this right?  verify account names.
                     new String[]{ TYPE_EXCHANGE, TYPE_POP_IMAP },
                     null);
 
         while(c.moveToNext())
-            contacts.add(new Contact(mCtx, c.getLong(0)));
+            contacts.add(new Contact(mCtx, c.getLong(0), c.getString(1), c.getString(2)));
         c.close();
     }
 
     public Contact add() {
         Contact c = super.add();
+        c.acctType = mAcctType;
+        c.acctName = mAcctName;
+
         mCIdx = mOps.size(); // where the contact xref is in the list
         mFixups.add(new Fixup(c, null, mCIdx));
-        mOps.add(c.buildInsert(mAcctName, mAcctType).build());
+        mOps.add(c.buildInsert().build());
         return c;
     }
 

@@ -19,42 +19,40 @@ import android.util.Log;
 public class Contact {
     public static final String TAG = "model.Contact";
     public static final long UNKNOWN_ID = -1;
+    public String acctName, acctType;
     public long locid, remid; // row id (not contact id!).
     public List<CData> data;
 
     public Contact() {
         data = new LinkedList<CData>();
+        acctName = null;
+        acctType = null;
         locid = UNKNOWN_ID;
         remid = UNKNOWN_ID;
     }
 
-    public Contact(long _id) {
+    /* Fetch a contact from the content provider */
+    public Contact(Context ctx, long id, String atype, String aname) {
         this();
-        locid = _id;
-    }
+        locid = id;
+        acctType = atype;
+        acctName = aname;
 
-    /* build a contact with rows from c */
-    public Contact(long id, Cursor c) {
-        this(id);
+        Cursor c = CData.getDatas(ctx, id);
         while(c.moveToNext())
             data.add(CData.get(c));
         c.close();
-    }
-
-    /* Fetch a contact from the content provider */
-    public Contact(Context ctx, long id) {
-        this(id, CData.getDatas(ctx, id));
     }
 
     public void add(CData d) { data.add(d); }
 
 
     // return a builder for inserting a contact into the db
-    public ContentProviderOperation.Builder buildInsert(String aname, String atype) {
+    public ContentProviderOperation.Builder buildInsert() {
         return ContentProviderOperation
                     .newInsert(RawContacts.CONTENT_URI)
-                    .withValue(RawContacts.ACCOUNT_NAME, aname)
-                    .withValue(RawContacts.ACCOUNT_TYPE, atype);
+                    .withValue(RawContacts.ACCOUNT_NAME, acctName)
+                    .withValue(RawContacts.ACCOUNT_TYPE, acctType);
     }
 
     // return a builder for deleting the contact from the db
@@ -68,7 +66,7 @@ public class Contact {
 
     public String toString() {
         String s = "";
-        s += "[Contact " + locid + "/" + remid + ": ";
+        s += "[Contact " + locid + "/" + remid + " acct " + acctType + "/" + acctName + ": ";
         for(CData d : data)
             s += d + " ";
         s += "]";
@@ -78,6 +76,8 @@ public class Contact {
     public void marshal(ByteBuffer buf, int vers) throws Marsh.Error {
         // XXX we dont really need both fields for the "remote" store,
         // only for the "last" store.. perhaps a switch for this.
+        Marsh.marshString(buf, acctType);
+        Marsh.marshString(buf, acctName);
         Marsh.marshInt64(buf, locid);
         Marsh.marshInt64(buf, remid);
         Marsh.marshInt16(buf, data.size());
@@ -89,6 +89,8 @@ public class Contact {
         Contact c = new Contact();
         // XXX we dont really need both fields for the "remote" store,
         // only for the "last" store.. perhaps a switch for this.
+        c.acctType = Marsh.unmarshString(buf);
+        c.acctName = Marsh.unmarshString(buf);
         c.locid = Marsh.unmarshInt64(buf);
         c.remid = Marsh.unmarshInt64(buf);
         int cnt = Marsh.unmarshInt16(buf);

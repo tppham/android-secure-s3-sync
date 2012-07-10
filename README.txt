@@ -220,6 +220,9 @@ TODO
  - XXX need to call create() on new buckets in generic code somewhere.
    and remove the call in the file.Store()
 
+ - "last" set stores more info (ie. local and remote IDs, account names)
+   than "remote".  We could make a more dense encoding of remote if we
+   make it skip those items.
 
 polish:
   - icon for app
