@@ -207,5 +207,20 @@ TODO
    - confirm that the account name is unique
    - confirm that we can authenticate (bucketlist?)
    - create a new empty store for "last"
+   - make a list of local account providers we will synch for!
+     - need a gui list of account names and types
    report any errors to user
+
+ - make sure that metachars cant be entered into account names!
+ - check out bug where synching to multiple synch accounts
+   causes slight disparity - some extra empty contacts!
+   - to repo: add sdcard and s3 account, synch both repeatedly
+ - XXX need to call create() on new buckets in generic code somewhere.
+   and remove the call in the file.Store()
+
+
+polish:
+  - icon for app
+  - icon for providers
+  - figure out which activity we want to launch by default
 
