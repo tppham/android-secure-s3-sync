@@ -311,7 +311,13 @@ public class Synch {
                 done.add(m);
         }
 
+        // remember accounts in last set
+        for(Merge m : done) {
+            m.last.acctType = m.local.acctType;
+            m.last.acctName = m.local.acctName;
+        }
 
+        // allocate IDs for any remotes that dont have IDs yet
         if(updated)
             allocateIDs(done);
         return updated;

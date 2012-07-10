@@ -21,12 +21,14 @@ class ContactSet(object) :
 
 class Contact(object) :
     def __init__(self, *args) :
+        self.acctType = None
+        self.acctName = None
         self.locid = -1
         self.remid = -1
         self.data = list(args)
     def __str__(self) :
         ds = '\n    '.join(str(d) for d in self.data)
-        return '[Contact: locid=%x remid=%x\n    %s]' % (self.locid, self.remid, ds)
+        return '[Contact: locid=%x remid=%x acct=%s/%s\n    %s]' % (self.locid, self.remid, self.acctType, self.acctName, ds)
 
 class Data(object) :
     PHONE, EMAIL, NAME = 1,2,3
@@ -61,13 +63,13 @@ class Buf(object) :
             raise Error("out of data at %d!" % (self.pos))
         x = self.b[self.pos]
         self.pos += 1
-        return x;
+        return x
     def put8(self, x) :
         self.b.append(x & 0xff)
         self.pos += 1
         return self
     def get16(self) :
-        return self.get8() << 8 | self.get8();
+        return self.get8() << 8 | self.get8()
     def put16(self, x) :
         return self.put8(x >> 8).put8(x)
     def get32(self) :
@@ -113,15 +115,19 @@ class Buf(object) :
 
     def getContact(self) :
         c = Contact()
-        c.locid = self.get64();
-        c.remid = self.get64();
+        c.acctType = self.getStr()
+        c.acctName = self.getStr()
+        c.locid = self.get64()
+        c.remid = self.get64()
         cnt = self.get16()
         for n in xrange(cnt) :
             c.data.append(self.getData())
         return c
     def putContact(self, c) :
-        self.put64(c.locid);
-        self.put64(c.remid);
+        self.putStr(c.acctType)
+        self.putStr(c.acctName)
+        self.put64(c.locid)
+        self.put64(c.remid)
         self.put16(len(c.data))
         for d in c.data :
             self.putData(d)
