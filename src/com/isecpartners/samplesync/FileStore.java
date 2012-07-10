@@ -1,4 +1,4 @@
-package com.isecpartners.samplesync.sdcard;
+package com.isecpartners.samplesync;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +13,8 @@ import com.isecpartners.samplesync.Utils;
 /**
  * A simplistic blob-store using local files.
  */
-public class Store implements IBlobStore {
-    private static final String LOG_TAG = "sdcard.Store";
+public class FileStore implements IBlobStore {
+    private static final String LOG_TAG = "FileStore";
     private String mDir;
 
     public static boolean checkStore(String dir) {
@@ -25,7 +25,7 @@ public class Store implements IBlobStore {
     /**
      * @param dir The directory for storing files.
      */
-    public Store(String dir) {
+    public FileStore(String dir) {
         mDir = dir;
     };
 

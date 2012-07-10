@@ -43,7 +43,7 @@ public class Misc extends Activity {
         IBlobStore store = null;
         try {
             //store = new com.isecpartners.samplesync.s3.Store(SecretKey, KeyId);
-            store = new com.isecpartners.samplesync.sdcard.Store("/sdcard/dir");
+            store = new com.isecpartners.samplesync.FileStore("/sdcard/dir");
         } catch (Exception e) {
             Log.e(LogTag, "error building blob store: ", e);
             return;

@@ -98,10 +98,8 @@ public class GenericSync {
                                     // XXX the issue here is that s3 wants lowercase bucket names in its API
     	Log.v(TAG, "_onPerformSync");
 
-        // note: the sdcard store is really a generic file store,
-        // we use it to store "last" sets.
         String lastPath = ctx.getDir("last", Context.MODE_PRIVATE).getPath();
-        IBlobStore lastStore = new com.isecpartners.samplesync.sdcard.Store(lastPath);
+        IBlobStore lastStore = new FileStore(lastPath);
         
         // XXX figure out account types to create new contacts as!
         ContactSet local = new ContactSetDB("localdb", ctx, null, null);

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.isecpartners.samplesync.R;
+import com.isecpartners.samplesync.FileStore;
 
 /**
  * A GUI for entering sdcard credentials (just a directory name).
@@ -58,7 +59,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         }
         String sdcard = Environment.getExternalStorageDirectory().getPath();
         String path = sdcard + "/SDSynch";
-        if(!Store.checkStore(path)) {
+        if(!FileStore.checkStore(path)) {
             // XXX error no longer makes sense
             mMsgTxt.setText("Can't use that directory");
             return;
