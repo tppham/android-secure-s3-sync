@@ -123,13 +123,14 @@ public class GenericSync {
     // record some per-account info like last synch time...
     // XXX we need a handle on preferences, like prefLocal!
     // XXX re-evaluate exception list
-    private static void _onPerformSync(Context ctx, IBlobStore store, SyncResult res) throws Exception {
+    private static void _onPerformSync(Context ctx, String name, IBlobStore store, SyncResult res) throws Exception {
     	Log.v(TAG, "_onPerformSync");
+        String lastPath = "/sdcard/" + name + ".bin"; // XXX! use private location!
 
         // XXX figure out account types to create new contacts as!
         ContactSet local = new ContactSetDB("localdb", ctx, null, null);
         // XXX last should be stored elsewhere!
-        ContactSetBS last = loadFromDisk("last", "/sdcard/last.bin");
+        ContactSetBS last = loadFromDisk("last", lastPath);
         ContactSetBS remote = loadFromStore("remote", store);
 
         if(last.id != remote.id) {
@@ -148,19 +149,17 @@ public class GenericSync {
         if(s.sync()) {
             // XXX notify user of synch
             // update last synch time
-            saveToDisk("/sdcard/last.bin", last);
+            saveToDisk(lastPath, last);
             saveToStore(store, remote);
         }
     }
 
     /* a synch is requested. */
-    public static void onPerformSync(Context ctx, String acctType, String token, IBlobStore store, SyncResult res) {
+    public static void onPerformSync(Context ctx, String name, String acctType, String token, IBlobStore store, SyncResult res) {
         Log.v(TAG, "onPerformSync");
-        AccountManager mgr = AccountManager.get(ctx);
-        Log.v(TAG, "Account: "+mgr.getAccounts().toString());
 
         try {
-            _onPerformSync(ctx, store, res);
+            _onPerformSync(ctx, name, store, res);
 
         // XXX re-evaluate which of these are needed...
         } catch (final OperationCanceledException e) {
@@ -182,6 +181,7 @@ public class GenericSync {
     }
 
     /* return a token or null, updating the result status */
+    // XXX dead code
     public static String getToken(Context ctx, Account acct, String tokenType, SyncResult res) {
         Log.v(TAG, "getToken");
         AccountManager mgr = AccountManager.get(ctx);

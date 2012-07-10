@@ -14,7 +14,7 @@ import com.isecpartners.samplesync.Utils;
  * A simplistic blob-store using local files.
  */
 public class Store implements IBlobStore {
-    private static final String LOG_TAG = "FileBlobStore";
+    private static final String LOG_TAG = "sdcard.Store";
     private String mDir;
 
     public static boolean checkStore(String dir) {
@@ -37,9 +37,15 @@ public class Store implements IBlobStore {
     public boolean create(String store)
     {
         try {
+            File topd = new File(mDir);
+            if(!topd.exists() && !topd.mkdir()) {
+                Log.e(LOG_TAG, "mkdir failed " + topd);
+                return false;
+            }
+
             File d = new File(mDir, store);
             if(!d.exists() && !d.mkdir()) {
-                Log.e(LOG_TAG, "mkdir failed " + store);
+                Log.e(LOG_TAG, "mkdir failed " + d);
                 return false;
             }
             if(!d.exists() || !d.isDirectory()) {
@@ -47,8 +53,7 @@ public class Store implements IBlobStore {
                 return false;
             }
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, "create " + store, e);
             return false;
         }
@@ -87,6 +92,8 @@ public class Store implements IBlobStore {
      */
     public boolean put(String store, String name, byte [] data)
     {
+        if(!create(store))
+            return false;
         FileOutputStream w = null;
         try {
             File d = new File(mDir, store);

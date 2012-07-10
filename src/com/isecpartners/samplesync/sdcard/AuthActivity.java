@@ -57,14 +57,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
         String sdcard = Environment.getExternalStorageDirectory().getPath();
-        acct = sdcard + acct;
-        if(!Store.checkStore(acct)) {
+        String path = sdcard + "/" + acct;
+        if(!Store.checkStore(path)) {
             mMsgTxt.setText("Can't use that directory");
             return;
         }
 
         Account a = new Account(acct, ACCOUNT_TYPE);
-        mAcctMgr.addAccountExplicitly(a, "", null);
+        mAcctMgr.addAccountExplicitly(a, path, null);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();
