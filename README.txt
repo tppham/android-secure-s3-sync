@@ -210,6 +210,8 @@ TODO
    - make a list of local account providers we will synch for!
      - need a gui list of account names and types
    report any errors to user
+ - need to catch account deletion somehow!
+   - cleanup the local storage we used to capture "last" data
 
  - make sure that metachars cant be entered into account names!
  - check out bug where synching to multiple synch accounts
