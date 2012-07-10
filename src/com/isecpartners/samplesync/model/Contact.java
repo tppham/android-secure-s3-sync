@@ -55,13 +55,18 @@ public class Contact {
                     .withValue(RawContacts.ACCOUNT_TYPE, acctType);
     }
 
-    // return a builder for deleting the contact from the db
+    /*
+     * return a builder for deleting the contact from the db.
+     * Note: we dont actually delete, we mark it as deleted, and let
+     * its provider do the cleanup when it can.
+     */
     public ContentProviderOperation.Builder buildDelete() {
         if(!(locid != UNKNOWN_ID))
             Log.e(TAG, "assert locid != UNKNOWN_ID");
         return ContentProviderOperation
-                    .newDelete(RawContacts.CONTENT_URI)
-                    .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(locid) });
+                    .newUpdate(RawContacts.CONTENT_URI)
+                    .withSelection(RawContacts._ID + "=?", new String[]{ String.valueOf(locid) })
+                    .withValue(RawContacts.DELETED, "1");
     }
 
     public String toString() {
