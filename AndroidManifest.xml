@@ -89,12 +89,6 @@
             >
         </activity>
         <activity
-            android:name=".test.Sync"
-            android:label="S3 Sync Test"
-            android:excludeFromRecents="true"
-            >
-        </activity>
-        <activity
             android:name=".test.AddContact"
             android:label="Add Contact Test"
             android:excludeFromRecents="true"
