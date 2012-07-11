@@ -32,8 +32,11 @@ public class Store implements IBlobStore {
 	public void create(String store) throws IBlobStore.Error {
 		try{
 			s3client.createBucket(store);
+		} catch(AmazonServiceException e){
+            if(e.getStatusCode() == 403)
+                throw new IBlobStore.AuthError("" + e);
+            throw new IBlobStore.IOError("" + e);
 		} catch(AmazonClientException e){
-            // XXX differentiate auth errors from other IO errors!
             throw new IBlobStore.IOError("" + e);
 		}
 	}
@@ -56,8 +59,11 @@ public class Store implements IBlobStore {
 			return buffer;
 		} catch (IOException e) {
             throw new IBlobStore.IOError("" + e);
-		} catch (AmazonClientException e){
-            // XXX differentiate auth errors!
+		} catch(AmazonServiceException e){
+            if(e.getStatusCode() == 403)
+                throw new IBlobStore.AuthError("" + e);
+            throw new IBlobStore.IOError("" + e);
+		} catch(AmazonClientException e){
             throw new IBlobStore.IOError("" + e);
 		}
 	}
@@ -84,8 +90,11 @@ public class Store implements IBlobStore {
 			om.setContentType("plain/text");
 			
 			s3client.putObject(store, name, is, om );
-		} catch (Exception e) {
-            // XXX differentiate aws auth errors from other errors!
+		} catch(AmazonServiceException e){
+            if(e.getStatusCode() == 403)
+                throw new IBlobStore.AuthError("" + e);
+            throw new IBlobStore.IOError("" + e);
+		} catch(AmazonClientException e){
             throw new IBlobStore.IOError("" + e);
 		}
 	}
