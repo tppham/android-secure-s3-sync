@@ -3,6 +3,7 @@ package com.isecpartners.samplesync;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.util.Log;
 
@@ -27,36 +28,17 @@ public class FileStore implements IBlobStore {
      */
     public FileStore(String dir) {
         mDir = dir;
-    };
+    }
 
     /**
      * @param store The name of the store to create.
-     *
-     * @return True for success.
      */
-    public boolean create(String store)
-    {
-        try {
-            File topd = new File(mDir);
-            if(!topd.exists() && !topd.mkdir()) {
-                Log.e(LOG_TAG, "mkdir failed " + topd);
-                return false;
-            }
-
-            File d = new File(mDir, store);
-            if(!d.exists() && !d.mkdir()) {
-                Log.e(LOG_TAG, "mkdir failed " + d);
-                return false;
-            }
-            if(!d.exists() || !d.isDirectory()) {
-                Log.e(LOG_TAG, "not a directory " + store);
-                return false;
-            }
-            return true;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "create " + store, e);
-            return false;
-        }
+    public void create(String store) throws IBlobStore.Error {
+        File d = new File(mDir, store);
+        if(!d.exists() && !d.mkdir()) 
+            throw new IBlobStore.IOError("Can't create bucket directory: " + d.getPath());
+        if(!d.exists() || !d.isDirectory()) 
+            throw new IBlobStore.IOError("Bucket directory isn't a directory: " + d.getPath());
     }
 
     /**
@@ -65,8 +47,7 @@ public class FileStore implements IBlobStore {
      *
      * @return The data fetched, or null.
      */
-    public byte[] get(String store, String name)
-    {
+    public byte[] get(String store, String name) throws IBlobStore.Error {
         try {
             File d = new File(mDir, store);
             File f = new File(d, name);
@@ -74,10 +55,8 @@ public class FileStore implements IBlobStore {
             byte[] dat = Utils.readAll(r);
             r.close();
             return dat;
-        }
-        catch (Exception e) {
-            Log.e(LOG_TAG, "get " + name, e);
-            return null;
+        } catch (IOException e) {
+            throw new IBlobStore.IOError("" + e);
         }
     }
 
@@ -87,23 +66,19 @@ public class FileStore implements IBlobStore {
      * object.
      * @param name The name of the object to create.
      * @param data The data to store in the object.
-     *
-     * @return True on success.
      */
-    public boolean put(String store, String name, byte [] data)
-    {
-        FileOutputStream w = null;
+    public void put(String store, String name, byte [] data) throws IBlobStore.Error {
         try {
             File d = new File(mDir, store);
             File f = new File(d, name);
-            w = new FileOutputStream(f);
-            w.write(data);
-            return true;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "put " + name, e);
-            return false;
-        } finally {
-            if(w != null) try { w.close(); } catch(final Exception e) {};
+            FileOutputStream w = new FileOutputStream(f);
+            try {
+                w.write(data);
+            } finally {
+                w.close();
+            }
+        } catch(final IOException e) {
+            throw new IBlobStore.IOError("" + e);
         }
     }
 }

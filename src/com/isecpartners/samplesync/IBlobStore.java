@@ -15,8 +15,8 @@ public interface IBlobStore {
         public IOError(String msg) { super(msg); }
     }
 
-    public boolean create(String store) throws Error;
+    public void create(String store) throws Error;
     public byte[] get(String store, String name) throws Error;
-    public boolean put(String store, String name, byte[] data) throws Error;
+    public void put(String store, String name, byte[] data) throws Error;
 }
 
