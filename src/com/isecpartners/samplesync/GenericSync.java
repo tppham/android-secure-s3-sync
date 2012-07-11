@@ -28,64 +28,54 @@ public class GenericSync {
     private static final boolean mPrefLocal = true; // XXX config!
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
-    // XXX we can merge load/loadFromStore and save/saveToStore
-    // now that this is our only kind of load/save
-
-    static ContactSetBS load(String name, ByteBuffer buf) {
-        if(buf != null) {
-            try {
-                ContactSetBS cs = ContactSetBS.unmarshal(name, buf);
-                Marsh.unmarshEof(buf);
-                return cs;
-            } catch(final Marsh.Error e) {
-                Log.v(TAG, "error unmarshalling " + name + " data: " + e);
-            } 
-        }
-
-        // XXX in the real program this should involve user
-        // interaction..  returning null might be best
-        Log.v(TAG, "making new empty contact set for " + name);
-        return new ContactSetBS(name);
-    }
-
-    static ContactSetBS loadFromStore(String name, IBlobStore store, String bucket) {
+    static ContactSetBS load(String setName, IBlobStore store, String bucket) throws Marsh.Error, IBlobStore.Error {
         // XXX should be trivial to refactor the IBlobStore
         // interface and implementations to return a ByteBuffer.
         byte[] bs = store.get(bucket, "synch");
-        if(bs == null)
-            return load(name, null);
         ByteBuffer buf = ByteBuffer.allocate(bs.length);
         buf.put(bs);
         buf.flip();
-        return load(name, buf);
+
+        ContactSetBS cs = ContactSetBS.unmarshal(setName, buf);
+        Marsh.unmarshEof(buf);
+        return cs;
     }
 
-    static ByteBuffer save(ContactSetBS cs) {
-        Log.v(TAG, "" + cs.name + " dirty: " + cs.dirty);
+    static void save(IBlobStore s, String bucket, ContactSetBS cs) throws Marsh.Error, IBlobStore.Error {
+        Log.v(TAG, "save: " + cs.name + " dirty: " + cs.dirty);
         if(!cs.dirty)
-            return null;
-        try {
-            ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
-            cs.marshal(buf);
-            buf.flip();
-            return buf;
-        } catch(final Marsh.Error e) {
-            Log.v(TAG, "error marshalling " + cs.name + " data");
-            return null;
-        } 
+            return;
+
+        ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
+        cs.marshal(buf);
+        buf.flip();
+
+        byte[] bs = new byte[buf.remaining()];
+        buf.get(bs);
+        s.put(bucket, "synch", bs);
     }
 
-    static void saveToStore(IBlobStore s, String bucket, ContactSetBS cs) {
-        ByteBuffer buf = save(cs);
-        if(buf != null) {
-            // XXX create bucket?
-            // XXX blob store should take bytebuffer
-            byte[] bs = new byte[buf.remaining()];
-            buf.get(bs);
-            if(!s.create(bucket)) // XXX elsewhere?  better error reporting!
-                Log.v(TAG, "couldn't create bucket: " + bucket);
-            s.put(bucket, "synch", bs);
+    /*
+     * An error occurred saving the remote data.  Make a last ditch
+     * effort to save a local copy in hopes that we can push it later.
+     */
+    public static void saveBackup(IBlobStore store, ContactSetBS cs) {
+        try {
+            save(store, "backup", cs);
+        } catch(final Exception e) {
+            Log.e(TAG, "save backup failed!"); // nothign to do - just log it
         }
+    }
+    
+    /*
+     * If there's a previous backup to push, load it, and then
+     * save it to the remote.
+     */
+    public static boolean pushBackup(IBlobStore lastStore, IBlobStore remStore, String name) {
+        // XXX todo, read in backup, if it doesnt exist, return
+        // if it does, save it to remStore, and gracefully handle
+        // all errors.
+        return true;
     }
 
     // XXX update syncResult!
@@ -93,38 +83,97 @@ public class GenericSync {
     // record some per-account info like last synch time...
     // XXX we need a handle on preferences, like prefLocal!
     // XXX re-evaluate exception list
-    private static void _onPerformSync(Context ctx, String name, IBlobStore store, SyncResult res) throws Exception {
+    private static void _onPerformSync(Context ctx, String name, IBlobStore remStore, SyncResult res) throws Exception {
+        // XXX figure out account types to create new contacts as!
+
         name = name.toLowerCase(); // XXX might destroy uniqueness! fixme!
                                     // XXX the issue here is that s3 wants lowercase bucket names in its API
-    	Log.v(TAG, "_onPerformSync");
+    	Log.v(TAG, "_onPerformSync " + name);
 
         String lastPath = ctx.getDir("last", Context.MODE_PRIVATE).getPath();
         IBlobStore lastStore = new FileStore(lastPath);
-        
-        // XXX figure out account types to create new contacts as!
+        ContactSetBS last, remote;
+
+        if(!pushBackup(lastStore, remStore, name))
+            return;
+
+        // load last
+        try {
+            last = load("last", lastStore, name);
+        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
+            // XXX notify: delete acct?
+            Log.e(TAG, "corrupt account state!");
+            return;
+        }
+
+        // load remote
+        try {
+            remote = load("remote", remStore, name);
+        } catch(final Marsh.BadVersion e) {
+            // XXX notify: update your software
+            Log.e(TAG, "synch data has bad version!");
+            return;
+        } catch(final Marsh.Error e) {
+            // XXX notify: corrupt, wipe?
+            Log.e(TAG, "synch data corrupt!");
+            return;
+        } catch(final IBlobStore.AuthError e) {
+            // XXX invalidate creds
+            // XXX notify: update creds
+            Log.e(TAG, "synch auth failed!");
+            return;
+        } catch(final IBlobStore.Error e) {
+            // XXX notify: retry?
+            Log.e(TAG, "synch load failed!");
+            return;
+        }
+
+        // load local
         ContactSet local = new ContactSetDB("localdb", ctx, null, null);
-        ContactSetBS last = loadFromStore("last", lastStore, name);
-        ContactSetBS remote = loadFromStore("remote", store, name);
 
         if(last.id != remote.id) {
-            if(last.contacts.isEmpty()) {
-                // lock on to the remote's ID the first time we run
+            if(last.contacts.isEmpty()) { // lock on to the remote's ID the first time we run
                 last.id = remote.id;
-            } else {
-                // disallow any changes in remote ID after the first run
-                Log.v(TAG, "Remote has different ID!  we can't synch to it!");
-                // XXX synch failed, notify user
+            } else { // disallow any changes in remote ID after the first run
+                // XXX notify: synch data changed.  wipe?
+                Log.e(TAG, "synch data was replaced by someone else!");
                 return;
             }
         }
 
         Synch s = new Synch(last, local, remote, mPrefLocal);
-        if(s.sync()) {
-            // XXX notify user of synch
-            // update last synch time
-            saveToStore(lastStore, name, last);
-            saveToStore(store, name, remote);
+        if(!s.sync()) {
+            Log.v(TAG, "no changes!");
+            return;
         }
+
+        Log.v(TAG, "saving changes");
+        try {
+            save(remStore, name, remote);
+        } catch(final IBlobStore.AuthError e) {
+            // XXX invalidate creds
+            // XXX notify: auth error saving, update creds
+            saveBackup(lastStore, remote);
+            Log.e(TAG, "auth error saving synch data");
+            /* keep going.. we cant back out now... */
+        } catch(final IBlobStore.Error e) {
+            // XXX notify: error saving, try again?
+            saveBackup(lastStore, remote);
+            Log.e(TAG, "error saving synch data");
+            /* keep going.. we cant back out now... */
+        } catch(final Marsh.Error e) { // should never happen
+            Log.e(TAG, "internal error saving synch data!");
+        } 
+
+        try {
+            save(lastStore, name, last);
+        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
+            // XXX notify: delete acct?
+            Log.e(TAG, "couldn't update account state!");
+            return;
+        }
+
+        // XXX update the last synch time for the account
     }
 
     /* a synch is requested. */
