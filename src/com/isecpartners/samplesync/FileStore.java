@@ -44,9 +44,7 @@ public class FileStore implements IBlobStore {
      */
     public boolean storeExists(String store) {
         File d = new File(mDir, store);
-        if(!d.isDirectory())
-            return false;
-        return true;
+        return d.exists() && d.isDirectory();
     }
 
     /**
