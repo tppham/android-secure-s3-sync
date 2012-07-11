@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -83,13 +84,13 @@ public class Misc extends Activity {
             makeTestFile(pathname);
 
             try {
-                store.put(bucket, pathname, readFile(pathname).getBytes("UTF-8"));
+                store.put(bucket, pathname, readFile(pathname));
             } catch(IBlobStore.Error e) {
                 toast("Could not create object " + pathname);
                 return;
             }
 
-            byte[] dat;
+            ByteBuffer dat;
             try {
                 dat = store.get(bucket, pathname);
             } catch(IBlobStore.Error e) {
@@ -97,7 +98,7 @@ public class Misc extends Activity {
                 return;
             }
 
-            String data = new String(dat);
+            String data = new String(dat.array(), 0, dat.limit());
             toast("/" + bucket + "/" + pathname + ": '" + data + "'");
         }
         catch (Exception e) {
@@ -110,13 +111,15 @@ public class Misc extends Activity {
     }
 
 
-    String readFile(String filename) throws IOException {
+    ByteBuffer readFile(String filename) throws IOException {
         FileInputStream fin = openFileInput(filename);
-        InputStreamReader isr = new InputStreamReader(fin);
-        char[] inputBuffer = new char[128];
-        int c = isr.read(inputBuffer);
-
-        return new String(inputBuffer, 0, c);
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(fin.available());
+            fin.getChannel().read(buf);
+            return buf;
+        } finally {
+            fin.close();
+        }
     }
 
 

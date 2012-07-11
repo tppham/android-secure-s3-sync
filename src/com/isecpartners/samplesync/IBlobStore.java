@@ -1,5 +1,7 @@
 package com.isecpartners.samplesync;
 
+import java.nio.ByteBuffer;
+
 /*
  * Blob store interface lets you create stores, and use
  * them to store and retrieve data.
@@ -19,7 +21,7 @@ public interface IBlobStore {
     }
 
     public void create(String store) throws Error;
-    public byte[] get(String store, String name) throws Error;
-    public void put(String store, String name, byte[] data) throws Error;
+    public ByteBuffer get(String store, String name) throws Error;
+    public void put(String store, String name, ByteBuffer data) throws Error;
 }
 

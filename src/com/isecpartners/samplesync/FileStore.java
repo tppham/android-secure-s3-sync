@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.nio.ByteBuffer;
 
 import android.util.Log;
 
@@ -48,14 +49,16 @@ public class FileStore implements IBlobStore {
      *
      * @return The data fetched, or null.
      */
-    public byte[] get(String store, String name) throws IBlobStore.Error {
+    public ByteBuffer get(String store, String name) throws IBlobStore.Error {
         try {
             File d = new File(mDir, store);
             File f = new File(d, name);
             FileInputStream r = new FileInputStream(f);
-            byte[] dat = Utils.readAll(r);
+            ByteBuffer buf = ByteBuffer.allocate(r.available()); // XXX is available() a reliable indicator of size?
+            r.getChannel().read(buf);
             r.close();
-            return dat;
+            buf.flip();
+            return buf;
         } catch(final FileNotFoundException e) {
             throw new IBlobStore.NotFoundError("" + e);
         } catch (IOException e) {
@@ -70,13 +73,13 @@ public class FileStore implements IBlobStore {
      * @param name The name of the object to create.
      * @param data The data to store in the object.
      */
-    public void put(String store, String name, byte [] data) throws IBlobStore.Error {
+    public void put(String store, String name, ByteBuffer data) throws IBlobStore.Error {
         try {
             File d = new File(mDir, store);
             File f = new File(d, name);
             FileOutputStream w = new FileOutputStream(f);
             try {
-                w.write(data);
+                w.getChannel().write(data);
             } finally {
                 w.close();
             }
