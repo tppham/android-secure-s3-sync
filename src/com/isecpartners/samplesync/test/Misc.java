@@ -5,11 +5,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.isecpartners.samplesync.IBlobStore;
+import com.isecpartners.samplesync.Passphrase;
+import com.isecpartners.samplesync.FileStore;
 
 
 /**
@@ -39,11 +44,10 @@ public class Misc extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-/*
         IBlobStore store = null;
         try {
             //store = new com.isecpartners.samplesync.s3.Store(SecretKey, KeyId);
-            store = new com.isecpartners.samplesync.FileStore("/sdcard/dir");
+            store = new FileStore("/sdcard/dir");
         } catch (Exception e) {
             Log.e(LogTag, "error building blob store: ", e);
             return;
@@ -65,21 +69,26 @@ public class Misc extends Activity {
             String bucket = Passphrase.hexadecimalKey(8),
                    pathname = "test-for-fun.txt";
 
-            if (!store.create(bucket)) {
+            try {
+                store.create(bucket);
+            } catch(IBlobStore.Error e) {
                 toast("Could not create bucket " + bucket);
                 return;
             }
 
             makeTestFile(pathname);
 
-            if (!store.put(bucket, pathname, readFile(pathname).getBytes("UTF-8")))
-            {
+            try {
+                store.put(bucket, pathname, readFile(pathname).getBytes("UTF-8"));
+            } catch(IBlobStore.Error e) {
                 toast("Could not create object " + pathname);
                 return;
             }
 
-            byte[] dat = store.get(bucket, pathname);
-            if (dat == null) {
+            byte[] dat;
+            try {
+                dat = store.get(bucket, pathname);
+            } catch(IBlobStore.Error e) {
                 toast("Could not get object " + pathname);
                 return;
             }
@@ -90,7 +99,6 @@ public class Misc extends Activity {
         catch (Exception e) {
             Log.e(LogTag, "onCreate", e);
         }
-*/
     }
 
     void toast(String message) {

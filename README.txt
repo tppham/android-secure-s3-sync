@@ -229,6 +229,7 @@ TODO
    - list of accounts to synch
    - let user change password?
    - show info: last synch time
+ - XXX differentiate IO errors and blobstore fetches that have no data
 
 polish:
   - icon for app
