@@ -29,21 +29,17 @@ public class Store implements IBlobStore {
         this(new BasicAWSCredentials(name, pw));
 	}
 
-	public boolean create(String store) {
+	public void create(String store) throws IBlobStore.Error {
 		try{
 			s3client.createBucket(store);
-			return true;
-			
 		} catch(AmazonClientException e){
-			Log.v(TAG, "create bucket failed: "+e);
+            // XXX differentiate auth errors from other IO errors!
+            throw new IBlobStore.IOError("" + e);
 		}
-		return false;
 	}
 
-	public byte[] get(String store, String name) {
+	public byte[] get(String store, String name) throws IBlobStore.Error {
 		try {
-			
-			
 			S3Object result = s3client.getObject(store, name);
 			long length = result.getObjectMetadata().getContentLength();
 			S3ObjectInputStream is = result.getObjectContent();
@@ -59,11 +55,10 @@ public class Store implements IBlobStore {
 
 			return buffer;
 		} catch (IOException e) {
-			Log.v(TAG, "Exception: "+e);
-			return null;
+            throw new IBlobStore.IOError("" + e);
 		} catch (AmazonClientException e){
-			Log.v(TAG, "Exception: "+e);
-			return null;
+            // XXX differentiate auth errors!
+            throw new IBlobStore.IOError("" + e);
 		}
 	}
 	public List<Bucket> getList() {
@@ -76,7 +71,7 @@ public class Store implements IBlobStore {
 		
 	}
 
-	public boolean put(String store, String name, byte[] data) {
+	public void put(String store, String name, byte[] data) throws IBlobStore.Error {
 	    InputStream is;
 	    ObjectMetadata om;
 	    
@@ -89,14 +84,9 @@ public class Store implements IBlobStore {
 			om.setContentType("plain/text");
 			
 			s3client.putObject(store, name, is, om );
-		} 	
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+            // XXX differentiate aws auth errors from other errors!
+            throw new IBlobStore.IOError("" + e);
 		}
-		
-		
-		return false;
 	}
-
 }

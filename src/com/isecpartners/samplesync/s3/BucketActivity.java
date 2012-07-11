@@ -12,6 +12,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.isecpartners.samplesync.Passphrase;
 import com.isecpartners.samplesync.R;
 import com.isecpartners.samplesync.S3Sync;
+import com.isecpartners.samplesync.IBlobStore;
 
 import android.R.layout;
 import android.accounts.Account;
@@ -89,12 +90,11 @@ public class BucketActivity extends Activity{
 	             
 	            String bucketname = Passphrase.hexadecimalKey(8); 
 	            //Log.v(TAG, "bucket: "+bucketname);
-	 	    	boolean result = s3.create(bucketname);
-	 	    	
-	 	    	if(result){
+
+                try {
+	 	    	    s3.create(bucketname);
 	 	    		mAcctMgr.setUserData(a[0], AccountManager.KEY_USERDATA, bucketname);
-	 	    	}
-	 	    	else{
+                } catch(final IBlobStore.Error e) {
 	 	    		mBucketErrTxt.setText("Failed to create bucket");
 	 	    	}
 	             
@@ -129,17 +129,17 @@ public class BucketActivity extends Activity{
 	                    	 /* Get Contacts from device*/
 	                    	 byte[] data = s.getContacts();
 	                    	 String name = "Android Contacts";
-	                    	 s3.put(bucketName, name, data);
+	                    	 //s3.put(bucketName, name, data);
 	                    	 
 	                    	 /* Get Raw contacts */
 	                    	 data = s.getRawContacts();
 	                    	 name = "Android Raw Contacts";
-	                    	 s3.put(bucketName, name, data);
+	                    	 //s3.put(bucketName, name, data);
 	                    	 
 	                    	 /* Get Data */
 	                    	 data = s.getData();
 	                    	 name = "Android Data";
-	                    	 s3.put(bucketName, name, data);
+	                    	 //s3.put(bucketName, name, data);
 	                    	 
 	                     }
 	                 });
@@ -156,17 +156,17 @@ public class BucketActivity extends Activity{
 	                    	 
 	                    	 /* Get Contacts from S3*/
 	                    	 String name = "Android Contacts";
-	                    	 byte[] data = s3.get(bucketName, name);
+	                    	 //byte[] data = s3.get(bucketName, name);
 	                    	 /* TODO create contacts and push them onto device */
-	                    	 Log.v(TAG, "Contacts: "+data.length+" : "+ (new String(data)));
+	                    	 //Log.v(TAG, "Contacts: "+data.length+" : "+ (new String(data)));
 	                    	 /* Get Raw contacts */ 
 	                    	 name = "Android Raw Contacts";
-	                    	 data = s3.get(bucketName, name);
-	                    	 Log.v(TAG, "Raw Contacts: "+data.length+" : "+ (new String(data)));
+	                    	 //data = s3.get(bucketName, name);
+	                    	 //Log.v(TAG, "Raw Contacts: "+data.length+" : "+ (new String(data)));
 	                    	 /* Get Data */
 	                    	 name = "Android Data";
-	                    	 data = s3.get(bucketName, name);
-	                    	 Log.v(TAG, "Data: "+data.length+" : "+ (new String(data)));
+	                    	 //data = s3.get(bucketName, name);
+	                    	 //Log.v(TAG, "Data: "+data.length+" : "+ (new String(data)));
 	                    	 
 	                     }
 	                 });
