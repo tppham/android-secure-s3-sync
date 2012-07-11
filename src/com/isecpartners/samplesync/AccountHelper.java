@@ -35,7 +35,7 @@ public class AccountHelper {
 
     public boolean stateStoreExists() {
         FileStore s = getStateStore();
-        return s.storeExists("synch");
+        return s.storeExists(mName);
     }
 
     /* load a contact set from this account's bucket */
