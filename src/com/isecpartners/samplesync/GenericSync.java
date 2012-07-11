@@ -29,13 +29,7 @@ public class GenericSync {
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
     static ContactSetBS load(String setName, IBlobStore store, String bucket) throws Marsh.Error, IBlobStore.Error {
-        // XXX should be trivial to refactor the IBlobStore
-        // interface and implementations to return a ByteBuffer.
-        byte[] bs = store.get(bucket, "synch");
-        ByteBuffer buf = ByteBuffer.allocate(bs.length);
-        buf.put(bs);
-        buf.flip();
-
+        ByteBuffer buf = store.get(bucket, "synch");
         ContactSetBS cs = ContactSetBS.unmarshal(setName, buf);
         Marsh.unmarshEof(buf);
         return cs;
@@ -49,10 +43,7 @@ public class GenericSync {
         ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
         cs.marshal(buf);
         buf.flip();
-
-        byte[] bs = new byte[buf.remaining()];
-        buf.get(bs);
-        s.put(bucket, "synch", bs);
+        s.put(bucket, "synch", buf);
     }
 
     /*
@@ -122,7 +113,7 @@ public class GenericSync {
             // XXX notify: update creds
             Log.e(TAG, "synch auth failed!");
             return;
-        } catch(final IBlobStore.FileNotFoundError e) {
+        } catch(final IBlobStore.NotFoundError e) {
             // XXX notify: synch data not found, wipe?
             Log.e(TAG, "synch load failed!");
             return;

@@ -3,6 +3,7 @@ package com.isecpartners.samplesync.s3;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import android.util.Log;
@@ -41,22 +42,20 @@ public class Store implements IBlobStore {
 		}
 	}
 
-	public byte[] get(String store, String name) throws IBlobStore.Error {
+	public ByteBuffer get(String store, String name) throws IBlobStore.Error {
 		try {
 			S3Object result = s3client.getObject(store, name);
 			long length = result.getObjectMetadata().getContentLength();
 			S3ObjectInputStream is = result.getObjectContent();
 
 			Log.v(TAG, " length: "+length);
-
-			/* TODO Change this ASAP */
-			byte[] buffer = new byte[(int) (length)];
-			
-			/* Change this ASAP */
-			is.read(buffer, 0, (int)length);
-			is.close();
-
-			return buffer;
+            if(length > 1024 * 1024)
+                throw new IBlobStore.IOError("data is too big");
+            byte[] buf = new byte[(int)length];
+            is.read(buf);
+            is.close();
+            
+            return ByteBuffer.wrap(buf);
 		} catch (IOException e) {
             throw new IBlobStore.IOError("" + e);
 		} catch(AmazonServiceException e){
@@ -79,16 +78,16 @@ public class Store implements IBlobStore {
 		
 	}
 
-	public void put(String store, String name, byte[] data) throws IBlobStore.Error {
+	public void put(String store, String name, ByteBuffer data) throws IBlobStore.Error {
 	    InputStream is;
 	    ObjectMetadata om;
 	    
 		try {
-			is = new ByteArrayInputStream(data);
+			is = new ByteArrayInputStream(data.array(), 0, data.limit());
 			om = new ObjectMetadata();
-			om.setContentLength(data.length);
+			om.setContentLength(data.limit());
 			
-			Log.v(TAG, "Content Length:" + data.length);
+			Log.v(TAG, "Content Length:" + data.limit());
 			om.setContentType("plain/text");
 			
 			s3client.putObject(store, name, is, om );
