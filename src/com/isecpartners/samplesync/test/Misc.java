@@ -43,6 +43,10 @@ public class Misc extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public void onStart() {
+        super.onStart();
 
         IBlobStore store = null;
         try {

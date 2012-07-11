@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import android.util.Log;
 
@@ -55,6 +56,8 @@ public class FileStore implements IBlobStore {
             byte[] dat = Utils.readAll(r);
             r.close();
             return dat;
+        } catch(final FileNotFoundException e) {
+            throw new IBlobStore.NotFoundError("" + e);
         } catch (IOException e) {
             throw new IBlobStore.IOError("" + e);
         }

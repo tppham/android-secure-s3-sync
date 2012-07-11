@@ -11,6 +11,9 @@ public interface IBlobStore {
     public static class AuthError extends Error {
         public AuthError(String msg) { super(msg); }
     }
+    public static class NotFoundError extends Error {
+        public NotFoundError(String msg) { super(msg); }
+    }
     public static class IOError extends Error {
         public IOError(String msg) { super(msg); }
     }
