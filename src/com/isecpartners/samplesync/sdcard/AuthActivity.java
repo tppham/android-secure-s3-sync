@@ -1,5 +1,7 @@
 package com.isecpartners.samplesync.sdcard;
 
+import java.io.File;
+
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 
 import com.isecpartners.samplesync.R;
 import com.isecpartners.samplesync.FileStore;
+import com.isecpartners.samplesync.IBlobStore;
+import com.isecpartners.samplesync.AccountHelper;
 
 /**
  * A GUI for entering sdcard credentials (just a directory name).
@@ -29,6 +33,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private AccountManager mAcctMgr;
 
     private TextView mMsgTxt;
+    private EditText mDirIn;
     private EditText mAcctIn;
 
     @Override
@@ -44,30 +49,58 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
 
         mMsgTxt = (TextView)findViewById(R.id.msg);
+        mDirIn = (EditText)findViewById(R.id.dir_edit);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
     }
 
     /**
      * SignIn button was clicked.  
+     * Validate the fields, initialize the storage and save the account.
+     *
      * @param view The Submit button for which this method is invoked
      */
     public void onSignIn(View view) {
         String acct = mAcctIn.getText().toString();
-        if(acct.equals("")) {
-            mMsgTxt.setText("You must enter an account name");
+        String dir = mDirIn.getText().toString();
+        if(acct.equals("") || dir.equals("")) {
+            mMsgTxt.setText("You must enter an account name and a directory");
             return;
         }
-        String sdcard = Environment.getExternalStorageDirectory().getPath();
-        String path = sdcard + "/SDSynch";
-        if(!FileStore.checkStore(path)) {
-            // XXX error no longer makes sense
-            mMsgTxt.setText("Can't use that directory");
+
+        AccountHelper h = new AccountHelper(this, acct);
+        if(h.stateStoreExists()) {
+            mMsgTxt.setText("That account already exists");
+            return;
+        }
+
+        File sd = Environment.getExternalStorageDirectory();
+        File d = new File(sd, dir);
+        if(d.exists()) {
+            if(!d.isDirectory()) {
+                mMsgTxt.setText("Can't use that directory");
+                return;
+            }
+        } else {
+            /* XXX ask for user confirmation if it already exists! */
+            if(!d.mkdirs()) {
+                mMsgTxt.setText("Couldn't create directory " + d.getPath());
+                return;
+            }
+        }
+
+        FileStore f = new FileStore(d.getPath());
+        try {
+            h.initStore(h.getStateStore());
+            h.initStore(f);
+        } catch(final IBlobStore.Error e) { /* shouldn't happen! */
+            Log.e(TAG, "error creating the store: " + e);
+            mMsgTxt.setText("Error initializing!");
             return;
         }
 
         Account a = new Account(acct, ACCOUNT_TYPE);
         mAcctMgr.addAccountExplicitly(a, "", null);
-        mAcctMgr.setUserData(a, "path", path);
+        mAcctMgr.setUserData(a, "path", d.getPath());
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();
