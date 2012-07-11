@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:text="Access Key ID" />
             <EditText
-                android:id="@+id/acct_edit"
+                android:id="@+id/keyid_edit"
                 android:singleLine="true"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:text="Secret Access Key" />
             <EditText
-                android:id="@+id/passwd_edit"
+                android:id="@+id/key_edit"
                 android:singleLine="true"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
