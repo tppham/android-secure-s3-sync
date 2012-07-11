@@ -62,6 +62,8 @@ public class Store implements IBlobStore {
 		} catch(AmazonServiceException e){
             if(e.getStatusCode() == 403)
                 throw new IBlobStore.AuthError("" + e);
+            if(e.getStatusCode() == 404)
+                throw new IBlobStore.NotFoundError("" + e);
             throw new IBlobStore.IOError("" + e);
 		} catch(AmazonClientException e){
             throw new IBlobStore.IOError("" + e);

@@ -101,7 +101,7 @@ public class GenericSync {
         try {
             last = load("last", lastStore, name);
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
-            // XXX notify: delete acct?
+            // XXX notify: missing or corrupted state, delete acct?
             Log.e(TAG, "corrupt account state!");
             return;
         }
@@ -121,6 +121,10 @@ public class GenericSync {
             // XXX invalidate creds
             // XXX notify: update creds
             Log.e(TAG, "synch auth failed!");
+            return;
+        } catch(final IBlobStore.FileNotFoundError e) {
+            // XXX notify: synch data not found, wipe?
+            Log.e(TAG, "synch load failed!");
             return;
         } catch(final IBlobStore.Error e) {
             // XXX notify: retry?
