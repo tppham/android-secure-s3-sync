@@ -9,10 +9,6 @@ import java.nio.ByteBuffer;
 
 import android.util.Log;
 
-import com.isecpartners.samplesync.IBlobStore;
-import com.isecpartners.samplesync.Utils;
-
-
 /**
  * A simplistic blob-store using local files.
  */
