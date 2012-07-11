@@ -94,6 +94,12 @@
             android:excludeFromRecents="true"
             >
         </activity>
+        <activity
+            android:name=".test.Misc"
+            android:label="Misc Test"
+            android:excludeFromRecents="true"
+            >
+        </activity>
         <service
             android:name=".sdcard.AuthService"
             android:exported="true">
