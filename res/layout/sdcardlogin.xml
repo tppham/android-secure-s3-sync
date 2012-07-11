@@ -18,6 +18,13 @@
             android:paddingLeft="20dip"
             android:paddingRight="20dip">
             <TextView
+                android:id="@+id/msg"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:text="Select a directory" />
+            <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
@@ -25,6 +32,23 @@
                 android:text="Account name" />
             <EditText
                 android:id="@+id/acct_edit"
+                android:text="MyContacts"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textEmailAddress" />
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/sdcard directory" />
+            <EditText
+                android:id="@+id/dir_edit"
                 android:text="MyContacts"
                 android:singleLine="true"
                 android:layout_width="fill_parent"

@@ -42,6 +42,21 @@ public class Store implements IBlobStore {
 		}
 	}
 
+    public boolean storeExists(String store) throws IBlobStore.Error {
+        try {
+            s3client.getBucketAcl(store);
+            return true;
+        } catch(final AmazonServiceException e) {
+            if(e.getStatusCode() == 404)
+                return false;
+            if(e.getStatusCode() == 403)
+                throw new IBlobStore.AuthError("" + e);
+            throw new IBlobStore.IOError("" + e);
+		} catch(AmazonClientException e){
+            throw new IBlobStore.IOError("" + e);
+		}
+    }
+
 	public ByteBuffer get(String store, String name) throws IBlobStore.Error {
 		try {
 			S3Object result = s3client.getObject(store, name);

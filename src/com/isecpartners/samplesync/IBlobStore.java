@@ -21,7 +21,9 @@ public interface IBlobStore {
     }
 
     public void create(String store) throws Error;
+    public boolean storeExists(String store) throws Error;
     public ByteBuffer get(String store, String name) throws Error;
     public void put(String store, String name, ByteBuffer data) throws Error;
+
 }
 

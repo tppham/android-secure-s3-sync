@@ -40,6 +40,16 @@ public class FileStore implements IBlobStore {
     }
 
     /**
+     * @param store The name of the store to test.
+     */
+    public boolean storeExists(String store) {
+        File d = new File(mDir, store);
+        if(!d.isDirectory())
+            return false;
+        return true;
+    }
+
+    /**
      * @param store The name of the store that contains the object.
      * @param name The name of the object to retrieve.
      *

@@ -59,11 +59,9 @@ public class GenericSync {
     private static void _onPerformSync(Context ctx, String name, IBlobStore remStore, SyncResult res) throws Exception {
         // XXX figure out account types to create new contacts as!
 
-        name = name.toLowerCase(); // XXX might destroy uniqueness! fixme!
-                                    // XXX the issue here is that s3 wants lowercase bucket names in its API
     	Log.v(TAG, "_onPerformSync " + name);
         AccountHelper h = new AccountHelper(ctx, name);
-        IBlobStore lastStore = h.getLocalStore();
+        IBlobStore lastStore = h.getStateStore();
         ContactSetBS last, remote;
 
         if(!pushBackup(h, lastStore, remStore))
@@ -74,7 +72,7 @@ public class GenericSync {
             last = h.load("last", lastStore, "synch");
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: missing or corrupted state, delete acct?
-            Log.e(TAG, "corrupt account state!");
+            Log.e(TAG, "corrupt account state! " + e);
             return;
         }
 
@@ -83,24 +81,24 @@ public class GenericSync {
             remote = h.load("remote", remStore, "synch");
         } catch(final Marsh.BadVersion e) {
             // XXX notify: update your software
-            Log.e(TAG, "synch data has bad version!");
+            Log.e(TAG, "synch data has bad version! " + e);
             return;
         } catch(final Marsh.Error e) {
             // XXX notify: corrupt, wipe?
-            Log.e(TAG, "synch data corrupt!");
+            Log.e(TAG, "synch data corrupt! " + e);
             return;
         } catch(final IBlobStore.AuthError e) {
             // XXX invalidate creds
             // XXX notify: update creds
-            Log.e(TAG, "synch auth failed!");
+            Log.e(TAG, "synch auth failed! " + e);
             return;
         } catch(final IBlobStore.NotFoundError e) {
             // XXX notify: synch data not found, wipe?
-            Log.e(TAG, "synch load failed!");
+            Log.e(TAG, "synch load failed! " + e);
             return;
         } catch(final IBlobStore.Error e) {
             // XXX notify: retry?
-            Log.e(TAG, "synch load failed!");
+            Log.e(TAG, "synch load failed! " + e);
             return;
         }
 
@@ -130,22 +128,22 @@ public class GenericSync {
             // XXX invalidate creds
             // XXX notify: auth error saving, update creds
             saveBackup(h, lastStore, remote);
-            Log.e(TAG, "auth error saving synch data");
+            Log.e(TAG, "auth error saving synch data: " + e);
             /* keep going.. we cant back out now... */
         } catch(final IBlobStore.Error e) {
             // XXX notify: error saving, try again?
             saveBackup(h, lastStore, remote);
-            Log.e(TAG, "error saving synch data");
+            Log.e(TAG, "error saving synch data: " + e);
             /* keep going.. we cant back out now... */
         } catch(final Marsh.Error e) { // should never happen
-            Log.e(TAG, "internal error saving synch data!");
+            Log.e(TAG, "internal error saving synch data! " + e);
         } 
 
         try {
             h.save(lastStore, "synch", last);
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: delete acct?
-            Log.e(TAG, "couldn't update account state!");
+            Log.e(TAG, "couldn't update account state! " + e);
             return;
         }
 

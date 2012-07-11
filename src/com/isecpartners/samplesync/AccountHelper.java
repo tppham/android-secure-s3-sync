@@ -20,15 +20,22 @@ public class AccountHelper {
 
     public AccountHelper(Context ctx, String name) {
         mCtx = ctx;
-        mName = name;
+        // XXX force name to lower.
+        // would be better to force user to enter lower case only!
+        mName = name.toLowerCase();
     }
 
     public String getDir() {
         return mCtx.getDir("state", Context.MODE_PRIVATE).getPath();
     }
 
-    public FileStore getLocalStore() {
+    public FileStore getStateStore() {
         return new FileStore(getDir());
+    }
+
+    public boolean stateStoreExists() {
+        FileStore s = getStateStore();
+        return s.storeExists("synch");
     }
 
     /* load a contact set from this account's bucket */
@@ -53,12 +60,17 @@ public class AccountHelper {
 
     public void initStore(IBlobStore s, String key) throws IBlobStore.Error {
         ContactSetBS empty = new ContactSetBS("empty");
+        empty.dirty = true;
         try {
-            save(s, "synch", empty);
+            s.create(mName);
+            save(s, key, empty);
         } catch(final Marsh.Error e) {
             // should never happen
             Log.e(TAG, "marshal empty set failed! should never happen!");
         }
+    }
+    public void initStore(IBlobStore s) throws IBlobStore.Error {
+        initStore(s, "synch");
     }
 }
 
