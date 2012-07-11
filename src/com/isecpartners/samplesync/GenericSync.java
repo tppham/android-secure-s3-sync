@@ -28,31 +28,13 @@ public class GenericSync {
     private static final boolean mPrefLocal = true; // XXX config!
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
-    static ContactSetBS load(String setName, IBlobStore store, String bucket) throws Marsh.Error, IBlobStore.Error {
-        ByteBuffer buf = store.get(bucket, "synch");
-        ContactSetBS cs = ContactSetBS.unmarshal(setName, buf);
-        Marsh.unmarshEof(buf);
-        return cs;
-    }
-
-    static void save(IBlobStore s, String bucket, ContactSetBS cs) throws Marsh.Error, IBlobStore.Error {
-        Log.v(TAG, "save: " + cs.name + " dirty: " + cs.dirty);
-        if(!cs.dirty)
-            return;
-
-        ByteBuffer buf = ByteBuffer.allocate(MAXBUFSIZE);
-        cs.marshal(buf);
-        buf.flip();
-        s.put(bucket, "synch", buf);
-    }
-
     /*
      * An error occurred saving the remote data.  Make a last ditch
      * effort to save a local copy in hopes that we can push it later.
      */
-    public static void saveBackup(IBlobStore store, ContactSetBS cs) {
+    public static void saveBackup(AccountHelper h, IBlobStore store, ContactSetBS cs) {
         try {
-            save(store, "backup", cs);
+            h.save(store, "remotebackup", cs);
         } catch(final Exception e) {
             Log.e(TAG, "save backup failed!"); // nothign to do - just log it
         }
@@ -62,7 +44,7 @@ public class GenericSync {
      * If there's a previous backup to push, load it, and then
      * save it to the remote.
      */
-    public static boolean pushBackup(IBlobStore lastStore, IBlobStore remStore, String name) {
+    public static boolean pushBackup(AccountHelper h, IBlobStore lastStore, IBlobStore remStore) {
         // XXX todo, read in backup, if it doesnt exist, return
         // if it does, save it to remStore, and gracefully handle
         // all errors.
@@ -80,17 +62,16 @@ public class GenericSync {
         name = name.toLowerCase(); // XXX might destroy uniqueness! fixme!
                                     // XXX the issue here is that s3 wants lowercase bucket names in its API
     	Log.v(TAG, "_onPerformSync " + name);
-
-        String lastPath = ctx.getDir("last", Context.MODE_PRIVATE).getPath();
-        IBlobStore lastStore = new FileStore(lastPath);
+        AccountHelper h = new AccountHelper(ctx, name);
+        IBlobStore lastStore = h.getLocalStore();
         ContactSetBS last, remote;
 
-        if(!pushBackup(lastStore, remStore, name))
+        if(!pushBackup(h, lastStore, remStore))
             return;
 
         // load last
         try {
-            last = load("last", lastStore, name);
+            last = h.load("last", lastStore, "synch");
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: missing or corrupted state, delete acct?
             Log.e(TAG, "corrupt account state!");
@@ -99,7 +80,7 @@ public class GenericSync {
 
         // load remote
         try {
-            remote = load("remote", remStore, name);
+            remote = h.load("remote", remStore, "synch");
         } catch(final Marsh.BadVersion e) {
             // XXX notify: update your software
             Log.e(TAG, "synch data has bad version!");
@@ -144,16 +125,16 @@ public class GenericSync {
 
         Log.v(TAG, "saving changes");
         try {
-            save(remStore, name, remote);
+            h.save(remStore, "synch", remote);
         } catch(final IBlobStore.AuthError e) {
             // XXX invalidate creds
             // XXX notify: auth error saving, update creds
-            saveBackup(lastStore, remote);
+            saveBackup(h, lastStore, remote);
             Log.e(TAG, "auth error saving synch data");
             /* keep going.. we cant back out now... */
         } catch(final IBlobStore.Error e) {
             // XXX notify: error saving, try again?
-            saveBackup(lastStore, remote);
+            saveBackup(h, lastStore, remote);
             Log.e(TAG, "error saving synch data");
             /* keep going.. we cant back out now... */
         } catch(final Marsh.Error e) { // should never happen
@@ -161,7 +142,7 @@ public class GenericSync {
         } 
 
         try {
-            save(lastStore, name, last);
+            h.save(lastStore, "synch", last);
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: delete acct?
             Log.e(TAG, "couldn't update account state!");
