@@ -17,13 +17,10 @@ import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 
 /**
  * Test crypto code.
+ * Assumes someone else has added the spongy castle provider.
  */
 public class Crypto extends Activity {
     static String TAG = "test.Crypto";
-
-    static {
-        //Security.addProvider(new org.spongycastle.jce.provider.BouncyCastleProvider());
-    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
