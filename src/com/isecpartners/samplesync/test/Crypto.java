@@ -81,11 +81,10 @@ public class Crypto extends Activity {
         Log.v(TAG, "genkey: " + showHex(K));
 
         /* we'll generate a random IV */
-        //byte[] K = Hex.decode("233952DEE4D5ED5F9B9C6D6FF80FF478");
         byte[] IV = Hex.decode("62EC67F9C3A4A407FCB2A8C49031A8B3");
         byte[] pt = "testing".getBytes();
 
-        /* we'll encrypt the message and send the (IV, salt, iter count, plaintext) */
+        /* we'll encrypt the message and send the (IV, salt, iter count, ciphertext) */
         byte[] ct = encrypt(K, IV, pt);
         Log.v(TAG, "encrypted: " + showHex(ct));
 
