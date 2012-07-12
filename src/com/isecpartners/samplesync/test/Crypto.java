@@ -69,18 +69,27 @@ public class Crypto extends Activity {
     public void onStart() {
         super.onStart();
 
+        /*
+         * a user will randomly generate a list of words, or enter
+         * a list generated previously.  With this we'll generate
+         * a key using PBKDF2, using a random salt and a fixed
+         * iteration count.
+         */
         String pw = "This is a test passpharse I just thought up!";
         byte[] salt = Hex.decode("233952DEE4D5ED5F9B9C6D6FF80FF478");
         byte[] K = genKey(pw, salt, 100);
         Log.v(TAG, "genkey: " + showHex(K));
 
+        /* we'll generate a random IV */
         //byte[] K = Hex.decode("233952DEE4D5ED5F9B9C6D6FF80FF478");
         byte[] IV = Hex.decode("62EC67F9C3A4A407FCB2A8C49031A8B3");
         byte[] pt = "testing".getBytes();
 
+        /* we'll encrypt the message and send the (IV, salt, iter count, plaintext) */
         byte[] ct = encrypt(K, IV, pt);
         Log.v(TAG, "encrypted: " + showHex(ct));
 
+        /* The receiver will generate the same key and use it to decrypt */
         byte[] pt2 = decrypt(K, IV, ct);
         Log.v(TAG, "decrypted: " + new String(pt2));
     }
