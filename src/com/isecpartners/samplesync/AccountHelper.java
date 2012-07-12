@@ -1,6 +1,7 @@
 package com.isecpartners.samplesync;
 
 import java.nio.ByteBuffer;
+import java.security.Security;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,6 +18,10 @@ public class AccountHelper {
     private static final int MAXBUFSIZE = 1024 * 1024;
     Context mCtx;
     String mName;
+
+    static {
+        Security.addProvider(new org.spongycastle.jce.provider.BouncyCastleProvider());
+    }
 
     public AccountHelper(Context ctx, String name) {
         mCtx = ctx;
