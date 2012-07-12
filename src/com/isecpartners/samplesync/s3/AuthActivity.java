@@ -65,7 +65,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         /* perform the background steps. calls done() when done. */
         public void run() {
-            Log.v(TAG, "check creds for " + mName + " key id " + mKeyId + " key " + mKey);
             AccountHelper h = new AccountHelper(mCtx, mName);
             if(h.stateStoreExists()) {
                 done("That account already exists");
@@ -75,11 +74,11 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             Store s = new Store(mKeyId, mKey);
             try {
                 // XXX warn user if store already exists, ask for confirmation
-                Log.v(TAG, "check store exists");
-                s.storeExists("synch");
-
-                Log.v(TAG, "init new store");
-                h.initStore(s);
+                // give them option to use existing, wipe, or cancel
+                if(!h.storeExists(s)) {
+                    Log.v(TAG, "create empty s3 store for " + mName);
+                    h.initStore(s);
+                }
                 h.initStore(h.getStateStore());
             } catch(final IBlobStore.AuthError e) {
                 Log.e(TAG, "auth error making new acct: " + e);

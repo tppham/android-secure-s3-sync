@@ -91,9 +91,12 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         FileStore f = new FileStore(d.getPath());
         try {
             // XXX warn user if store already exists, ask for confirmation
-            f.storeExists("synch");
+            // give them option to use existing, wipe, or cancel
+            if(!h.storeExists(f)) {
+                Log.v(TAG, "create empty file store for " + acct);
+                h.initStore(f);
+            }
 
-            h.initStore(f);
             h.initStore(h.getStateStore());
         } catch(final IBlobStore.Error e) { /* shouldn't happen! */
             Log.e(TAG, "error creating the store: " + e);
