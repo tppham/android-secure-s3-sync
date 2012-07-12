@@ -33,9 +33,13 @@ public class AccountHelper {
         return new FileStore(getDir());
     }
 
-    public boolean stateStoreExists() {
-        FileStore s = getStateStore();
+    public boolean storeExists(IBlobStore s) throws IBlobStore.Error {
         return s.storeExists(mName);
+    }
+
+    public boolean stateStoreExists() {
+        FileStore f = getStateStore();
+        return f.storeExists(mName);
     }
 
     /* load a contact set from this account's bucket */
