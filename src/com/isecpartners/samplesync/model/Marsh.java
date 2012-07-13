@@ -36,6 +36,18 @@ public class Marsh {
             throw new Marsh.BadFormat("" + buf.remaining() + "extra bytes found");
     }
 
+    public static void marshBytes(ByteBuffer buf, byte[] bs, int len) throws Error {
+        if(bs.length != len)
+            throw new Marsh.BadData("buflen " + bs.length + " != " + len);
+        buf.put(bs);
+    }
+
+    public static byte[] unmarshBytes(ByteBuffer buf, int len) throws Error {
+        byte[] bs = new byte[len];
+        buf.get(bs);
+        return bs;
+    }
+
     public static void marshInt8(ByteBuffer buf, int x) throws Error {
         if(x < 0 || x > 0xff)
             throw new BadData("int8 is too large: " + x);
