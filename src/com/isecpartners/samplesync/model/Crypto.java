@@ -6,6 +6,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.security.Security;
 
 import android.util.Log;
 
@@ -22,6 +23,10 @@ public class Crypto {
     static String TAG = "model.Crypto";
 
     public static final SecureRandom rand = new SecureRandom();
+
+    static {
+        Security.addProvider(new org.spongycastle.jce.provider.BouncyCastleProvider());
+    }
 
     /* generate a key from passwd */
     public static byte[] genKey(String passwd, byte[] salt, int iters) {

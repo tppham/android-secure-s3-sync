@@ -71,14 +71,15 @@ public class Crypto extends Activity {
         try {
             sendb.marshal(buf);
             Log.v(TAG, "sending: " + sendb);
-            Log.v(TAG, "send data: " + C.hex(buf));
         } catch(final Exception e) {
             Log.e(TAG, "error marshalling blob: " + e);
             return;
         }
 
-        /* receiver decodes it using nothing but the password */
         buf.flip();
+        Log.v(TAG, "send data: " + C.hex(buf));
+
+        /* receiver decodes it using nothing but the password */
         try {
             Blob recvb = Blob.unmarshal(pw, "received", buf);
             Log.v(TAG, "received: " + recvb);
