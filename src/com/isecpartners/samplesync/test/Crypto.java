@@ -134,11 +134,18 @@ public class Crypto extends Activity {
 
        new Thread(new Runnable() {
             public void run() {
-                testPrims();
-                testProto();
-                testAccountHelper();
+                try {
+                    testPrims();
+                    testProto();
+                    testAccountHelper();
+                } catch(Exception e) {
+                    Log.v(TAG, "exception in test cases: " + e);
+                } finally {
+                    Log.v(TAG, "tests done");
+                }
             }
         }).start();
+        Log.v(TAG, "started...");
     }
 }
 

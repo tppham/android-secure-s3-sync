@@ -2,6 +2,9 @@ package com.isecpartners.samplesync.model;
 
 import java.nio.ByteBuffer;
 
+import android.util.Log;
+
+
 /*
  * The data blob we store remotely and locally.  It contains
  * a ContactSet and is protected with authenticated encryption.
@@ -23,15 +26,19 @@ public class Blob {
 
         /* plaintext header */
         byte[] salt = Marsh.unmarshBytes(buf, SALTLEN);
+        int iterCount = Marsh.unmarshInt32(buf);
         byte[] iv = Marsh.unmarshBytes(buf, IVLEN);
+
         Blob x = new Blob(pw, salt, iv, name);
-        x.iterCount = Marsh.unmarshInt32(buf);
+        x.iterCount = iterCount;
 
         /* decrypt remaining */
         int csz = buf.remaining();
         byte[] cipher = Marsh.unmarshBytes(buf, csz);
         byte[] key = Crypto.genKey(pw, x.salt, x.iterCount);
         byte[] plain = Crypto.decrypt(key, x.iv, cipher);
+        if(plain == null)
+            throw new Marsh.BadKey("couldn't decrypt");
         ByteBuffer buf2 = ByteBuffer.wrap(plain);
 
         /* decode encrypted body */
