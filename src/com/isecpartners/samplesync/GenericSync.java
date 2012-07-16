@@ -56,11 +56,11 @@ public class GenericSync {
     // record some per-account info like last synch time...
     // XXX we need a handle on preferences, like prefLocal!
     // XXX re-evaluate exception list
-    private static void _onPerformSync(Context ctx, String name, IBlobStore remStore, SyncResult res) throws Exception {
+    private static void _onPerformSync(Context ctx, String name, String passphrase, IBlobStore remStore, SyncResult res) throws Exception {
         // XXX figure out account types to create new contacts as!
 
     	Log.v(TAG, "_onPerformSync " + name);
-        AccountHelper h = new AccountHelper(ctx, name);
+        AccountHelper h = new AccountHelper(ctx, name, passphrase);
         IBlobStore lastStore = h.getStateStore();
         ContactSetBS last, remote;
 
@@ -151,11 +151,11 @@ public class GenericSync {
     }
 
     /* a synch is requested. */
-    public static void onPerformSync(Context ctx, String name, String acctType, String token, IBlobStore store, SyncResult res) {
+    public static void onPerformSync(Context ctx, String name, String passphrase, String acctType, String token, IBlobStore store, SyncResult res) {
         Log.v(TAG, "onPerformSync");
 
         try {
-            _onPerformSync(ctx, name, store, res);
+            _onPerformSync(ctx, name, passphrase, store, res);
 
         // XXX re-evaluate which of these are needed...
         } catch (final OperationCanceledException e) {

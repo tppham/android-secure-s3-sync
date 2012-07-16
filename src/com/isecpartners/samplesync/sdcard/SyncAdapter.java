@@ -32,7 +32,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.v(TAG, "sync with sdcard store: " + acct.name);
         AccountManager mgr = AccountManager.get(mCtx);
         String path = mgr.getUserData(acct, "path");
+        String passphrase = mgr.getUserData(acct, "passphrase");
         IBlobStore store = new FileStore(path);
-        GenericSync.onPerformSync(mCtx, acct.name, TOKEN_TYPE, path, store, res);
+        GenericSync.onPerformSync(mCtx, acct.name, passphrase, TOKEN_TYPE, path, store, res);
     }
 }
