@@ -8,8 +8,11 @@ import android.util.Log;
 
 import org.spongycastle.util.encoders.Hex;
 
+import com.isecpartners.samplesync.AccountHelper;
+import com.isecpartners.samplesync.IBlobStore;
 import com.isecpartners.samplesync.model.Blob;
 import com.isecpartners.samplesync.model.Contact;
+import com.isecpartners.samplesync.model.ContactSetBS;
 import com.isecpartners.samplesync.model.Name;
 import com.isecpartners.samplesync.model.Phone;
 
@@ -87,12 +90,50 @@ public class Crypto extends Activity {
             Log.e(TAG, "error unmarshalling blob: " + e);
             return;
         }
+
+        /* now try it with bad data */
+        buf.array()[0] ++;
+        buf.flip();
+        Log.v(TAG, "bad data: " + C.hex(buf));
+
+        /* receiver decodes it using nothing but the password */
+        try {
+            Blob recvb = Blob.unmarshal(pw, "received", buf);
+            Log.v(TAG, "received: " + recvb);
+        } catch(final Exception e) {
+            Log.e(TAG, "error unmarshalling blob: " + e);
+            return;
+        }
     }
 
+    /* use the account helper to save and load an encrypted contact set */
+    void testAccountHelper() {
+        String acct = "testaccount";
+        String pw = "this is a test passphrase";
+        AccountHelper h1 = new AccountHelper(this, acct, pw);
+        try {
+            IBlobStore s = h1.getStateStore();
+            h1.initStore(s);
+            Log.v(TAG, "initialized test store");
+        } catch(final Exception e) {
+            Log.e(TAG, "error initializing test store");
+        }
+
+        AccountHelper h2 = new AccountHelper(this, acct, pw);
+        try {
+            IBlobStore s = h2.getStateStore();
+            ContactSetBS cs = h2.load("local", s, "synch");
+            Log.v(TAG, "loaded: " + cs);
+        } catch(final Exception e) {
+            Log.e(TAG, "error loading test store");
+        }
+    }
+    
     public void onStart() {
         super.onStart();
         testPrims();
         testProto();
+        testAccountHelper();
     }
 }
 
