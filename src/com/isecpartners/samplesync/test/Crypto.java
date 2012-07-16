@@ -131,9 +131,14 @@ public class Crypto extends Activity {
     
     public void onStart() {
         super.onStart();
-        testPrims();
-        testProto();
-        testAccountHelper();
+
+       new Thread(new Runnable() {
+            public void run() {
+                testPrims();
+                testProto();
+                testAccountHelper();
+            }
+        }).start();
     }
 }
 
