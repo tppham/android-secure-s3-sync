@@ -60,6 +60,7 @@ public class AccountHelper {
 
     /* load a contact set from this account's bucket */
     public ContactSetBS load(String setName, IBlobStore store, String key) throws Marsh.Error, IBlobStore.Error {
+        Log.v(TAG, "load: " + mName + " " + key);
         ByteBuffer buf = store.get(mName, key);
         Blob blob = Blob.unmarshal(mPw, setName, buf);
         if(mSalt == null)
@@ -69,11 +70,11 @@ public class AccountHelper {
 
     /* save a contact set to this account's bucket */
     public void save(IBlobStore s, String key, ContactSetBS cs) throws Marsh.Error, IBlobStore.Error {
-        Log.v(TAG, "save: " + cs.name + " dirty: " + cs.dirty);
+        Log.v(TAG, "save: " + cs.name + " key " + key + " dirty: " + cs.dirty);
         if(!cs.dirty)
             return;
 
-        Blob blob = new Blob(mPw, mSalt, Crypto.genIV(), mName);
+        Blob blob = new Blob(mPw, mSalt, Crypto.genIV(), cs.name);
         blob.set = cs;
         if(mSalt == null)
             throw new Marsh.Error("internal error. shouldnt happen.  salt == null");
