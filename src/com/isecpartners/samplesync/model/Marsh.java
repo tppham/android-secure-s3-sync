@@ -30,6 +30,9 @@ public class Marsh {
     public static class BadVersion extends Error { 
         public BadVersion(String msg) { super(msg); }
     }
+    public static class BadKey extends Error { 
+        public BadKey(String msg) { super(msg); }
+    }
 
     public static void unmarshEof(ByteBuffer buf) throws Error {
         if(buf.hasRemaining())
