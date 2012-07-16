@@ -60,9 +60,7 @@ public class Crypto extends Activity {
         String pw = "This is a test passphrase I just thought up!";
 
         /* sender makes some data */
-        Blob sendb = new Blob(pw, C.genSalt(), "sent");
-        sendb.iv = C.genIV();
-
+        Blob sendb = new Blob(pw, C.genSalt(), C.genIV(), "sent");
         Contact c = sendb.set.add();
         sendb.set.addData(c, new Name("Don", "King"));
         sendb.set.addData(c, new Phone("888-555-1212", 0, null));
