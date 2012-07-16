@@ -22,10 +22,10 @@ public class Blob {
     public static Blob unmarshal(String pw, String name, ByteBuffer buf) throws Marsh.Error {
 
         /* plaintext header */
-        salt = Marsh.unmarshBytes(buf, SALTLEN);
-        Blob x = new Blob(name, pw, salt);
+        byte[] salt = Marsh.unmarshBytes(buf, SALTLEN);
+        byte[] iv = Marsh.unmarshBytes(buf, IVLEN);
+        Blob x = new Blob(pw, salt, iv, name);
         x.iterCount = Marsh.unmarshInt32(buf);
-        x.iv = Marsh.unmarshBytes(buf, IVLEN);
 
         /* decrypt remaining */
         int csz = buf.remaining();
@@ -43,11 +43,11 @@ public class Blob {
         return x;
     }
 
-    public Blob(String pw, byte[] salt, String name) {
+    public Blob(String pw, byte[] _salt, byte[] _iv, String name) {
         passphrase = pw;
         salt = _salt;
+        iv = _iv;
         set = new ContactSetBS(name);
-        iv = null;
         iterCount = ITERCOUNT;
         magic = MAGIC;
     }
