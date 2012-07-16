@@ -73,9 +73,8 @@ public class AccountHelper {
         if(!cs.dirty)
             return;
 
-        Blob blob = new Blob(mPw, mName);
+        Blob blob = new Blob(mPw, mSalt, mName);
         blob.iv = Crypto.genIV();
-        blob.salt = mSalt; 
         blob.set = cs;
         if(mSalt == null)
             throw new Marsh.Error("internal error. shouldnt happen.  salt == null");

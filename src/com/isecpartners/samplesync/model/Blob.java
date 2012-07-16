@@ -20,10 +20,10 @@ public class Blob {
     public int magic;
 
     public static Blob unmarshal(String pw, String name, ByteBuffer buf) throws Marsh.Error {
-        Blob x = new Blob(name, pw);
 
         /* plaintext header */
-        x.salt = Marsh.unmarshBytes(buf, SALTLEN);
+        salt = Marsh.unmarshBytes(buf, SALTLEN);
+        Blob x = new Blob(name, pw, salt);
         x.iterCount = Marsh.unmarshInt32(buf);
         x.iv = Marsh.unmarshBytes(buf, IVLEN);
 
@@ -43,10 +43,10 @@ public class Blob {
         return x;
     }
 
-    public Blob(String pw, String name) {
+    public Blob(String pw, byte[] salt, String name) {
         passphrase = pw;
+        salt = _salt;
         set = new ContactSetBS(name);
-        salt = null;
         iv = null;
         iterCount = ITERCOUNT;
         magic = MAGIC;
