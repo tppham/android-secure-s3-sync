@@ -80,6 +80,8 @@ public class Crypto {
 
     /* Return a hex string from byte array */
     public static String hex(byte[] xs) {
+        if (xs == null)
+            return "null";
         return new String(Hex.encode(xs));
     }
 
