@@ -43,11 +43,11 @@ public class Blob {
         return x;
     }
 
-    public Blob(String name, String pw) {
+    public Blob(String pw, String name) {
         passphrase = pw;
         set = new ContactSetBS(name);
-        salt = Crypto.genSalt();
-        iv = Crypto.genIV();
+        salt = null;
+        iv = null;
         iterCount = ITERCOUNT;
         magic = MAGIC;
     }
