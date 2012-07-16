@@ -55,17 +55,18 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     /* bg threads for testing creds and creating the state */
     private class SigninThread extends Thread {
         private static final String TAG = "s3.SigninThread";
-        public String mName, mKeyId, mKey;
+        public String mName, mKeyId, mKey, mPassphrase;
 
-        public SigninThread(String name, String keyid, String key) {
+        public SigninThread(String name, String passphrase, String keyid, String key) {
             mName = name;
+            mPassphrase = passphrase;
             mKeyId = keyid;
             mKey = key;
         }
 
         /* perform the background steps. calls done() when done. */
         public void run() {
-            AccountHelper h = new AccountHelper(mCtx, mName);
+            AccountHelper h = new AccountHelper(mCtx, mName, mPassphrase);
             if(h.stateStoreExists()) {
                 done("That account already exists");
                 return;
@@ -176,7 +177,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         
         //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
         showDialog(DIALOG_PROGRESS);
-        mSigninThread = new SigninThread(name, keyid, key);
+        String passphrase = "the quick brown fox"; // XXX get from gui!
+        mSigninThread = new SigninThread(name, passphrase, keyid, key);
         mSigninThread.start();
         /* thread will invoke onSigninDone when done */
     }
@@ -213,7 +215,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
               
             String name = "XXXdummy"; // XXX fetch account name from result
             showDialog(DIALOG_PROGRESS);
-            mSigninThread = new SigninThread(name, access_key, secret_key);
+            String passphrase = "the quick brown fox"; // XXX get from gui!
+            mSigninThread = new SigninThread(name, passphrase, access_key, secret_key);
             mSigninThread.start();
             /* thread will invoke onSigninDone when done */
          } else {       
@@ -243,6 +246,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         Account a = new Account(thr.mName, ACCOUNT_TYPE);
         mAcctMgr.addAccountExplicitly(a, thr.mKey, null);
         mAcctMgr.setUserData(a, "keyID", thr.mKeyId);
+        mAcctMgr.setUserData(a, "passphrase", thr.mPassphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();

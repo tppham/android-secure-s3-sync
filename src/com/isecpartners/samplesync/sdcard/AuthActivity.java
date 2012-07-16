@@ -67,7 +67,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        AccountHelper h = new AccountHelper(this, acct);
+        String passphrase = "the quick brown fox"; // XXX get from the GUI!
+        AccountHelper h = new AccountHelper(this, acct, passphrase);
         if(h.stateStoreExists()) {
             mMsgTxt.setText("That account already exists");
             return;
@@ -107,6 +108,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         Account a = new Account(acct, ACCOUNT_TYPE);
         mAcctMgr.addAccountExplicitly(a, "", null);
         mAcctMgr.setUserData(a, "path", d.getPath());
+        mAcctMgr.setUserData(a, "passphrase", passphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();
