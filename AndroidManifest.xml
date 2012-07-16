@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.isecpartners.samplesync"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <!-- XXX revisit perms and do some cleanup -->
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission
+        android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+    <!-- We are hoping to avoid needing this, but if we support backing up
+         and restoring settings someday, we will.
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission
+            android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    -->
+    <uses-permission
+        android:name="android.permission.READ_CONTACTS" />
+    <uses-permission
+        android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission
+        android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission
+        android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission
+        android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <!-- To restore the external storage. We do not yet back up the external
+         storage device, but plan to. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/label">
+        <service
+            android:name=".s3.AuthService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/s3auth" />
+        </service>
+        <service
+            android:name=".s3.SyncService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/s3sync" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+        <activity
+            android:name=".s3.AuthActivity"
+            android:label="S3 Sign-in"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".s3.BucketActivity"
+            android:label="S3 Sign-in"
+            android:excludeFromRecents="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".s3.MyActivity"
+            android:label="S3 Sync"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".test.AddContact"
+            android:label="Add Contact Test"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".test.Misc"
+            android:label="Misc Test"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".test.Crypto"
+            android:label="Crypto Test"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <service
+            android:name=".sdcard.AuthService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/sdcardauth" />
+        </service>
+        <service
+            android:name=".sdcard.SyncService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sdcardsync" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+        <activity
+            android:name=".sdcard.AuthActivity"
+            android:label="SDCard Sign-in"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".TestActivity"
+            android:label="S3 Client Test"
+            android:excludeFromRecents="false"
+            >
+            
+        </activity>
+    </application>
+    <uses-sdk
+        android:minSdkVersion="5" />
+</manifest>
