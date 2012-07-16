@@ -2,8 +2,10 @@
 <classpath>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/scprov-jdk15on-1.47.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/aws-android-sdk-1.2.2-core.jar"/>
+	<classpathentry kind="lib" path="libs/aws-android-sdk-1.2.2-s3.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="libs/aws-android-sdk-1.2.2-debug.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
