@@ -12,15 +12,15 @@ public class Blob {
     public static final int IVLEN = 16; // XXX right?
     public static final int ITERCOUNT = 1000; // XXX whats a good value here?
     public static final int MAGIC = 0x1badd00d;
+
     public String passphrase;
     public ContactSetBS set;
     public byte[] salt, iv;
     public int iterCount;
     public int magic;
 
-
     public static Blob unmarshal(String pw, String name, ByteBuffer buf) throws Marsh.Error {
-        Blob x = new Blob(pw);
+        Blob x = new Blob(name, pw);
 
         /* plaintext header */
         x.salt = Marsh.unmarshBytes(buf, SALTLEN);
@@ -43,11 +43,11 @@ public class Blob {
         return x;
     }
 
-    public Blob(String pw) {
+    public Blob(String name, String pw) {
         passphrase = pw;
-        salt = new byte[SALTLEN];
-        iv = new byte[IVLEN];
-        // XXX fill in salt and iv with random bytes now?
+        set = new ContactSetBS(name);
+        salt = Crypto.genSalt();
+        iv = Crypto.genIV();
         iterCount = ITERCOUNT;
         magic = MAGIC;
     }
@@ -69,6 +69,15 @@ public class Blob {
         byte[] key = Crypto.genKey(passphrase, salt, iterCount);
         byte[] cipher = Crypto.encrypt(key, iv, plain);
         Marsh.marshBytes(buf, cipher, cipher.length);
+    }
+
+    public String toString() {
+        return "[Blob magic=" + magic 
+                + " salt=" + Crypto.hex(salt) 
+                + " iv=" + Crypto.hex(iv)
+                + " iterCount=" + iterCount
+                + " set=" + set
+                + "]";
     }
 }
 
