@@ -46,5 +46,15 @@ public class ContactSetBS extends ContactSet {
         }
         return cs;
     }
+
+    public String toString() {
+        String s = "[ContactSetBS " + name 
+                + " ver=" + version
+                + " id=" + id;
+        for(Contact c : contacts)
+            s += " " + c;
+        s += "]";
+        return s;
+    }
 }
 
