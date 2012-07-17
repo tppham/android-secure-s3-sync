@@ -231,6 +231,9 @@ TODO
    - show info: last synch time
  - XXX differentiate IO errors and blobstore fetches that have no data
 
+ - gui needs to let user enter passphrase or generate one for them
+   right now key is hardwired
+
 polish:
   - icon for app
   - icon for providers
