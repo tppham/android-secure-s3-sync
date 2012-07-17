@@ -41,6 +41,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private static final String TAG = "s3.AuthActivity";
     public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.s3";
     private static final int DIALOG_PROGRESS = 0;
+	private static final int AUTH_SDCARD_CREDS = 0x00001010;
+	private static final int QR_CODE_CREDS = 0x0000c0de;
     
     private final Handler mCb = new Handler();
 
@@ -192,37 +194,57 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         integrator.initiateScan();
     }
     
-    /**
-     *  read the contents of the QR code and 
-     * parse them to get Access Key ID and Secret Access Key 
-     * XXX this needs to be fixed up to also support the account name!
-     */
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if(result == null)
-            return;
+    public void onSignInFromFile(View view) {
+    	
+  	   /*  call file picker activity to read credentials */	   
+  	   Intent myIntent = new Intent(AuthActivity.this, FilePickerActivity.class);
+  	   startActivityForResult(myIntent, AUTH_SDCARD_CREDS);
+      }
+     
+     /**
+      *  read the contents of the QR code and 
+      * parse them to get Access Key ID and Secret Access Key 
+      * XXX this needs to be fixed up to also support the account name!
+      */
+     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+     	String access_key = null;
+     	String secret_key = null;
+     	String passphrase = "the quick brown fox";
+     	if (requestCode == QR_CODE_CREDS){ 
+         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+         if(result == null)
+             return;
 
-        String contents = result.getContents();
-        if (contents != null) {
-            String [] creds = contents.split("\n");
-            String access_key = creds[0];
-            String secret_key = creds[1];
-            if(access_key.equals("") || secret_key.equals("")) {
-                mMsgTxt.setText("Invalid S3 Credentials");
-                return;
-            }
-            //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
-              
-            String name = "XXXdummy"; // XXX fetch account name from result
-            showDialog(DIALOG_PROGRESS);
-            String passphrase = "the quick brown fox"; // XXX get from gui!
-            mSigninThread = new SigninThread(name, passphrase, access_key, secret_key);
-            mSigninThread.start();
-            /* thread will invoke onSigninDone when done */
-         } else {       
-            Log.v(TAG, "Failed to Scan");
+         String contents = result.getContents();
+         if (contents != null) {
+             String [] creds = contents.split("\n");
+             access_key = creds[0];
+             secret_key = creds[1];
+             if(access_key.equals("") || secret_key.equals("")) {
+                 mMsgTxt.setText("Invalid S3 Credentials");
+                 return;
+                 }
+             }
+     	
+     	else {       
+             Log.v(TAG, "Failed to Scan");
+          }
+     	}
+     	
+     	if (requestCode == AUTH_SDCARD_CREDS){
+       	  /* read the contents of the file */
+       	  access_key = intent.getStringExtra("access_key");
+       	  secret_key = intent.getStringExtra("secret_key");
          }
-    }
+             //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
+               
+             String name = "XXXdummy"; // XXX fetch account name from result
+             showDialog(DIALOG_PROGRESS);
+             mSigninThread = new SigninThread(name, passphrase,access_key, secret_key);
+             mSigninThread.start();
+             /* thread will invoke onSigninDone when done */
+           
+     }
     
     /**
      * Callback (through mCb) from SigninThread when completed.

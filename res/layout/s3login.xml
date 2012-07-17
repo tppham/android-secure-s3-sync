@@ -116,5 +116,20 @@
             android:layout_gravity="center_horizontal"
             android:minWidth="100dip"
             android:text="Scan QR code"
-            android:onClick="onSignInQRcode" />    
+            android:onClick="onSignInQRcode" />  
+            
+         <TextView
+        android:id="@+id/Read_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read credentials from a file" />
+        
+        <Button
+            android:id="@+id/read_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:text="Read from file"
+            android:onClick="onSignInFromFile" />
 </LinearLayout>

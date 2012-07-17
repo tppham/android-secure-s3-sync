@@ -53,7 +53,6 @@ public class BucketActivity extends Activity{
 	        /* Create a bucket for sync if it doesnt exist*/
 	        mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);;
             a = mAcctMgr.getAccountsByType(ACCOUNT_TYPE);
-            
             credentials = new BasicAWSCredentials(a[0].name, mAcctMgr.getPassword(a[0]));
             if (a.length != 1){
             	Log.e(TAG, "Sync account error: "+ a.length);
