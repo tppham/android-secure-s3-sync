@@ -24,17 +24,20 @@ def get(s3, n, k) :
 
 defBucket = 'mycontacts'
 defKey = 'synch'
+pw = 'the quick brown fox'
 def load(bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
     b = marsh.Buf(d)
-    cs = b.getContactSet()
+    blob = b.getBlob(pw)
     b.getEof()
-    return cs
+    return blob.cset
 
 def save(cs, bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
+    blob = Blob(pw, genSalt(), genIV())
+    blob.cset = cs
     b = marsh.Buf()
-    b.putContactSet(cs)
+    b.putBlob(blob)
     return put(getS3(), bucket, key, str(b))
 
 def saveRaw(fn, bucket=defBucket, key=defKey) :
