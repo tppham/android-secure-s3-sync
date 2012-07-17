@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 """
 Data marshalling for the contact set format used by the synch store.
+
+Requires https://github.com/mikeboers/PyTomCrypt
+  (pip install PyTomCrypt or easy_install PyTomCrypt)
 """
 import sys
+from tomcrypt import cipher
+import pbkdf2
 #import debug
 
 class Error(Exception) :
@@ -43,6 +48,36 @@ class Data(object) :
         fs = ', '.join(repr(f) for f in self.fields)
         return '[Data: %s]' % (fs)
 
+    
+# note: this is a test program that does not care about
+# the security of your data!  Do not use this for anything
+# sensitive!
+
+def genSalt() : # we dont care about security here
+    return "B" * 8
+def genIV() : # we don't care about security here
+    return "A" * 16
+
+def genKey(pw, salt, niters) :
+    return pbkdf2.PBKDF2(pw, salt, niters).read(32)
+
+def encrypt(pw, iv, buf) :
+    return cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax').encrypt(buf)
+def decrypt(pw, iv, buf) :
+    return cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax').decrypt(buf)
+
+class Blob(object) :
+    MAGIC = 0x1badd00d
+    def __init__(self, pw, salt, iv, niters=1000) :
+        self.pw = pw
+        self.salt = salt
+        self.iv = iv
+        self.niters = niters
+        self.magic = self.MAGIC
+        self.cset = ContactSet()
+    def __str__(self) :
+        return '[Blob salt=%s niters=%d magic=%x cset=%s]' % (self.salt.encode('hex'), self.niters, self.magic, self.cset)
+
 class Buf(object) :
     def __init__(self, b=None) :
         if b is None :
@@ -54,8 +89,10 @@ class Buf(object) :
     def __str__(self) :
         return ''.join(chr(x) for x in self.b)
 
+    def remaining(self) :
+        return len(self.b) - self.pos
     def getEof(self) :
-        resid = len(self.b) - self.pos
+        resid = self.remaining()
         if resid :
             raise Error("%d extra bytes found at %d!" % (self.pos, resid))
     def get8(self) :
@@ -80,15 +117,20 @@ class Buf(object) :
         return self.get32() << 32 | self.get32()
     def put64(self, x) :
         return self.put32(x >> 32).put32(x)
+    def getBytes(self, n) :
+        return ''.join(chr(self.get8()) for m in xrange(n))
+    def putBytes(self, x) :
+        for ch in x :
+            self.put8(ord(ch))
+        return self
     def getStr(self) :
         n = self.get16()
         if n != 0xffff :
-            return ''.join(chr(self.get8()) for m in xrange(n)).decode('utf8')
+            return self.getBytes(n).decode('utf8')
     def putStr(self, x) :
         if x is not None :
             self.put16(len(x))
-            for ch in x.encode('utf8') :
-                self.put8(ord(ch))
+            self.putBytes(x.encode('utf8'))
         else :
             self.put16(0xffff)
         return self
@@ -163,17 +205,48 @@ class Buf(object) :
             raise Error("bad kind %d!" % d.kind)
         return self
 
+    def getBlob(self, pw) :
+        salt = self.getBytes(8)
+        niters = self.get32()
+        iv = self.getBytes(16)
+        x = Blob(pw, salt, iv, niters)
 
+        key = genKey(x.pw, x.salt, x.niters)
+        plain = decrypt(key, x.iv, self.getBytes(self.remaining()))
+        buf = Buf(plain)
+
+        x.magic = buf.get32()
+        if x.magic != x.MAGIC :
+            raise Error("bad magic number: %x" % x.magic)
+        x.cset = buf.getContactSet()
+        self.getEof()
+        return x
+    def putBlob(self, x) :
+        self.putBytes(x.salt)
+        self.put32(x.niters)
+        self.putBytes(x.iv)
+
+        buf = Buf()
+        buf.put32(x.magic)
+        buf.putContactSet(x.cset)
+        key = genKey(x.pw, x.salt, x.niters)
+        self.putBytes(encrypt(key, x.iv, str(buf)))
+
+pw = 'the quick brown fox'
 def load(fn) :
     d = file(fn, 'rb').read()
     b = Buf(d)
-    cs = b.getContactSet()
+    blob = b.getBlob(pw)
+    cs = blob.cset
     b.getEof()
     return cs
 
 def save(fn, cs) :
     b = Buf()
-    b.putContactSet(cs)
+    blob = Blob(pw, genSalt(), genIV())
+    blob.cset = cs
+
+    b.putBlob(blob)
     file(fn, 'wb').write(str(b))
 
 def test() :
@@ -186,10 +259,12 @@ def test() :
 
     # cycle it through the marshaller once
     print
-    s = str(Buf().putContactSet(r))
+    blob = Blob(pw, genSalt(), genIV())
+    blob.cset = r
+    s = str(Buf().putBlob())
     print 'hex', s.encode('hex')
     b = Buf(s)
-    r2 = b.getContactSet()
+    r2 = b.getBlob(pw)
     b.getEof()
     print 'remote after remarshall', r2
 
