@@ -1,0 +1,119 @@
+
+Our syncher keeps its own contact record for each contact
+that is being synched.  We'll call these "synch" contacts.
+Our synch contacts will only store the following data:
+   - vnd.android.cursor.item/name
+   - vnd.android.cursor.item/phone_v2
+   - vnd.android.cursor.item/photo ?
+   - others?
+
+The syncher will make backups of some contact records that
+are created by some other select synch providers:
+
+   - those that have no synch provider (ie. created locally)
+   - gmail synch provider?
+   - exchange synch provider?
+
+We'll call these "local" contacts.
+
+Any time a synch contact is created from a local contact
+it will be created with the SYNC1 field referencing the 
+contact_id of the local contact.  These synch 
+contacts are referred to as "shadow" contacts since
+they shadow the information in the local contact.
+Any other synch contacts are created from remote data
+and will not normally match any existing local contacts
+(they could match items created more recently or items
+created by unsupported synch providers).  These we'll
+call remote contacts.
+
+The synch contacts always represent the state of the contact
+after the last synch.  Between synchs the local and the
+remote contacts may change.
+
+To perform a synch we do two merge steps.  First we merge
+all of the local contacts into the sync contacts.  Any
+changes in the supported fields of the local contacts
+cause updates to fields in the shadow synch contact.
+New shadows are created for any local contacts that dont
+yet have a shadow.  Any changed synch contacts are marked
+"dirty" by setting a field in the SYNC2 field.
+
+Next we merge all of the remote contacts into the sync
+contacts.  During this merge step dirty sync contacts
+are ignored (to prefer local changes over remote changes).
+Any changes to the supported fields of the remote
+contacts cause updates to fields in the sync contacts.
+New sync contacts are created for any remote contacts
+that dont have a match yet. Any changed sync contacts
+cause similar updates to the shadowed local contact if
+there is one.
+
+Finally the dirty contacts are bundled up and written to the
+remote.
+
+XXX to start off we'll just write all contacts to the
+remote each time.  After a sync the sync contacts and
+the remote contacts will be identical except for any
+conflicts resolved in favor of local updates.
+
+XXX we have no mechanism for atomic update... race
+condition can cause loss..  This wouldnt be as big
+an issue if we were just pushing up deltas instead of
+the full set of records...
+
+
+----
+XXX how to handle deletes?  We can keep a delete flag in
+the remotes section, but how do we track it locally without
+it showing up in the contacts app?  
+  - to start off with we can just strip all the info and
+    mark it with a weird color or icon or something...
+    and delete any matching local entry..
+  - or maybe we just delete the item matching the shadow once
+    and then unlink the shadow?
+
+XXX how to handle renames?  i think we can probably detect
+local renames fine with our shadow copies, but how do we track
+remote renames?  we'll have to make some ID system for tracking
+remote entries.
+
+
+
+------
+
+ContactsContract.CommonDataKinds.Phone
+  - vnd.android.cursor.item/phone_v2
+  - data1: string number
+  - data2: type (int)
+  - data3: if data2 is 0, then a string, else null
+
+ContactsContract.CommonDataKinds.Email
+  - vnd.android.cursor.item/email_v2
+  - same as phone
+
+ContactsContract.CommonDataKinds.StructuredName
+  - vnd.android.cursor.item/name
+  - data1 .. data9 : strings
+
+
+
+raw contact:
+  STARRED
+  ACCOUNT_NAME
+  
+
+
+-----
+References
+
+The Email.apk app has a SyncAdapter that can sync email, contacts
+and calendar items.
+  git clone git://git.omapzoom.org/platform/packages/apps/Email.git
+  PopImapSyncAdapterService.java
+  PopImapAuthenticatorService.java
+
+  - when its added, new contacts get added to it, rather than to the null sync
+  - when its added, old contacts get subsumed into it somehow..
+
+http://developer.android.com/guide/topics/providers/contacts-provider.html

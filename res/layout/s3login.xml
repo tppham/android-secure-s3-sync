@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <!-- <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"> -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="5dip"
+            android:paddingBottom="13dip"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip">
+            <TextView
+                android:id="@+id/msg"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip" 
+                android:text="Sign in to your S3 account" />
+             <TextView
+                android:id="@+id/err_msg"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FF0000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip" 
+                android:text="" />
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A name for this account:" />
+            <EditText
+                android:id="@+id/name_edit"
+                android:text="MyContacts"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textEmailAddress" />
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Access Key ID" />
+            <EditText
+                android:id="@+id/keyid_edit"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textEmailAddress" />
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:layout_marginTop="2dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Secret Access Key" />
+            <EditText
+                android:id="@+id/key_edit"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:password="true"
+                android:inputType="textPassword" />
+        
+        <Button
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:text="Sign in"
+            android:onClick="onSignIn" />
+
+        <TextView
+        android:id="@+id/Scan_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan using bar code scanner" />
+
+<ProgressBar
+    android:id="@+id/signin_progress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:indeterminate="true"
+    android:visibility="invisible" />
+
+    </LinearLayout>
+        <Button
+            android:id="@+id/scan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:text="Scan QR code"
+            android:onClick="onSignInQRcode" />  
+            
+         <TextView
+        android:id="@+id/Read_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read credentials from a file" />
+        
+        <Button
+            android:id="@+id/read_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:text="Read from file"
+            android:onClick="onSignInFromFile" />
+</LinearLayout>
