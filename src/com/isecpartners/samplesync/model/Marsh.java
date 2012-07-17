@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 public class Marsh {
     public static class Error extends Exception { 
         public Error(String msg) { super(msg); }
+        public String descr() { return "invalid data"; }
     }
     public static class BufferError extends Error {
         public BufferError(String msg) { super(msg); }
@@ -29,9 +30,11 @@ public class Marsh {
     }
     public static class BadVersion extends Error { 
         public BadVersion(String msg) { super(msg); }
+        public String descr() { return "incompatible version"; }
     }
     public static class BadKey extends Error { 
         public BadKey(String msg) { super(msg); }
+        public String descr() { return "incorrect passpharse"; }
     }
 
     public static void unmarshEof(ByteBuffer buf) throws Error {
