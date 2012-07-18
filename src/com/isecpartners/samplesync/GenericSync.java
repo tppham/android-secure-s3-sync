@@ -4,15 +4,18 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.FileChannel;
 import java.io.IOException;
+import java.util.List;
+import java.util.LinkedList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException; // XXX review?
-import android.accounts.OperationCanceledException; // XXX review?
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.SyncResult;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.isecpartners.samplesync.model.Contact;
 import com.isecpartners.samplesync.model.ContactSet;
 import com.isecpartners.samplesync.model.ContactSetDB;
 import com.isecpartners.samplesync.model.ContactSetBS;
@@ -33,14 +36,16 @@ public class GenericSync {
     String mTokenType;
     IBlobStore mRemStore;
     SyncResult mRes;
+    Bundle mExtras;
 
     // XXX can we get tokenType from acct and eliminate that arg and member?
-    public GenericSync(Context ctx, Account acct, String tokenType, IBlobStore store, SyncResult res) {
+    public GenericSync(Context ctx, Account acct, String tokenType, IBlobStore store, Bundle extras, SyncResult res) {
         mCtx = ctx;
         mAcct = acct;
         mTokenType = tokenType;
         mRemStore = store;
         mRes = res;
+        mExtras = extras;
     }
 
     /*
@@ -63,6 +68,63 @@ public class GenericSync {
         // XXX todo, read in backup, if it doesnt exist, return
         // if it does, save it to remStore, and gracefully handle
         // all errors.
+        return true;
+    }
+
+    static boolean contactIsOwned(Contact c, Account[] accts) {
+        /* "null" account always "exists" */
+        if(c.acctType == null || c.acctName == null)
+            return true;
+        for(int i = 0; i < accts.length; i++) {
+            if(accts[i].name.equals(c.acctName) 
+            && accts[i].type.equals(c.acctType))
+                return true;
+        }
+        return false;
+    }
+
+    /*
+     * If a local synch provider was deleted we will want to
+     * handle it specially.  The accounts will all have been
+     * deleted in the local database, but the user may want to 
+     * keep all of those contacts.  Without any action we will 
+     * see them all as account deletions.
+     *
+     * Return true if we handled this ourselves, or false if user
+     * intervention is required.
+     */
+    public boolean handleAccountDeleted(ContactSet cs, boolean forceDelete, boolean keepLocals) {
+        /* deletions will be forced without any intervention */
+        if(forceDelete)
+            return true;
+
+        /*
+         * Figure out if there are any contacts belonging to an
+         * account that no longer exists.  We do this by creating
+         * a list of contacts for accounts that do exist (we'll need it later).
+         */
+        AccountManager mgr = AccountManager.get(mCtx);
+        Account[] accts = mgr.getAccounts();
+        List<Contact> owned = new LinkedList<Contact>();
+        for(Contact c : cs.contacts) {
+            if(contactIsOwned(c, accts))
+                owned.add(c);
+        }
+
+        /* all are owned, nothing to do. */
+        if(owned.size() == cs.contacts.size())
+            return true;
+
+        /* user needs to make the choice */
+        if(!keepLocals)
+            return false;
+
+        /* 
+         * To prevent deletions we remove all the unowned
+         * items from our last set so they look like new remote 
+         * additions during the synch.
+         */
+        cs.contacts = owned;
         return true;
     }
 
@@ -90,6 +152,20 @@ public class GenericSync {
             mRes.stats.numParseExceptions++;
             mRes.databaseError = true;
             Log.e(TAG, "corrupt account state! " + e);
+            return;
+        }
+
+        /* 
+         * Determine if any accounts that are used in local went away.
+         * If so, we need the user's consent first.
+         * We use the SyncResult "tooManyDeletions" mechanism to handle this.
+         * The synch framework will prompt the user and set the 
+         * appropriate flag in the mExtras with the users choice.
+         */
+        boolean forceDelete = mExtras.getBoolean(ContentResolver.SYNC_EXTRAS_OVERRIDE_TOO_MANY_DELETIONS);
+        boolean keepLocals = mExtras.getBoolean(ContentResolver.SYNC_EXTRAS_DISCARD_LOCAL_DELETIONS);
+        if(!handleAccountDeleted(last, forceDelete, keepLocals)) {
+            mRes.tooManyDeletions = true;
             return;
         }
 
