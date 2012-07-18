@@ -28,6 +28,21 @@ public class GenericSync {
     private static final boolean mPrefLocal = true; // XXX config!
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
+    Context mCtx;
+    Account mAcct;
+    String mTokenType;
+    IBlobStore mRemStore;
+    SyncResult mRes;
+
+    // XXX can we get tokenType from acct and eliminate that arg and member?
+    public GenericSync(Context ctx, Account acct, String tokenType, IBlobStore store, SyncResult res) {
+        mCtx = ctx;
+        mAcct = acct;
+        mTokenType = tokenType;
+        mRemStore = store;
+        mRes = res;
+    }
+
     /*
      * An error occurred saving the remote data.  Make a last ditch
      * effort to save a local copy in hopes that we can push it later.
@@ -51,20 +66,20 @@ public class GenericSync {
         return true;
     }
 
-    // XXX update syncResult!
-    // XXX we should have some handle on the account so we can
-    // record some per-account info like last synch time...
+    /* a synch is requested. */
+    // XXX update mRes syncResult!
     // XXX we need a handle on preferences, like prefLocal!
-    // XXX re-evaluate exception list
-    private static void _onPerformSync(Context ctx, String name, String passphrase, IBlobStore remStore, SyncResult res) throws Exception {
+    public void onPerformSync() { 
         // XXX figure out account types to create new contacts as!
 
-    	Log.v(TAG, "_onPerformSync " + name);
-        AccountHelper h = new AccountHelper(ctx, name, passphrase);
+    	Log.v(TAG, "_onPerformSync " + mAcct.name);
+        AccountManager mgr = AccountManager.get(mCtx);
+        String passphrase = mgr.getUserData(mAcct, "passphrase");
+        AccountHelper h = new AccountHelper(mCtx, mAcct.name, passphrase);
         IBlobStore lastStore = h.getStateStore();
         ContactSetBS last, remote;
 
-        if(!pushBackup(h, lastStore, remStore))
+        if(!pushBackup(h, lastStore, mRemStore))
             return;
 
         // load last
@@ -78,7 +93,7 @@ public class GenericSync {
 
         // load remote
         try {
-            remote = h.load("remote", remStore, "synch");
+            remote = h.load("remote", mRemStore, "synch");
         } catch(final Marsh.BadVersion e) {
             // XXX notify: update your software
             Log.e(TAG, "synch data has bad version! " + e);
@@ -103,7 +118,7 @@ public class GenericSync {
         }
 
         // load local
-        ContactSet local = new ContactSetDB("localdb", ctx, null, null);
+        ContactSet local = new ContactSetDB("localdb", mCtx, null, null);
 
         if(last.id != remote.id) {
             if(last.contacts.isEmpty()) { // lock on to the remote's ID the first time we run
@@ -123,7 +138,7 @@ public class GenericSync {
 
         Log.v(TAG, "saving changes");
         try {
-            h.save(remStore, "synch", remote);
+            h.save(mRemStore, "synch", remote);
         } catch(final IBlobStore.AuthError e) {
             // XXX invalidate creds
             // XXX notify: auth error saving, update creds
@@ -150,19 +165,19 @@ public class GenericSync {
         // XXX update the last synch time for the account
     }
 
-    /* a synch is requested. */
-    public static void onPerformSync(Context ctx, String name, String passphrase, String acctType, String token, IBlobStore store, SyncResult res) {
+/*
+    public void onPerformSync() {
         Log.v(TAG, "onPerformSync");
 
         try {
-            _onPerformSync(ctx, name, passphrase, store, res);
+            _onPerformSync();
 
         // XXX re-evaluate which of these are needed...
         } catch (final OperationCanceledException e) {
             Log.e(TAG, "onPerformSync", e);
-        } catch (final IOException e) {
-            Log.e(TAG, "onPerformSync", e);
-            res.stats.numIoExceptions++;
+        //} catch (final IOException e) {
+        //    Log.e(TAG, "onPerformSync", e);
+        //    res.stats.numIoExceptions++;
         //} catch (final AuthenticationException e) {
         //    Log.e(TAG, "onPerformSync", e);
         //    mgr.invalidateAuthToken(acctType, token);
@@ -170,31 +185,11 @@ public class GenericSync {
         //} catch (final ParseException e) {
         //    Log.e(TAG, "onPerformSync", e);
         //    res.stats.numParseExceptions++;
-        } catch (final Exception e) {
-            Log.e(TAG, "onPerformSync", e);
-            res.stats.numIoExceptions++; // XXX?
+        //} catch (final Exception e) {
+        //    Log.e(TAG, "onPerformSync", e);
+        //    res.stats.numIoExceptions++; // XXX?
         }
     }
-
-    /* return a token or null, updating the result status */
-    // XXX dead code
-    public static String getToken(Context ctx, Account acct, String tokenType, SyncResult res) {
-        Log.v(TAG, "getToken");
-        AccountManager mgr = AccountManager.get(ctx);
-
-        try {
-            return mgr.blockingGetAuthToken(acct, tokenType, true);
-
-        } catch (final AuthenticatorException e) {
-            Log.e(TAG, "getToken", e);
-            res.stats.numParseExceptions++;
-        } catch (final OperationCanceledException e) {
-            Log.e(TAG, "getToken", e);
-        } catch (final IOException e) {
-            Log.e(TAG, "getToken", e);
-            res.stats.numIoExceptions++;
-        }
-        return null;
-    }
+*/
 }
 
