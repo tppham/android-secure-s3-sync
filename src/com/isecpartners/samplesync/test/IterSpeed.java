@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.ListView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.view.View;
 
 import org.spongycastle.util.encoders.Hex;
@@ -39,10 +39,12 @@ public class IterSpeed extends Activity {
 
         mCnt = 0;
 
-        ListView box = new ListView(this);
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
         box.addView(text("Enter an iteration count:"));
         box.addView(text("Results:"));
         Button b = new Button(this);
+        b.setText("GenKey");
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String in = mInput.getText().toString();
