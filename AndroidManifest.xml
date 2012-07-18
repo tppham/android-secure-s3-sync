@@ -112,6 +112,12 @@
             android:excludeFromRecents="true"
             >
         </activity>
+        <activity
+            android:name=".test.IterSpeed"
+            android:label="Crypto Iter Speed Test"
+            android:excludeFromRecents="true"
+            >
+        </activity>
         <service
             android:name=".sdcard.AuthService"
             android:exported="true">
