@@ -43,9 +43,9 @@ public class IterSpeed extends Activity {
         box.addView(text("Enter an iteration count:"));
         box.addView(text("Results:"));
         Button b = new Button(this);
-        b.setOnClickListener(new View.onClickListener() {
+        b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String in = mInput.getText();
+                String in = mInput.getText().toString();
                 try {
                     int x = Integer.parseInt(in);
                     genKey(x);
