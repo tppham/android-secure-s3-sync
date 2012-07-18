@@ -12,8 +12,8 @@ import android.util.Log;
 public class Blob {
     private static final String TAG = "model.Blob";
     public static final int SALTLEN = 8;
-    public static final int IVLEN = 16; // XXX right?
-    public static final int ITERCOUNT = 1000; // XXX whats a good value here?
+    public static final int IVLEN = 16;
+    public static final int ITERCOUNT = 500; // about 100msec on HTC vivid, 500msec in my emulator and 1250msec on an ADP1.
     public static final int MAGIC = 0x1badd00d;
 
     public String passphrase;
