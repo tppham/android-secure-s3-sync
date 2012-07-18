@@ -87,6 +87,8 @@ public class GenericSync {
             last = h.load("last", lastStore, "synch");
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: missing or corrupted state, delete acct?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
             Log.e(TAG, "corrupt account state! " + e);
             return;
         }
@@ -96,23 +98,33 @@ public class GenericSync {
             remote = h.load("remote", mRemStore, "synch");
         } catch(final Marsh.BadVersion e) {
             // XXX notify: update your software
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
             Log.e(TAG, "synch data has bad version! " + e);
             return;
         } catch(final Marsh.Error e) {
             // XXX notify: corrupt, wipe?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
             Log.e(TAG, "synch data corrupt! " + e);
             return;
         } catch(final IBlobStore.AuthError e) {
-            // XXX invalidate creds
+            /* note: we're not using an auth token right now.  If we were, we should:
+            mgr.invalidateAuthToken(TOKENTYPE, token);
+             */
             // XXX notify: update creds
+            mRes.stats.numAuthExceptions++;
             Log.e(TAG, "synch auth failed! " + e);
             return;
         } catch(final IBlobStore.NotFoundError e) {
             // XXX notify: synch data not found, wipe?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
             Log.e(TAG, "synch load failed! " + e);
             return;
-        } catch(final IBlobStore.Error e) {
+        } catch(final IBlobStore.Error e) { // probably intermittent failure
             // XXX notify: retry?
+            mRes.stats.numIoExceptions++;
             Log.e(TAG, "synch load failed! " + e);
             return;
         }
@@ -125,12 +137,14 @@ public class GenericSync {
                 last.id = remote.id;
             } else { // disallow any changes in remote ID after the first run
                 // XXX notify: synch data changed.  wipe?
+                mRes.stats.numParseExceptions++;
+                mRes.databaseError = true;
                 Log.e(TAG, "synch data was replaced by someone else!");
                 return;
             }
         }
 
-        Synch s = new Synch(last, local, remote, mPrefLocal);
+        Synch s = new Synch(last, local, remote, mPrefLocal, mRes.stats);
         if(!s.sync()) {
             Log.v(TAG, "no changes!");
             return;
@@ -140,14 +154,16 @@ public class GenericSync {
         try {
             h.save(mRemStore, "synch", remote);
         } catch(final IBlobStore.AuthError e) {
-            // XXX invalidate creds
+            /* invalidate auth tokens here if we were using them */
             // XXX notify: auth error saving, update creds
             saveBackup(h, lastStore, remote);
+            mRes.stats.numAuthExceptions++;
             Log.e(TAG, "auth error saving synch data: " + e);
             /* keep going.. we cant back out now... */
-        } catch(final IBlobStore.Error e) {
+        } catch(final IBlobStore.Error e) { // probably intermittent
             // XXX notify: error saving, try again?
             saveBackup(h, lastStore, remote);
+            mRes.stats.numIoExceptions++;
             Log.e(TAG, "error saving synch data: " + e);
             /* keep going.. we cant back out now... */
         } catch(final Marsh.Error e) { // should never happen
@@ -158,38 +174,14 @@ public class GenericSync {
             h.save(lastStore, "synch", last);
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
             // XXX notify: delete acct?
+            mRes.stats.numParseExceptions++; // close enough...
+            mRes.databaseError = true;
             Log.e(TAG, "couldn't update account state! " + e);
             return;
         }
 
         // XXX update the last synch time for the account
+        mgr.setUserData(mAcct, "lastSync", "" + System.currentTimeMillis());
     }
-
-/*
-    public void onPerformSync() {
-        Log.v(TAG, "onPerformSync");
-
-        try {
-            _onPerformSync();
-
-        // XXX re-evaluate which of these are needed...
-        } catch (final OperationCanceledException e) {
-            Log.e(TAG, "onPerformSync", e);
-        //} catch (final IOException e) {
-        //    Log.e(TAG, "onPerformSync", e);
-        //    res.stats.numIoExceptions++;
-        //} catch (final AuthenticationException e) {
-        //    Log.e(TAG, "onPerformSync", e);
-        //    mgr.invalidateAuthToken(acctType, token);
-        //    res.stats.numAuthExceptions++;
-        //} catch (final ParseException e) {
-        //    Log.e(TAG, "onPerformSync", e);
-        //    res.stats.numParseExceptions++;
-        //} catch (final Exception e) {
-        //    Log.e(TAG, "onPerformSync", e);
-        //    res.stats.numIoExceptions++; // XXX?
-        }
-    }
-*/
 }
 

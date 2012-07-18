@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
+
+import android.content.SyncStats;
 import android.util.Log;
 
 /*
@@ -36,6 +38,7 @@ public class Synch {
 
     ContactSet mLast, mLocal, mRemote;
     boolean mPreferLocal;
+    SyncStats mStats;
 
     /* return a score for how well x matches m */
     static int match(Contact x, Merge m) {
@@ -223,7 +226,7 @@ public class Synch {
         /* then bring local up to date */
         Changes d2 = changes(m.last, m.local); // d2 = last - local
         if(d2 != null)
-            m.local = mLocal.push(m.local, d2); // local += d2
+            m.local = mLocal.push(m.local, d2, mStats); // local += d2
         return true;
     }
 
@@ -323,11 +326,12 @@ public class Synch {
         return updated;
     }
 
-    public Synch(ContactSet last, ContactSet local, ContactSet remote, boolean preferLocal) {
+    public Synch(ContactSet last, ContactSet local, ContactSet remote, boolean preferLocal, SyncStats stats) {
         mLast = last;
         mLocal = local;
         mRemote = remote;
         mPreferLocal = preferLocal;
+        mStats = stats;
     }
 }
 

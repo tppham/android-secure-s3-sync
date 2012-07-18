@@ -2,6 +2,8 @@ package com.isecpartners.samplesync.model;
 
 import java.util.List;
 import java.util.LinkedList;
+
+import android.content.SyncStats;
 import android.util.Log;
 
 /*
@@ -29,9 +31,12 @@ public class ContactSet {
     /*
      * Apply changes d to contact c, returning the contact.
      */
-    public Contact push(Contact c, Synch.Changes ch) {
-        if(c == null) 
+    public Contact push(Contact c, Synch.Changes ch, SyncStats stats) {
+        stats.numEntries ++;
+        if(c == null)  {
+            stats.numInserts++;
             c = add();
+        }
         if(ch.addData != null) {
             for(CData d : ch.addData)
                 addData(c, d);
@@ -41,11 +46,16 @@ public class ContactSet {
                 delData(c, d);
         }
         if(ch.delContact) {
+            stats.numDeletes++;
             del(c);
             c = null;
         }
         commit();
         return c;
+    }
+
+    public Contact push(Contact c, Synch.Changes ch) {
+        return push(c, ch, new SyncStats());
     }
 
     public Contact add() {
