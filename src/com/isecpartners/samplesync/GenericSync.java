@@ -105,10 +105,14 @@ public class GenericSync {
          */
         AccountManager mgr = AccountManager.get(mCtx);
         Account[] accts = mgr.getAccounts();
+        for(int i = 0; i < accts.length; i++) // XXX debug
+            Log.v(TAG, "account " + accts[i].name + " type " + accts[i].type);
+
         List<Contact> owned = new LinkedList<Contact>();
         for(Contact c : cs.contacts) {
             if(contactIsOwned(c, accts))
                 owned.add(c);
+            else Log.v(TAG, "orphaned contact: " + c); // debug
         }
 
         /* all are owned, nothing to do. */
@@ -124,6 +128,7 @@ public class GenericSync {
          * items from our last set so they look like new remote 
          * additions during the synch.
          */
+        Log.v(TAG, "removing all orphaned contacts from last set");
         cs.contacts = owned;
         return true;
     }
