@@ -28,7 +28,6 @@ import com.isecpartners.samplesync.model.Marsh;
  */
 public class GenericSync {
     private static final String TAG = "GenericSync";
-    private static final boolean mPrefLocal = true; // XXX config!
     public static final int MAXBUFSIZE  = 1024 * 1024;
 
     Context mCtx;
@@ -62,7 +61,7 @@ public class GenericSync {
      * save it to the remote.
      */
     public static boolean pushBackup(AccountHelper h, IBlobStore lastStore, IBlobStore remStore) {
-        // XXX todo, read in backup, if it doesnt exist, return
+        // XXX todo, read in backup, if it doesnt exist, return.
         // if it does, save it to remStore, and gracefully handle
         // all errors.
         return true;
@@ -102,8 +101,6 @@ public class GenericSync {
          */
         AccountManager mgr = AccountManager.get(mCtx);
         Account[] accts = mgr.getAccounts();
-        for(int i = 0; i < accts.length; i++) // XXX debug
-            Log.v(TAG, "account " + accts[i].name + " type " + accts[i].type);
 
         List<Contact> owned = new LinkedList<Contact>();
         for(Contact c : cs.contacts) {
