@@ -69,7 +69,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         String passphrase = "the quick brown fox"; // XXX get from the GUI!
         AccountHelper h = new AccountHelper(this, acct, passphrase);
-        if(h.stateStoreExists()) {
+        if(h.accountExists()) {
             mMsgTxt.setText("That account already exists");
             return;
         }

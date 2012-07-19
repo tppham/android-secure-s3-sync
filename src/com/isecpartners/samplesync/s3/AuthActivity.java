@@ -69,7 +69,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         /* perform the background steps. calls done() when done. */
         public void run() {
             AccountHelper h = new AccountHelper(mCtx, mName, mPassphrase);
-            if(h.stateStoreExists()) {
+            if(h.accountExists()) {
                 done("That account already exists");
                 return;
             }

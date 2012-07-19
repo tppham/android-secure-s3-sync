@@ -2,6 +2,8 @@ package com.isecpartners.samplesync;
 
 import java.nio.ByteBuffer;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -25,6 +27,7 @@ import com.isecpartners.samplesync.model.Marsh;
  */
 public class AccountHelper {
     private static final String TAG = "AccountHelper";
+    private static final String ACCOUNT_TYPE_PREFIX = "com.isecpartners.samplesync"; // XXX move elsewhere?
     private static final int MAXBUFSIZE = 1024 * 1024;
 
     Context mCtx;
@@ -53,9 +56,24 @@ public class AccountHelper {
         return s.storeExists(mName);
     }
 
-    public boolean stateStoreExists() {
-        FileStore f = getStateStore();
-        return f.storeExists(mName);
+    public boolean accountIsOurs(Account a) {
+        return a.type.startsWith(ACCOUNT_TYPE_PREFIX);
+    }
+
+    /* 
+     * return true if an account already exists under this name
+     * for any sync account type we support.
+     */
+    public boolean accountExists() {
+        /* remember we're forcing account names to lower case */
+        AccountManager mgr = AccountManager.get(mCtx);
+        Account[] accts = mgr.getAccounts();
+        for(int i = 0; i < accts.length; i++) {
+            if(accountIsOurs(accts[i]) &&
+               accts[i].name.toLowerCase().equals(mName))
+                return true;
+        }
+        return false;
     }
 
     /* load a contact set from this account's bucket */
