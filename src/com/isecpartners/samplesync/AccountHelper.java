@@ -86,24 +86,15 @@ public class AccountHelper {
     }
 
     /* A helper to test if we can load from a store */
-    public enum LoadStatus { OK, AuthError, NotFound, Corrupt, IoError, BadKey };
-    public LoadStatus tryLoad(IBlobStore store, String key) {
+    public Error tryLoad(IBlobStore store, String key) {
         try {
             load("tryload", store, key);
-            return LoadStatus.OK;
-        } catch(final IBlobStore.NotFoundError e) {
-            return LoadStatus.NotFound;
-        } catch(final IBlobStore.AuthError e) {
-            return LoadStatus.AuthError;
-        } catch(final IBlobStore.Error e) {
-            return LoadStatus.IoError;
-        } catch(final Marsh.BadKey e) {
-            return LoadStatus.BadKey;
-        } catch(final Marsh.Error e) {
-            return LoadStatus.Corrupt;
+            return null;
+        } catch(Error e) {
+            return e;
         }
     }
-    public LoadStatus tryLoad(IBlobStore store) {
+    public Error tryLoad(IBlobStore store) {
         return tryLoad(store, "sync");
     }
 

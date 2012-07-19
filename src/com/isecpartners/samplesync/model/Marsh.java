@@ -15,22 +15,21 @@ import java.io.UnsupportedEncodingException;
  * a subclass of the Error class here.
  */
 public class Marsh {
-    public static class Error extends Exception { 
+    public static class Error extends com.isecpartners.samplesync.Error {
         public Error(String msg) { super(msg); }
-        public String descr() { return "invalid data"; }
-    }
-    public static class BufferError extends Error {
-        public BufferError(String msg) { super(msg); }
+        public String descr() { return "internal error processing data"; }
     }
     public static class BadFormat extends Error { 
         public BadFormat(String msg) { super(msg); }
+        public String descr() { return "bad data format"; }
     }
     public static class BadData extends Error { 
         public BadData(String msg) { super(msg); }
+        public String descr() { return "internal error encoding bad data"; }
     }
     public static class BadVersion extends Error { 
         public BadVersion(String msg) { super(msg); }
-        public String descr() { return "incompatible version"; }
+        public String descr() { return "unsupported version number in data"; }
     }
     public static class BadKey extends Error { 
         public BadKey(String msg) { super(msg); }
@@ -60,7 +59,7 @@ public class Marsh {
         try {
             buf.put((byte)x);
         } catch(final BufferOverflowException e) {
-            throw new BufferError("not enough room");
+            throw new BadFormat("not enough room");
         } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
@@ -73,7 +72,7 @@ public class Marsh {
                 x += 0x100;
             return x;
         } catch(final BufferUnderflowException e) {
-            throw new BufferError("not enough data");
+            throw new BadFormat("not enough data");
         }
     }
 
@@ -83,7 +82,7 @@ public class Marsh {
         try {
             buf.putShort((short)x);
         } catch(final BufferOverflowException e) {
-            throw new BufferError("not enough room");
+            throw new BadFormat("not enough room");
         } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
@@ -96,7 +95,7 @@ public class Marsh {
                 x += 0x10000;
             return x;
         } catch(final BufferUnderflowException e) {
-            throw new BufferError("not enough data");
+            throw new BadFormat("not enough data");
         }
     }
 
@@ -104,7 +103,7 @@ public class Marsh {
         try {
             buf.putInt(x);
         } catch(final BufferOverflowException e) {
-            throw new BufferError("not enough room");
+            throw new BadFormat("not enough room");
         } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
@@ -114,7 +113,7 @@ public class Marsh {
         try {
             return buf.getInt();
         } catch(final BufferUnderflowException e) {
-            throw new BufferError("not enough data");
+            throw new BadFormat("not enough data");
         }
     }
 
@@ -122,7 +121,7 @@ public class Marsh {
         try {
             buf.putLong(x);
         } catch(final BufferOverflowException e) {
-            throw new BufferError("not enough room");
+            throw new BadFormat("not enough room");
         } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
@@ -132,7 +131,7 @@ public class Marsh {
         try {
             return buf.getLong();
         } catch(final BufferUnderflowException e) {
-            throw new BufferError("not enough data");
+            throw new BadFormat("not enough data");
         }
     }
 
@@ -150,7 +149,7 @@ public class Marsh {
         } catch(final UnsupportedEncodingException e) {
             throw new Error("utf8 error1 should never happen");
         } catch(final BufferOverflowException e) {
-            throw new BufferError("not enough room");
+            throw new BadFormat("not enough room");
         } catch(final ReadOnlyBufferException e) {
             throw new Error("" + e);
         }
@@ -169,7 +168,7 @@ public class Marsh {
         } catch(final UnsupportedEncodingException e) {
             throw new Error("utf8 error2 should never happen");
         } catch(final BufferUnderflowException e) {
-            throw new BufferError("not enough data");
+            throw new BadFormat("not enough data");
         }
     }
 };
