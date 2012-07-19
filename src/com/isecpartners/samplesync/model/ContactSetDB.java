@@ -52,6 +52,7 @@ public class ContactSetDB extends ContactSet {
                     RawContacts.DELETED + " = 0 AND "
                         + "(" + RawContacts.ACCOUNT_TYPE + " is null OR " 
                         + RawContacts.ACCOUNT_TYPE + "=? OR " 
+                        + RawContacts.ACCOUNT_TYPE + "=? OR " 
                         + RawContacts.ACCOUNT_TYPE + "=?)",
                     new String[]{ 
                         Constants.ACCOUNT_TYPE_GOOGLE,
