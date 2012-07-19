@@ -85,6 +85,25 @@ public class AccountHelper {
         return blob.set;
     }
 
+    /* A helper to test if we can load from a store */
+    public enum LoadStatus { OK, AuthError, NotFound, Corrupt, IoError, BadKey };
+    public LoadStatus tryLoad(IBlobStore store, String key) {
+        try {
+            load("tryload", store, key);
+            return LoadStatus.OK;
+        } catch(final IBlobStore.NotFoundError e) {
+            return LoadStatus.NotFound;
+        } catch(final IBlobStore.AuthError e) {
+            return LoadStatus.AuthError;
+        } catch(final IBlobStore.Error e) {
+            return LoadStatus.IoError;
+        } catch(final Marsh.BadKey e) {
+            return LoadStatus.BadKey;
+        } catch(final Marsh.Error e) {
+            return LoadStatus.Corrupt;
+        }
+    }
+
     /* save a contact set to this account's bucket */
     public void save(IBlobStore s, String key, ContactSetBS cs) throws Marsh.Error, IBlobStore.Error {
         Log.v(TAG, "save: " + cs.name + " key " + key + " dirty: " + cs.dirty);
