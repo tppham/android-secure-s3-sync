@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.isecpartners.samplesync.R;
+import com.isecpartners.samplesync.Constants;
 import com.isecpartners.samplesync.FileStore;
 import com.isecpartners.samplesync.IBlobStore;
 import com.isecpartners.samplesync.AccountHelper;
@@ -27,7 +28,7 @@ import com.isecpartners.samplesync.AccountHelper;
  */
 public class AuthActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "sdcard.AuthActivity";
-    public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.sdcard";
+    public static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_SD;
 
     private AccountManager mAcctMgr;
 

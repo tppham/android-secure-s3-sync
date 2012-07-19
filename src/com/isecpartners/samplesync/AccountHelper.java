@@ -27,7 +27,6 @@ import com.isecpartners.samplesync.model.Marsh;
  */
 public class AccountHelper {
     private static final String TAG = "AccountHelper";
-    private static final String ACCOUNT_TYPE_PREFIX = "com.isecpartners.samplesync"; // XXX move elsewhere?
     private static final int MAXBUFSIZE = 1024 * 1024;
 
     Context mCtx;
@@ -57,7 +56,7 @@ public class AccountHelper {
     }
 
     public boolean accountIsOurs(Account a) {
-        return a.type.startsWith(ACCOUNT_TYPE_PREFIX);
+        return a.type.startsWith(Constants.ACCOUNT_TYPE_PREFIX);
     }
 
     /* 

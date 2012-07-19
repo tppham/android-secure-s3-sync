@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 public class AccountListActivity extends Activity{
 	private static final String TAG = "AccountListActivity";
-	private static final String ACCOUNT_TYPE_S3 = "com.isecpartners.samplesync.s3";
-	private static final String ACCOUNT_TYPE_SD = "com.isecpartners.samplesync.sdcard"; 
     
 	private AccountManager s3mAcctMgr;
 	private AccountManager sdmAcctMgr;
@@ -43,11 +41,11 @@ public class AccountListActivity extends Activity{
 	private void getAccountInfo() {
 		s3layout = (LinearLayout) findViewById(R.id.display_accounts);
 	    s3mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);;
-	    s3_accounts = s3mAcctMgr.getAccountsByType(ACCOUNT_TYPE_S3);
+	    s3_accounts = s3mAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_S3);
 	      
 		sdlayout = (LinearLayout) findViewById(R.id.display_accounts);
 		sdmAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);;
-	    sd_accounts = sdmAcctMgr.getAccountsByType(ACCOUNT_TYPE_SD);
+	    sd_accounts = sdmAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_SD);
 	    
 	 //   Log.v(TAG, "s3: "+s3_accounts.length+" sd: "+sd_accounts.length);
 	        
@@ -121,7 +119,7 @@ public class AccountListActivity extends Activity{
 						Intent myIntent = new Intent(AccountListActivity.this, ShowAccountActivity.class);
 						
 						Bundle bundle = new Bundle();
-			        	bundle.putString("ACCOUNT_TYPE", ACCOUNT_TYPE_S3);
+			        	bundle.putString("ACCOUNT_TYPE", Constants.ACCOUNT_TYPE_S3);
 			        	bundle.putString("ACCOUNT_NAME", acct);
 			        	myIntent.putExtras(bundle);
 			        	startActivity(myIntent);
@@ -185,7 +183,7 @@ public class AccountListActivity extends Activity{
 						Intent myIntent = new Intent(AccountListActivity.this, ShowAccountActivity.class);
 						
 						Bundle bundle = new Bundle();
-			        	bundle.putString("ACCOUNT_TYPE", ACCOUNT_TYPE_SD);
+			        	bundle.putString("ACCOUNT_TYPE", Constants.ACCOUNT_TYPE_SD);
 			        	bundle.putString("ACCOUNT_NAME", acct);
 			        	myIntent.putExtras(bundle);
 			        	startActivity(myIntent);
