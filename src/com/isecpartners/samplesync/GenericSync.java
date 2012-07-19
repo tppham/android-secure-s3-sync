@@ -33,16 +33,13 @@ public class GenericSync {
 
     Context mCtx;
     Account mAcct;
-    String mTokenType;
     IBlobStore mRemStore;
     SyncResult mRes;
     Bundle mExtras;
 
-    // XXX can we get tokenType from acct and eliminate that arg and member?
-    public GenericSync(Context ctx, Account acct, String tokenType, IBlobStore store, Bundle extras, SyncResult res) {
+    public GenericSync(Context ctx, Account acct, IBlobStore store, Bundle extras, SyncResult res) {
         mCtx = ctx;
         mAcct = acct;
-        mTokenType = tokenType;
         mRemStore = store;
         mRes = res;
         mExtras = extras;

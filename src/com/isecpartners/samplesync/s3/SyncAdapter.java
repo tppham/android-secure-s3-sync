@@ -18,7 +18,6 @@ import com.isecpartners.samplesync.IBlobStore;
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "s3.SyncAdapter";
-    private static final String TOKEN_TYPE = "com.isecpartners.samplesync.s3"; // XXX?
     private final Context mCtx;
 
     public SyncAdapter(Context context) {
@@ -34,6 +33,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String key = mgr.getPassword(acct);
         Log.v(TAG, "sync here with s3 store: " + acct.name + " " +  keyid + " " + key);
         IBlobStore store = new Store(keyid, key);
-        new GenericSync(mCtx, acct, TOKEN_TYPE, store, extras, res).onPerformSync();
+        new GenericSync(mCtx, acct, store, extras, res).onPerformSync();
     }
 }
