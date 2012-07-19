@@ -103,21 +103,9 @@
             android:excludeFromRecents="true"
             >
         </activity>
-        <activity
-            android:name=".s3.BucketListActivity"
-            android:label="S3 Sign-in"
-            android:excludeFromRecents="true"
-            >
-        </activity>
          <activity
             android:name=".s3.FilePickerActivity"
             android:label="S3 Choose File"
-            android:excludeFromRecents="true"
-            >
-        </activity>
-        <activity
-            android:name=".s3.MyActivity"
-            android:label="S3 Sync"
             android:excludeFromRecents="true"
             >
         </activity>
