@@ -18,7 +18,6 @@ import com.isecpartners.samplesync.FileStore;
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "sdcard.SyncAdapter";
-    private static final String TOKEN_TYPE = "com.isecpartners.samplesync.sdcard"; // XXX?
     private final Context mCtx;
 
     public SyncAdapter(Context context) {
@@ -33,6 +32,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String path = mgr.getUserData(acct, "path");
         Log.v(TAG, "sync with sdcard store: " + acct.name);
         IBlobStore store = new FileStore(path);
-        new GenericSync(mCtx, acct, TOKEN_TYPE, store, extras, res).onPerformSync();
+        new GenericSync(mCtx, acct, store, extras, res).onPerformSync();
     }
 }
