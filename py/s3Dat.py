@@ -34,7 +34,7 @@ def load(bucket=defBucket, key=defKey) :
 
 def save(cs, bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
-    blob = Blob(pw, genSalt(), genIV())
+    blob = marsh.Blob(pw, marsh.genSalt(), marsh.genIV())
     blob.cset = cs
     b = marsh.Buf()
     b.putBlob(blob)
