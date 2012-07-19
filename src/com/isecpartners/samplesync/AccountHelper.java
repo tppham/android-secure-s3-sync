@@ -103,6 +103,9 @@ public class AccountHelper {
             return LoadStatus.Corrupt;
         }
     }
+    public LoadStatus tryLoad(IBlobStore store) {
+        return tryLoad(store, "sync");
+    }
 
     /* save a contact set to this account's bucket */
     public void save(IBlobStore s, String key, ContactSetBS cs) throws Marsh.Error, IBlobStore.Error {
