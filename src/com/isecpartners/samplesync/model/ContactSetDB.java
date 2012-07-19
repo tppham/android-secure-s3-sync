@@ -13,6 +13,8 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
+import com.isecpartners.samplesync.Constants;
+
 
 /*
  * A contact set for interacting with the contact provider DB.
@@ -20,10 +22,6 @@ import android.util.Log;
  * We build up operations into mOps and then commit them all at once.
  */
 public class ContactSetDB extends ContactSet {
-    // XXX move elsewhere?
-    static final String TYPE_EXCHANGE = "com.android.exchange";
-    static final String TYPE_POP_IMAP = "com.android.email";
-
     protected Context mCtx;
     protected String mAcctName;
     protected String mAcctType;
@@ -55,8 +53,10 @@ public class ContactSetDB extends ContactSet {
                         + "(" + RawContacts.ACCOUNT_TYPE + " is null OR " 
                         + RawContacts.ACCOUNT_TYPE + "=? OR " 
                         + RawContacts.ACCOUNT_TYPE + "=?)",
-                    // XXX is this right?  verify account names.
-                    new String[]{ TYPE_EXCHANGE, TYPE_POP_IMAP },
+                    new String[]{ 
+                        Constants.ACCOUNT_TYPE_GOOGLE,
+                        Constants.ACCOUNT_TYPE_EXCHANGE,
+                        Constants.ACCOUNT_TYPE_DEV },
                     null);
 
         while(c.moveToNext())
