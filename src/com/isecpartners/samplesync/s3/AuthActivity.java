@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -138,16 +137,23 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         Log.v(TAG, "onCreate");
         mAcctMgr = AccountManager.get(this);
 
-        if (layout.equals("s3login1_1"))
+        if (layout.equals("s3login1_1")){
         	setContentView(R.layout.s3login1_1);
+        	mMsgTxt = (TextView)findViewById(R.id.err1_1_msg);
+        }
+        	
         
-        if (layout.equals("s3login1_2"))
+        if (layout.equals("s3login1_2")){
             setContentView(R.layout.s3login1_2);
+        	mMsgTxt = (TextView)findViewById(R.id.err1_2_msg);
+        }
         
-        if (layout.equals("s3login1_3"))
+        if (layout.equals("s3login1_3")){
             setContentView(R.layout.s3login1_3);
+        	mMsgTxt = (TextView)findViewById(R.id.err1_3_msg);
+        }
 
-        mMsgTxt = (TextView)findViewById(R.id.err_msg);
+        
   //      mNameIn = (EditText)findViewById(R.id.name_edit);
   //      mKeyIdIn = (EditText)findViewById(R.id.keyid_edit);
 //        mKeyIn = (EditText)findViewById(R.id.key_edit);
