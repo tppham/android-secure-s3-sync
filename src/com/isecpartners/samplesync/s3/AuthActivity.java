@@ -30,8 +30,6 @@ import com.isecpartners.samplesync.AccountHelper;
 import com.isecpartners.samplesync.IBlobStore;
 import com.isecpartners.samplesync.R;
 
-import java.io.*; // XXX temp hack for prefill!  remove me!
-
 /**
  * A GUI for entering S3 credentials.  
  * The AccountAuthenticatorActivity allows us to pass results
@@ -111,22 +109,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         }
     };
         
-    /*
-     * XXX as a temp hack, prefill in the account and password information
-     * from the first two lines of /sdcard/secrets.txt.
-     * To make testing on an emulator a lot easier.
-     */
-    void prefillHackXXX() {
-        try {
-            String sdcard = Environment.getExternalStorageDirectory().getPath();
-            BufferedReader in = new BufferedReader(new FileReader(sdcard + "/secrets.txt"));
-            mKeyIdIn.setText(in.readLine());
-            mKeyIn.setText(in.readLine());
-            in.close();
-        } catch(Exception e) {
-        }
-    }
-
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -163,7 +145,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     @Override
     public void onStart() {
         super.onStart();
-        prefillHackXXX();
     }
 
     @Override
@@ -284,7 +265,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
          }
              //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
                
-             //String name = "XXXdummy"; // XXX fetch account name from result
              showDialog(DIALOG_PROGRESS);
             
              /* thread will invoke onSigninDone when done */
