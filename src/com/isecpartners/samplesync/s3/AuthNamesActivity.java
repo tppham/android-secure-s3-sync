@@ -1,5 +1,6 @@
 package com.isecpartners.samplesync.s3;
 
+import com.isecpartners.samplesync.AccountHelper;
 import com.isecpartners.samplesync.R;
 
 import android.app.Activity;
@@ -26,7 +27,7 @@ public class AuthNamesActivity extends Activity{
 	public void getAccountInfo(View v){
 		mAcctName = (EditText)findViewById(R.id.acct_name2);
 		mPassphrase = (EditText)findViewById(R.id.s3_passphrase);
-		mErrText = (TextView) findViewById(R.id.s3l2_err_msg);
+		mErrText = (TextView) findViewById(R.id.err2_msg);
 		
 		AcctName = mAcctName.getText().toString();
 		Passphrase = mPassphrase.getText().toString();
@@ -37,11 +38,19 @@ public class AuthNamesActivity extends Activity{
 			return;
 		}
 		
+		AccountHelper h = new AccountHelper(this, AcctName, Passphrase);
+        if(h.accountExists()) {
+            mErrText.setText("Account already exists. Enter a new account name");
+            mAcctName.setText("");
+        }
+        
+        if(!AcctName.equals("") && !Passphrase.equals("") && !h.accountExists()){
 		  Intent i = new Intent();
 	        i.putExtra("AccountName", AcctName);
 	        i.putExtra("Passphrase", Passphrase);
 	        setResult(RESULT_OK, i);
 	        finish();
+        }
 		
 		
 	}

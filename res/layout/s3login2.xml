@@ -32,14 +32,16 @@
         android:layout_gravity="center_vertical"
         android:text="@string/signin_msg"/>    
             
-             <TextView
-                android:id="@+id/err_msg"
+            
+     			<TextView
+                android:id="@+id/err2_msg"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#000001"
+                android:textColor="#ff0000"
+                android:textStyle="italic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dip" 
-                android:text="" />
+                android:text="" /> 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
@@ -87,15 +89,7 @@
                  android:layout_marginBottom="20dip"
                  android:paddingTop="200dp" 
                  android:background="#505050" />
- 			<TextView
-                android:id="@+id/s3l2_err_msg"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#ff0000"
-                android:textStyle="italic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dip" 
-                android:text="" /> 
+
 
     </LinearLayout>
 
