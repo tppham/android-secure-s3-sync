@@ -25,9 +25,6 @@ import com.isecpartners.samplesync.FileStore;
 public class Misc extends Activity {
 
     static String LogTag = "test.Misc";
-
-    // TODO XXX: Get these dynamically, probably from a Service that
-    // remembers them after asking the user in a KeyInputActivity.
     static String KeyId = "Your S3 access key ID here",
                   SecretKey = "Your S3 secret access key here";
 
