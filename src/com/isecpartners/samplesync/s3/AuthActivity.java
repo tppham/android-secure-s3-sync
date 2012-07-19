@@ -3,6 +3,7 @@ package com.isecpartners.samplesync.s3;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -43,7 +44,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private static final int DIALOG_PROGRESS = 0;
 	private static final int AUTH_SDCARD_CREDS = 0x00001010;
 	private static final int QR_CODE_CREDS = 0x0000c0de;
+	private static final int ACCT_INFO = 0x000002020;
     
+	private String access_key = null;
+ 	private String secret_key = null;
+ 	private String passphrase = null;
+ 	private String name = null;
+ 	
     private final Handler mCb = new Handler();
 
     private AccountManager mAcctMgr;
@@ -51,7 +58,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     
     private Context mCtx;
     private TextView mMsgTxt;
-    private EditText mNameIn, mKeyIdIn, mKeyIn;
+    private EditText mNameIn, mKeyIdIn, mKeyIn, mPassphrase;
     private Thread mSigninThread;
 
     /* bg threads for testing creds and creating the state */
@@ -70,7 +77,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         public void run() {
             AccountHelper h = new AccountHelper(mCtx, mName, mPassphrase);
             if(h.accountExists()) {
-                done("That account already exists");
+                done("Account already exists. Enter a different account name.");
                 return;
             }
 
@@ -125,19 +132,26 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         mCtx = this;
-
+        Bundle bundle = this.getIntent().getExtras();
+        String layout = bundle.getString("SIGNIN_TYPE");
+        
         Log.v(TAG, "onCreate");
         mAcctMgr = AccountManager.get(this);
 
-        Window w = getWindow();
-        w.requestFeature(Window.FEATURE_LEFT_ICON);
-        setContentView(R.layout.s3login);
-        w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
+        if (layout.equals("s3login1_1"))
+        	setContentView(R.layout.s3login1_1);
+        
+        if (layout.equals("s3login1_2"))
+            setContentView(R.layout.s3login1_2);
+        
+        if (layout.equals("s3login1_3"))
+            setContentView(R.layout.s3login1_3);
 
         mMsgTxt = (TextView)findViewById(R.id.err_msg);
-        mNameIn = (EditText)findViewById(R.id.name_edit);
-        mKeyIdIn = (EditText)findViewById(R.id.keyid_edit);
-        mKeyIn = (EditText)findViewById(R.id.key_edit);
+  //      mNameIn = (EditText)findViewById(R.id.name_edit);
+  //      mKeyIdIn = (EditText)findViewById(R.id.keyid_edit);
+//        mKeyIn = (EditText)findViewById(R.id.key_edit);
+//        mPassphrase = (EditText)findViewById(R.id.s3_passphrase);
     }
 
     @Override
@@ -169,17 +183,19 @@ public class AuthActivity extends AccountAuthenticatorActivity {
      * @param view The Submit button for which this method is invoked
      */
     public void onSignIn(View view) {
-        String name = mNameIn.getText().toString();
+
         String keyid = mKeyIdIn.getText().toString();
         String key = mKeyIn.getText().toString();
-        if(name.equals("") || key.equals("") || keyid.equals("")) {
-            mMsgTxt.setText("You must enter a name, key ID and key");
+
+        if(key.equals("") || keyid.equals("")) {
+            mMsgTxt.setText("You must enter an access key ID and secret key!");
             return;
         }
         
         //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
-        showDialog(DIALOG_PROGRESS);
-        String passphrase = "the quick brown fox"; // XXX get from gui!
+        //showDialog(DIALOG_PROGRESS);
+        
+        getAcctInfo();
         mSigninThread = new SigninThread(name, passphrase, keyid, key);
         mSigninThread.start();
         /* thread will invoke onSigninDone when done */
@@ -200,17 +216,35 @@ public class AuthActivity extends AccountAuthenticatorActivity {
   	   Intent myIntent = new Intent(AuthActivity.this, FilePickerActivity.class);
   	   startActivityForResult(myIntent, AUTH_SDCARD_CREDS);
       }
+    
+    /* Get Account Name and passphrase */
+    public void getAcctInfo(){
+    	Intent myIntent = new Intent (AuthActivity.this, AuthNamesActivity.class);
+    	startActivityForResult(myIntent, ACCT_INFO);    	
+    }
      
      /**
       *  read the contents of the QR code and 
       * parse them to get Access Key ID and Secret Access Key 
-      * XXX this needs to be fixed up to also support the account name!
       */
      public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-     	String access_key = null;
-     	String secret_key = null;
-     	String passphrase = "the quick brown fox";
-     	if (requestCode == QR_CODE_CREDS){ 
+    	if (resultCode == 0){
+        	return;
+        }
+    	
+     	
+     	if(requestCode == ACCT_INFO){
+     		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+     		if(resultCode == Activity.RESULT_OK){
+     		passphrase = intent.getStringExtra("Passphrase");
+     		name = intent.getStringExtra("AccountName");
+             mSigninThread = new SigninThread(name, passphrase, access_key, secret_key);
+             mSigninThread.start();
+     		}
+     	}
+        
+        
+     	if (requestCode == QR_CODE_CREDS){
          IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
          if(result == null)
              return;
@@ -224,6 +258,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                  mMsgTxt.setText("Invalid S3 Credentials");
                  return;
                  }
+             getAcctInfo();
              }
      	
      	else {       
@@ -235,13 +270,17 @@ public class AuthActivity extends AccountAuthenticatorActivity {
        	  /* read the contents of the file */
        	  access_key = intent.getStringExtra("access_key");
        	  secret_key = intent.getStringExtra("secret_key");
+       	  if(resultCode != Activity.RESULT_OK){
+       		  Log.v(TAG, "Result: "+ resultCode);
+       		  return;
+       	  }
+       	  getAcctInfo();
          }
              //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
                
-             String name = "XXXdummy"; // XXX fetch account name from result
+             //String name = "XXXdummy"; // XXX fetch account name from result
              showDialog(DIALOG_PROGRESS);
-             mSigninThread = new SigninThread(name, passphrase,access_key, secret_key);
-             mSigninThread.start();
+            
              /* thread will invoke onSigninDone when done */
            
      }

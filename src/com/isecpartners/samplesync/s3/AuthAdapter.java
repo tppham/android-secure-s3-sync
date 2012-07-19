@@ -26,7 +26,7 @@ class AuthAdapter extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) {
         /* Return an intent to start up our account GUI */
         Bundle b = new Bundle();
-        Intent i = new Intent(mCtx, AuthActivity.class);
+        Intent i = new Intent(mCtx, AuthOptionsActivity.class);
         i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         b.putParcelable(AccountManager.KEY_INTENT, i);
         return b;

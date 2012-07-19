@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+        <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    	 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" >
+    	 <TextView 
+        android:id="@+id/file_list"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text=""/>
+    	</LinearLayout> 
+
+</LinearLayout>

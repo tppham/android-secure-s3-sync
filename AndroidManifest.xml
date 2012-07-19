@@ -42,7 +42,8 @@
     
     <application
         android:icon="@drawable/icon"
-        android:label="@string/label">
+        android:label="@string/label"
+        android:theme="@android:style/Theme.NoTitleBar">
         <service
             android:name=".s3.AuthService"
             android:exported="true">
@@ -69,13 +70,41 @@
                 android:resource="@xml/contacts" />
         </service>
         <activity
+            android:name=".MainActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".HelpActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+             </activity>
+             <activity
+            android:name=".ShowAccountActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+             </activity>
+        <activity
             android:name=".s3.AuthActivity"
             android:label="S3 Sign-in"
             android:excludeFromRecents="true"
             >
         </activity>
         <activity
-            android:name=".s3.BucketActivity"
+            android:name=".s3.AuthNamesActivity"
+            android:label="S3 Sign-in"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".s3.BucketListActivity"
             android:label="S3 Sign-in"
             android:excludeFromRecents="true"
             >
@@ -91,11 +120,23 @@
             android:label="S3 Sync"
             android:excludeFromRecents="true"
             >
-             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+         <activity
+            android:name=".AccountListActivity"
+            android:excludeFromRecents="true"
+            >
+             
+        </activity>
+         <activity
+            android:name=".Authenticate"
+            android:excludeFromRecents="true"
+            >
+        </activity>
+        <activity
+            android:name=".s3.AuthOptionsActivity"
+            android:excludeFromRecents="true"
+            >
+            </activity>
         <activity
             android:name=".test.AddContact"
             android:label="Add Contact Test"
@@ -148,7 +189,6 @@
         <activity
             android:name=".sdcard.AuthActivity"
             android:label="SDCard Sign-in"
-            android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true"
             >
         </activity>

@@ -46,7 +46,7 @@ public class FilePickerActivity extends Activity{
 			public void onCreate(Bundle savedInstanceState) {
 
 				super.onCreate(savedInstanceState);
-
+				setContentView(R.layout.filepicker);
 				loadFileList();
 
 				showDialog(DIALOG_LOAD_FILE);
@@ -94,7 +94,7 @@ public class FilePickerActivity extends Activity{
 						for (int i = 0; i < fileList.length; i++) {
 							temp[i + 1] = fileList[i];
 						}
-						temp[0] = new Item("Up", R.drawable.directory_up);
+						temp[0] = new Item("Back", R.drawable.directory_up);
 			
 						fileList = temp;
 					}
@@ -176,8 +176,8 @@ public class FilePickerActivity extends Activity{
 
 							}
 
-							// Checks if 'up' was clicked
-							else if (chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
+							// Checks if 'back' was clicked
+							else if (chosenFile.equalsIgnoreCase("back") && !sel.exists()) {
 
 								// present directory removed from list
 								String s = str.remove(str.size() - 1);
