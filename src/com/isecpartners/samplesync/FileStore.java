@@ -58,7 +58,7 @@ public class FileStore implements IBlobStore {
             File d = new File(mDir, store);
             File f = new File(d, name);
             FileInputStream r = new FileInputStream(f);
-            ByteBuffer buf = ByteBuffer.allocate(r.available()); // XXX is available() a reliable indicator of size?
+            ByteBuffer buf = ByteBuffer.allocate(r.available());
             r.getChannel().read(buf);
             r.close();
             buf.flip();
