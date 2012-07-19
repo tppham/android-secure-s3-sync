@@ -106,8 +106,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         Account a = new Account(acct, ACCOUNT_TYPE);
         mAcctMgr.addAccountExplicitly(a, "", null);
-        mAcctMgr.setUserData(a, "path", d.getPath());
-        mAcctMgr.setUserData(a, "passphrase", passphrase);
+        AccountHelper h2 = new AccountHelper(this, a);
+        h2.setAcctPref("path", d.getPath());
+        h2.setAcctPref("passphrase", passphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();

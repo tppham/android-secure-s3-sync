@@ -292,9 +292,10 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         //findViewById(R.id.signin_progress).setVisibility(View.GONE);
 
         Account a = new Account(thr.mName, ACCOUNT_TYPE);
+        AccountHelper h = new AccountHelper(mCtx, a);
         mAcctMgr.addAccountExplicitly(a, thr.mKey, null);
-        mAcctMgr.setUserData(a, "keyID", thr.mKeyId);
-        mAcctMgr.setUserData(a, "passphrase", thr.mPassphrase);
+        h.setAcctPref("keyID", thr.mKeyId);
+        h.setAcctPref("passphrase", thr.mPassphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
 
         Intent i = new Intent();

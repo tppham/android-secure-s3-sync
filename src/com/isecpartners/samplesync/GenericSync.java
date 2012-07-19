@@ -134,15 +134,11 @@ public class GenericSync {
     }
 
     /* a synch is requested. */
-    // XXX update mRes syncResult!
-    // XXX we need a handle on preferences, like prefLocal!
     public void onPerformSync() { 
-        // XXX figure out account types to create new contacts as!
+        // XXX let the user choose which account to create new contacts as?
 
     	Log.v(TAG, "_onPerformSync " + mAcct.name);
-        AccountManager mgr = AccountManager.get(mCtx);
-        String passphrase = mgr.getUserData(mAcct, "passphrase");
-        AccountHelper h = new AccountHelper(mCtx, mAcct.name, passphrase);
+        AccountHelper h = new AccountHelper(mCtx, mAcct);
         IBlobStore lastStore = h.getStateStore();
         ContactSetBS last, remote;
 
@@ -232,7 +228,8 @@ public class GenericSync {
             }
         }
 
-        Synch s = new Synch(last, local, remote, mPrefLocal, mRes.stats);
+        boolean prefLocal = h.getAcctPrefBool("prefLocal", true);
+        Synch s = new Synch(last, local, remote, prefLocal, mRes.stats);
         if(!s.sync()) {
             Log.v(TAG, "no changes!");
             return;
@@ -268,8 +265,7 @@ public class GenericSync {
             return;
         }
 
-        // XXX update the last synch time for the account
-        mgr.setUserData(mAcct, "lastSync", "" + System.currentTimeMillis());
+        h.setAcctPrefLong("lastSync", System.currentTimeMillis());
     }
 }
 
