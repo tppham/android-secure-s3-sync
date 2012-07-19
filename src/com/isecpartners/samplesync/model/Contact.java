@@ -83,7 +83,7 @@ public class Contact {
     }
 
     public void marshal(ByteBuffer buf, int vers) throws Marsh.Error {
-        // XXX we dont really need both fields for the "remote" store,
+        // we dont really need both fields for the "remote" store,
         // only for the "last" store.. perhaps a switch for this.
         Marsh.marshString(buf, acctType);
         Marsh.marshString(buf, acctName);
@@ -96,7 +96,7 @@ public class Contact {
 
     public static Contact unmarshal(ByteBuffer buf, int vers) throws Marsh.Error {
         Contact c = new Contact();
-        // XXX we dont really need both fields for the "remote" store,
+        // we dont really need both fields for the "remote" store,
         // only for the "last" store.. perhaps a switch for this.
         c.acctType = Marsh.unmarshString(buf);
         c.acctName = Marsh.unmarshString(buf);

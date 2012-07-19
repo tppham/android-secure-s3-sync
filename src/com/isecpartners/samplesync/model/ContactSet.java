@@ -74,10 +74,10 @@ public class ContactSet {
     }
 
     // note: d will be shared, not copied.
+    // we might want to consider copying in the future.
     public void addData(Contact c, CData d) {
         dirty = true;
         Log.v(TAG + name, "adding " + d + " to " + c);
-        // XXX consider copying (all but id)?
         c.data.add(d);
         return;
     }
