@@ -14,7 +14,6 @@ import com.isecpartners.samplesync.model.Marsh;
 
 /*
  * Some helpers for account management.
- * XXX perhaps later this will morph into an account preferences gui.
  *
  * This class allows us to load and store contact sets remotely
  * and on the local disk.  It also managed the encryption protocol.
@@ -32,15 +31,62 @@ public class AccountHelper {
     Context mCtx;
     String mName;
     String mPw;
+    Account mAcct;
     byte[] mSalt;
 
-    public AccountHelper(Context ctx, String name, String pw) {
+    private AccountHelper(Context ctx, String name, String pw, Account acct) {
         mCtx = ctx;
         // XXX force name to lower.
         // would be better to force user to enter lower case only!
         mName = name.toLowerCase();
         mPw = pw;
+        mAcct = acct;
         mSalt = null;
+
+        if(mPw == null && mAcct != null)
+            mPw = getAcctPref("passphrase", null);
+    }
+
+    public AccountHelper(Context ctx, String name, String pw) {
+        this(ctx, name, pw, null);
+    }
+
+    public AccountHelper(Context ctx, Account acct) {
+        this(ctx, acct.name, null, acct);
+        mPw = getAcctPref("passphrase", null);
+    }
+
+
+    public String getAcctPref(String key, String def) {
+        String val = AccountManager.get(mCtx).getUserData(mAcct, key);
+        return (val == null) ? def : val;
+    }
+    public void setAcctPref(String key, String val) {
+        AccountManager.get(mCtx).setUserData(mAcct, key, val);
+    }
+
+    public boolean getAcctPrefBool(String key, boolean def) {
+        String val = getAcctPref(key, null);
+        if(val == null)
+            return def;
+        return val.equals("true");
+    }
+    public void setAcctPrefBool(String key, boolean val) {
+        setAcctPref(key, val ? "true" : "false");
+    }
+
+    public long getAcctPrefLong(String key, long def) {
+        String val = getAcctPref(key, null);
+        if(val == null)
+            return def;
+        try {
+            return Long.parseLong(val);
+        } catch(final Exception e) {
+            return def;
+        }
+    }
+    public void setAcctPrefLong(String key, long val) {
+        setAcctPref(key, "" + val);
     }
 
     public String getDir() {
