@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"  
+    	android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >    
+
+    <ImageView
+        	android:id="@+id/banner"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:src="@drawable/banner48" />
+    
+
+
+    <TextView 
+        android:id="@+id/welcome_text"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dip"
+        android:layout_gravity="center_vertical"
+        android:text="@string/signin_msg"/>    
+            
+             <TextView
+                android:id="@+id/err_msg"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000001"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dip" 
+                android:text="" />
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:textColor="#000001"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dip"
+                android:text="A name for this account:" />
+            <EditText
+                android:id="@+id/acct_name2"
+                android:text="MyContacts"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:layout_marginBottom="10dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textEmailAddress" />
+            
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:textColor="#000001"
+                android:text="Enter Passphrase" />
+            <EditText
+                android:id="@+id/s3_passphrase"
+                android:text=""
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:layout_marginBottom="20dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textPassword"  />
+            
+             <View android:layout_width="fill_parent" 
+                 android:layout_height="2dp" 
+                 android:layout_marginBottom="20dip"
+                 android:paddingTop="200dp" 
+                 android:background="#505050" />
+ 			<TextView
+                android:id="@+id/s3l2_err_msg"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#ff0000"
+                android:textStyle="italic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dip" 
+                android:text="" /> 
+
+    </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/scan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="#00000000"
+            android:src="@drawable/finish_button"
+            android:onClick="getAccountInfo" />  
+</LinearLayout>

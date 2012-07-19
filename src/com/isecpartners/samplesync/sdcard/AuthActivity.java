@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -35,6 +34,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private TextView mMsgTxt;
     private EditText mDirIn;
     private EditText mAcctIn;
+    private EditText mPassphrase;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -43,14 +43,12 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         Log.v(TAG, "onCreate");
         mAcctMgr = AccountManager.get(this);
 
-        Window w = getWindow();
-        w.requestFeature(Window.FEATURE_LEFT_ICON);
         setContentView(R.layout.sdcardlogin);
-        w.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
 
         mMsgTxt = (TextView)findViewById(R.id.msg);
         mDirIn = (EditText)findViewById(R.id.dir_edit);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
+        mPassphrase = (EditText)findViewById(R.id.sd_passphrase);
     }
 
     /**
@@ -62,12 +60,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onSignIn(View view) {
         String acct = mAcctIn.getText().toString();
         String dir = mDirIn.getText().toString();
-        if(acct.equals("") || dir.equals("")) {
-            mMsgTxt.setText("You must enter an account name and a directory");
+        String passphrase = mPassphrase.getText().toString();
+        if(acct.equals("") || dir.equals("") || passphrase.equals("")) {
+            mMsgTxt.setText("You must enter an account name, a directory and a passphrase");
             return;
         }
 
-        String passphrase = "the quick brown fox"; // XXX get from the GUI!
+        //String passphrase = "the quick brown fox"; // XXX get from the GUI!
         AccountHelper h = new AccountHelper(this, acct, passphrase);
         if(h.accountExists()) {
             mMsgTxt.setText("That account already exists");

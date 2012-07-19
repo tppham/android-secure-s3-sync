@@ -68,7 +68,7 @@ public class MyActivity extends Activity{// implements OnAccountsUpdateListener{
             	startButton.setOnClickListener(new View.OnClickListener() {
          			
          			public void onClick(View v) {
-         				Intent myIntent = new Intent(MyActivity.this, BucketActivity.class);
+         				Intent myIntent = new Intent(MyActivity.this, BucketListActivity.class);
          				startActivity(myIntent);
          			}
          		});
@@ -102,7 +102,7 @@ public class MyActivity extends Activity{// implements OnAccountsUpdateListener{
     	 startButton.setOnClickListener(new View.OnClickListener() {
  			
  			public void onClick(View v) {
- 				startActivity(new Intent(MyActivity.this, BucketActivity.class));
+ 				startActivity(new Intent(MyActivity.this, BucketListActivity.class));
  			}
  		});
     	

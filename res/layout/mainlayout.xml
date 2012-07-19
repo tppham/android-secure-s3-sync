@@ -1,29 +1,64 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
     android:orientation="vertical" >
-    
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    	android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >    
     <TextView 
         android:id="@+id/welcome_text"
-        android:layout_width="match_parent"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:text="Add an AWS account to get started!"/>
-    
-    <TextView 
+        android:text="@string/main_description"/>
+
+    <TextView
         android:id="@+id/main_err_text"
-        android:textColor="#FF0000"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text=""/>
+        android:text="" />
+
+    </LinearLayout>
     
-    <Button
-        android:id="@+id/start_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="Add AWS Account" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+        <ImageButton
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:onClick="displayHomePage"
+            android:src="@drawable/syncprefs_button" />
+    
+        <ImageButton
+            android:id="@+id/help_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:onClick="displayHelpPage"
+            android:src="@drawable/help_button" />
+
+  </LinearLayout>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    </LinearLayout>      
 
 </LinearLayout>

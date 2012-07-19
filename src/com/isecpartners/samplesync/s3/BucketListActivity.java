@@ -30,7 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BucketActivity extends Activity{
+public class BucketListActivity extends Activity{
 	 
 	 public static final String TAG = "s3.BucketActivity";
 	    public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.s3";
@@ -43,6 +43,7 @@ public class BucketActivity extends Activity{
 		LinearLayout layout;
 		private String bucketName;
 		private Account[] a = null;
+		private Button startButton;
 	    
 	    public void onCreate(Bundle icicle) {
 	    	
@@ -53,6 +54,22 @@ public class BucketActivity extends Activity{
 	        /* Create a bucket for sync if it doesnt exist*/
 	        mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);;
             a = mAcctMgr.getAccountsByType(ACCOUNT_TYPE);
+            
+            if(a.length == 0){
+            	/* No sync accounts created
+                 * Send auth intent */
+            	Log.v(TAG, "No accounts exist. Starting Auth Activity");
+                /* Load UI */
+                setContentView(R.layout.mainlayout);
+                startButton = (Button) findViewById(R.id.start_button);                     
+                startButton.setOnClickListener(new View.OnClickListener() {
+        			
+        			public void onClick(View v) {
+        				Intent myIntent = new Intent(BucketListActivity.this, AuthActivity.class);
+        				startActivityForResult(myIntent, 0);
+        			}
+        		});
+            }
             credentials = new BasicAWSCredentials(a[0].name, mAcctMgr.getPassword(a[0]));
             if (a.length != 1){
             	Log.e(TAG, "Sync account error: "+ a.length);
@@ -123,7 +140,7 @@ public class BucketActivity extends Activity{
 	                 button.setOnClickListener(new View.OnClickListener() {
 	                     public void onClick(View v) {
 	                         /* Code to sync to this bucket */
-	                    	 S3Sync s = new S3Sync(BucketActivity.this);
+	                    	 S3Sync s = new S3Sync(BucketListActivity.this);
 	                    	 
 	                    	 /* Get Contacts from device*/
 	                    	 byte[] data = s.getContacts();
@@ -150,7 +167,7 @@ public class BucketActivity extends Activity{
 	                 button1.setOnClickListener(new View.OnClickListener() {
 	                     public void onClick(View v) {
 	                         /* Code to sync to this bucket */
-	                    	 S3Sync s = new S3Sync(BucketActivity.this);
+	                    	 S3Sync s = new S3Sync(BucketListActivity.this);
 
 	                    	 
 	                    	 /* Get Contacts from S3*/
