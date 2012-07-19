@@ -36,8 +36,6 @@ public class AccountHelper {
 
     private AccountHelper(Context ctx, String name, String pw, Account acct) {
         mCtx = ctx;
-        // XXX force name to lower.
-        // would be better to force user to enter lower case only!
         mName = name.toLowerCase();
         mPw = pw;
         mAcct = acct;
