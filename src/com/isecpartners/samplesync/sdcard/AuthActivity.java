@@ -67,7 +67,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        //String passphrase = "the quick brown fox"; // XXX get from the GUI!
         AccountHelper h = new AccountHelper(this, acct, passphrase);
         if(h.accountExists()) {
             mMsgTxt.setText("That account already exists");
