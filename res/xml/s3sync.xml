@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.android.contacts"
-    android:accountType="com.isecpartners.samplesync.s3"
+    android:accountType="com.isecpartners.sync.s3"
     android:supportsUploading="false"
 />

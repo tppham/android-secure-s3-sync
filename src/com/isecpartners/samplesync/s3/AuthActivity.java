@@ -27,6 +27,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.zxing.integration.android.*;
 
 import com.isecpartners.samplesync.AccountHelper;
+import com.isecpartners.samplesync.Constants;
 import com.isecpartners.samplesync.IBlobStore;
 import com.isecpartners.samplesync.R;
 
@@ -37,7 +38,7 @@ import com.isecpartners.samplesync.R;
  */
 public class AuthActivity extends AccountAuthenticatorActivity {
     private static final String TAG = "s3.AuthActivity";
-    public static final String ACCOUNT_TYPE = "com.isecpartners.samplesync.s3";
+    public static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_S3;
     private static final int DIALOG_PROGRESS = 0;
 	private static final int AUTH_SDCARD_CREDS = 0x00001010;
 	private static final int QR_CODE_CREDS = 0x0000c0de;
