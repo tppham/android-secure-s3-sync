@@ -116,12 +116,15 @@ public class GenericSync {
         }
 
         /* all are owned, nothing to do. */
-        if(owned.size() == cs.contacts.size())
+        int numDeletes = cs.contacts.size() - owned.size();
+        if(numDeletes == 0)
             return true;
 
         /* user needs to make the choice */
-        if(!keepLocals)
+        if(!keepLocals) {
+            mRes.stats.numDeletes = numDeletes;
             return false;
+        }
 
         /* 
          * To prevent deletions we remove all the unowned
@@ -169,7 +172,14 @@ public class GenericSync {
          */
         boolean forceDelete = mExtras.getBoolean(ContentResolver.SYNC_EXTRAS_OVERRIDE_TOO_MANY_DELETIONS);
         boolean keepLocals = mExtras.getBoolean(ContentResolver.SYNC_EXTRAS_DISCARD_LOCAL_DELETIONS);
-        if(!handleAccountDeleted(last, forceDelete, keepLocals)) {
+        /* XXX In testing in android 10 this properly reports a synch
+         * error and gives me the notification with the choice to keep or 
+         * delete, but it never calls back the synch when I select one
+         * of the choices!  So for now we're forcing the policy 
+         * to keep locals.  We'll address the user choice later.
+         */
+        //if(!handleAccountDeleted(last, forceDelete, keepLocals)) {
+        if(!handleAccountDeleted(last, false, true)) { // XXX force keep local
             mRes.tooManyDeletions = true;
             return;
         }
