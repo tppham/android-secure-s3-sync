@@ -55,7 +55,7 @@
         android:text="@string/signin_msg"/>    
             
              <TextView
-                android:id="@+id/err_msg"
+                android:id="@+id/err1_2_msg"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#ff0000"
                 android:textStyle="italic"
