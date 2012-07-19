@@ -7,9 +7,8 @@ import java.nio.ByteBuffer;
  * them to store and retrieve data.
  */
 public interface IBlobStore {
-    public static class Error extends Exception {
+    public abstract static class Error extends com.isecpartners.samplesync.Error {
         public Error(String msg) { super(msg); }
-        public String descr() { return "a storage error occured"; }
     }
     public static class AuthError extends Error {
         public AuthError(String msg) { super(msg); }
