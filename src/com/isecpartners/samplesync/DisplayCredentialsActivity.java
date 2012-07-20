@@ -5,6 +5,7 @@ import com.isecpartners.samplesync.AuthNamesActivity;
 
 
 import android.accounts.Account;
+import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -16,10 +17,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class DisplayCredentialsActivity extends Activity{
+public class DisplayCredentialsActivity extends AccountAuthenticatorActivity{
 	private static final String TAG = "DisplayCredentialsActivity";
-	private static final String ACCOUNT_TYPE_S3 = "com.isecpartners.samplesync.s3";
-	private static final String ACCOUNT_TYPE_SD = "com.isecpartners.samplesync.sdcard"; 
 	private static final int ACCT_S3_INFO = 0x3030;
 	private static final int ACCT_SD_INFO = 0x4040;
 	
@@ -42,6 +41,8 @@ public class DisplayCredentialsActivity extends Activity{
 	protected String path;
 
 	public void onCreate(Bundle icicle){
+		
+		Log.v(TAG, "OnCreate");
         super.onCreate(icicle);
         setContentView(R.layout.display_creds);
         p.setMargins(0, 20, 0, 20);
@@ -55,12 +56,13 @@ public class DisplayCredentialsActivity extends Activity{
 	private void getCredsInfo() {
 		s3layout = (LinearLayout) findViewById(R.id.display_creds);
 	    s3mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-	    s3_accounts = s3mAcctMgr.getAccountsByType(ACCOUNT_TYPE_S3);
+	    s3_accounts = s3mAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_S3);
 	      
 		sdlayout = (LinearLayout) findViewById(R.id.display_creds);
 		sdmAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-	    sd_accounts = sdmAcctMgr.getAccountsByType(ACCOUNT_TYPE_SD);
+	    sd_accounts = sdmAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_SD);
 		
+	    Log.v(TAG, "s3accounts: "+s3_accounts.length + "sdaccounts: "+sd_accounts.length);
 	}
 
 	/* List all S3 accounts */
