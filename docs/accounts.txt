@@ -1,0 +1,12 @@
+
+The following fields are attached (setUserData/getUserData) to accounts:
+
+  - passphrase: string, required, the encryption passphrase
+  - lastSync: long, containing the currentTimeMillis of the last sync
+  - prefLocal: boolean, default to true, prefer local edits during merge
+               if false, prefer remote edits during merge
+  - path (sd): string, required, the path to the directory for the sd datastore
+  - keyID (s3): string, required, the name of the s3 authentication key
+
+the s3 authentication key is stored with setPassword/getPassword.
+

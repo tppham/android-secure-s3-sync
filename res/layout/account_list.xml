@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+            <ImageButton
+            android:id="@+id/add_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:background="#00000000"
+            android:src="@drawable/add_icon"
+            android:onClick="addAccount" />
+            <View 
+      android:layout_width="1dip"
+      android:layout_height="48dip"
+      android:background="#888888"
+/>
+            
+            <ImageButton
+            android:id="@+id/edit_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="left"
+            android:background="#00000000"
+            android:src="@drawable/edit_icon"
+            android:onClick="" />
+            
+            <View 
+      android:layout_width="1dip"
+      android:layout_height="48dip"
+      android:background="#888888"
+/>
+            
+            <ImageButton
+            android:id="@+id/delete_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="left"
+            android:background="#00000000"
+            android:src="@drawable/delete_icon"
+            android:onClick="" />
+            
+           
+     </LinearLayout>
+    
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+                 
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/display_accounts"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" 
+    	android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >
+    	 	
+    </LinearLayout>
+    </ScrollView>
+ </LinearLayout>
+     
+    
+

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+    		android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >    
+    	
+    <TextView 
+        android:id="@+id/welcome_text"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/auth_description"/>
+
+    <TextView
+        android:id="@+id/main_err_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    </LinearLayout>
+    
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:layout_width="match_parent"
+    	 android:layout_height="wrap_content"
+    	 android:orientation="vertical" >
+    <RadioGroup 
+        android:id="@+id/signintype"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+         <RadioButton
+             android:id="@+id/manual"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:checked="true"
+             android:text="@string/manual_entry"/>
+         
+         <RadioButton
+             android:id="@+id/scan_qrcode"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:text="@string/scan_qrcode" />
+         <RadioButton
+             android:id="@+id/read_creds"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:text="@string/read_creds" />
+         </RadioGroup>
+          <ImageButton
+            android:id="@+id/select_signin_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:src="@drawable/select_signin_type_button"
+            android:onClick="SelectSigninType" />
+         
+     </LinearLayout>
+    
+
+</LinearLayout>

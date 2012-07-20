@@ -1,0 +1,38 @@
+#!/bin/sh
+
+FLAG=-e
+
+if [ $# != 1 ] ; then
+    N=1
+else 
+    N=$(($1 + 0))
+fi
+
+rm -f dat$N/*
+
+# clear log, uninstall old software and install new
+adb $FLAG logcat -c
+adb $FLAG uninstall com.isecpartners.samplesync || die "uninstall"
+adb $FLAG install ../bin/TestActivity-debug.apk || die "install"
+
+# start logging
+adb $FLAG logcat > log$N.txt &
+LOGCAT=$!
+
+# run program, then kill logcat when done
+adb $FLAG shell am start -a android.intent.action.MAIN -n com.isecpartners.samplesync/.TestActivity
+echo 'sleeping...'
+sleep 5
+kill $LOGCAT
+
+# and fetch our generated data
+DIR=dat$N
+if [ ! -d "$DIR" ] ; then
+    mkdir -p "$DIR"
+fi
+    
+adb $FLAG pull /sdcard/last.bin $DIR
+adb $FLAG pull /sdcard/remote.bin $DIR
+adb $FLAG pull /data/data/com.android.providers.contacts/databases/contacts2.db $DIR
+./s3Dat.py $DIR/s3.bin
+
