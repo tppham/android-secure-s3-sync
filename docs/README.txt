@@ -239,3 +239,8 @@ polish:
   - icon for providers
   - figure out which activity we want to launch by default
 
+ - something to let the user know how much s3 space is being
+   used and what the charges will be like?
+   or how much sdcard space is used?
+
+
