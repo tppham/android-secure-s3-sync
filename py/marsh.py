@@ -62,9 +62,16 @@ def genKey(pw, salt, niters) :
     return pbkdf2.PBKDF2(pw, salt, niters).read(32)
 
 def encrypt(pw, iv, buf) :
-    return cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax').encrypt(buf)
+    c = cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax');
+    return c.encrypt(buf) + c.done()[:8]
 def decrypt(pw, iv, buf) :
-    return cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax').decrypt(buf)
+    ct, auth = buf[:-8], buf[-8:]
+    c = cipher.Cipher(key=pw, iv=iv, cipher='aes', mode='eax');
+    pt = c.decrypt(ct)
+    auth2 = c.done()[:8]
+    if auth2 != auth :
+        raise Error("mac auth failed")
+    return pt
 
 class Blob(object) :
     MAGIC = 0x1badd00d
@@ -219,6 +226,7 @@ class Buf(object) :
         if x.magic != x.MAGIC :
             raise Error("bad magic number: %x" % x.magic)
         x.cset = buf.getContactSet()
+        buf.getEof()
         self.getEof()
         return x
     def putBlob(self, x) :
