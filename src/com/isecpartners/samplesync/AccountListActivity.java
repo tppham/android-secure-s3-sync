@@ -3,10 +3,12 @@ package com.isecpartners.samplesync;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -74,8 +76,9 @@ public class AccountListActivity extends Activity{
 		TextView tv = new TextView(getApplicationContext());
     	tv.setText("AWS S3 Accounts");
     	tv.setTextColor(0xffffffff);
-    	tv.setBackgroundColor(Color.argb(255, 192, 18, 48));
+    	tv.setBackgroundColor(Color.argb(255, 88, 88, 88));
     	tv.setTextSize(20);
+    	tv.setPadding(10, 10, 10, 10);
     	tv.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
     	tv.setLayoutParams(p);
     	s3layout.addView(tv);
@@ -143,8 +146,9 @@ public class AccountListActivity extends Activity{
     	TextView tv = new TextView(getApplicationContext());
     	tv.setText("SD Card Accounts");
     	tv.setTextColor(0xffffffff);
-    	tv.setBackgroundColor(Color.argb(255, 192, 18, 48));
+    	tv.setBackgroundColor(Color.argb(255, 88, 88, 88));
     	tv.setTextSize(20);
+    	tv.setPadding(10, 10, 10, 10);
     	tv.setTypeface(Typeface.DEFAULT, 1);
     	tv.setLayoutParams(p);
     	sdlayout.addView(tv);
@@ -204,6 +208,34 @@ public class AccountListActivity extends Activity{
 	public void addAccount(View v){
 		Intent myIntent = new Intent(AccountListActivity.this, ChooseCredsActivity.class);
 		startActivity(myIntent);
+	}
+	
+	public void syncAllAccounts(View v){
+		Log.v(TAG, "In syncAllAccounts()");
+		getAccountInfo();
+		/* sync all S3 accounts */
+		for (int i=0; i<sd_accounts.length;i++){
+			Bundle bundle = new Bundle();
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+			ContentResolver.requestSync(sd_accounts[i], ContactsContract.AUTHORITY, bundle);
+			Log.v(TAG, "Finished synching: "+s3_accounts[i].name);
+			
+		}
+		
+		/* sync all SD card accounts */
+		for (int i=0; i<sd_accounts.length;i++){
+			Bundle bundle = new Bundle();
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
+			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+			ContentResolver.requestSync(sd_accounts[i], ContactsContract.AUTHORITY , bundle);
+			Log.v(TAG, "Finished synching: "+sd_accounts[i].name);
+			
+		}
+		
+		
 	}
 		 	
 }
