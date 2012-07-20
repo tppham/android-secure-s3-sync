@@ -78,7 +78,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             mMsgTxt.setText("You must enter an account name, a directory and a passphrase");
             return;
         }
-
+        
+        AccountHelper h = new AccountHelper(this, acct, passphrase);
         if(h.accountExists()) {
             mMsgTxt.setText("That account already exists");
             return;
