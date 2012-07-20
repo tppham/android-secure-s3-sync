@@ -51,6 +51,7 @@ public class GenericSync {
      * effort to save a local copy in hopes that we can push it later.
      */
     public void saveBackup(IBlobStore store, ContactSetBS cs) {
+        Log.v(TAG, "we couldn't save remote, so we're backing it up for later");
         try {
             mHelp.save(store, "remotebackup", cs);
         } catch(final Exception e) {
@@ -70,6 +71,7 @@ public class GenericSync {
             Log.e(TAG, "no backup to push...");
             return true; // not an error
         }
+        Log.v(TAG, "pushing backup from previous error...");
         return saveRemote(remStore, lastStore, back);
     }
 
