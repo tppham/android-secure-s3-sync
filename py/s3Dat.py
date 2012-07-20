@@ -46,7 +46,7 @@ def saveRaw(fn, bucket=defBucket, key=defKey) :
     file(fn, 'wb').write(d)
 
 def clear(bucket=defBucket, key=defKey) :
-    #getS3().delete(bucket, key)
+    getS3().delete(bucket, key)
     getS3().delete_bucket(bucket)
 
 def dump() :
