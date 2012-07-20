@@ -35,6 +35,7 @@ public class GenericSync {
     IBlobStore mRemStore;
     SyncResult mRes;
     Bundle mExtras;
+    AccountHelper mHelp;
 
     public GenericSync(Context ctx, Account acct, IBlobStore store, Bundle extras, SyncResult res) {
         mCtx = ctx;
@@ -42,15 +43,16 @@ public class GenericSync {
         mRemStore = store;
         mRes = res;
         mExtras = extras;
+        mHelp = new AccountHelper(mCtx, mAcct);
     }
 
     /*
      * An error occurred saving the remote data.  Make a last ditch
      * effort to save a local copy in hopes that we can push it later.
      */
-    public static void saveBackup(AccountHelper h, IBlobStore store, ContactSetBS cs) {
+    public void saveBackup(IBlobStore store, ContactSetBS cs) {
         try {
-            h.save(store, "remotebackup", cs);
+            mHelp.save(store, "remotebackup", cs);
         } catch(final Exception e) {
             Log.e(TAG, "save backup failed!"); // nothign to do - just log it
         }
@@ -60,11 +62,15 @@ public class GenericSync {
      * If there's a previous backup to push, load it, and then
      * save it to the remote.
      */
-    public static boolean pushBackup(AccountHelper h, IBlobStore lastStore, IBlobStore remStore) {
-        // XXX todo, read in backup, if it doesnt exist, return.
-        // if it does, save it to remStore, and gracefully handle
-        // all errors.
-        return true;
+    public boolean pushBackup(IBlobStore remStore, IBlobStore lastStore) {
+        ContactSetBS back;
+        try {
+            back = mHelp.load("backup", lastStore, "remotebackup");
+        } catch(final Exception e) {
+            Log.e(TAG, "no backup to push...");
+            return true; // not an error
+        }
+        return saveRemote(remStore, lastStore, back);
     }
 
     static boolean contactIsOwned(Contact c, Account[] accts) {
@@ -130,28 +136,118 @@ public class GenericSync {
         return true;
     }
 
+    ContactSetBS loadLast(IBlobStore store) {
+        try {
+            return mHelp.load("last", store, "synch");
+        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
+            // XXX notify: missing or corrupted state, delete acct?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
+            Log.e(TAG, "corrupt account state! " + e);
+        }
+        return null;
+    }
+
+    ContactSetBS loadRemote(IBlobStore store) {
+        try {
+            return mHelp.load("remote", store, "synch");
+        } catch(final Marsh.BadVersion e) {
+            // XXX notify: update your software
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
+            Log.e(TAG, "synch data has bad version! " + e);
+        } catch(final Marsh.Error e) {
+            // XXX notify: corrupt, wipe?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
+            Log.e(TAG, "synch data corrupt! " + e);
+        } catch(final IBlobStore.AuthError e) {
+            /* note: we're not using an auth token right now.  If we were, we should:
+            mgr.invalidateAuthToken(TOKENTYPE, token);
+             */
+            // XXX notify: update creds
+            mRes.stats.numAuthExceptions++;
+            Log.e(TAG, "synch auth failed! " + e);
+        } catch(final IBlobStore.NotFoundError e) {
+            // XXX notify: synch data not found, wipe?
+            mRes.stats.numParseExceptions++;
+            mRes.databaseError = true;
+            Log.e(TAG, "synch load failed! " + e);
+        } catch(final IBlobStore.Error e) { // probably intermittent failure
+            // XXX notify: retry?
+            mRes.stats.numIoExceptions++;
+            Log.e(TAG, "synch load failed! " + e);
+        }
+        return null;
+    }
+
+    boolean checkID(ContactSetBS last, ContactSetBS remote) {
+        if(last.id != remote.id) {
+            if(last.contacts.isEmpty()) { // lock on to the remote's ID the first time we run
+                last.id = remote.id;
+            } else { // disallow any changes in remote ID after the first run
+                // XXX notify: synch data changed.  wipe?
+                mRes.stats.numParseExceptions++;
+                mRes.databaseError = true;
+                Log.e(TAG, "synch data was replaced by someone else!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    boolean saveRemote(IBlobStore store, IBlobStore lastStore, ContactSetBS remote) {
+        try {
+            mHelp.save(store, "synch", remote);
+            return true;
+        } catch(final IBlobStore.AuthError e) {
+            /* invalidate auth tokens here if we were using them */
+            // XXX notify: auth error saving, update creds
+            saveBackup(lastStore, remote);
+            mRes.stats.numAuthExceptions++;
+            Log.e(TAG, "auth error saving synch data: " + e);
+            /* keep going.. we cant back out now... */
+        } catch(final IBlobStore.Error e) { // probably intermittent
+            // XXX notify: error saving, try again?
+            saveBackup(lastStore, remote);
+            mRes.stats.numIoExceptions++;
+            Log.e(TAG, "error saving synch data: " + e);
+            /* keep going.. we cant back out now... */
+        } catch(final Marsh.Error e) { // should never happen
+            Log.e(TAG, "internal error saving synch data! " + e);
+        } 
+        return false;
+    }
+
+    boolean saveLast(IBlobStore store, ContactSetBS last) {
+        try {
+            mHelp.save(store, "synch", last);
+            return true;
+        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
+            // XXX notify: delete acct?
+            mRes.stats.numParseExceptions++; // close enough...
+            mRes.databaseError = true;
+            Log.e(TAG, "couldn't update account state! " + e);
+        }
+        return false;
+    }
+
     /* a synch is requested. */
     public void onPerformSync() { 
         // XXX let the user choose which account to create new contacts as?
 
     	Log.v(TAG, "_onPerformSync " + mAcct.name);
         AccountHelper h = new AccountHelper(mCtx, mAcct);
-        IBlobStore lastStore = h.getStateStore();
-        ContactSetBS last, remote;
+        IBlobStore lastStore = mHelp.getStateStore();
 
-        if(!pushBackup(h, lastStore, mRemStore))
+        // push any backup from a previous error first...
+        if(!pushBackup(mRemStore, lastStore))
             return;
 
-        // load last
-        try {
-            last = h.load("last", lastStore, "synch");
-        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
-            // XXX notify: missing or corrupted state, delete acct?
-            mRes.stats.numParseExceptions++;
-            mRes.databaseError = true;
-            Log.e(TAG, "corrupt account state! " + e);
+        // load our last set
+        ContactSetBS last = loadLast(lastStore);
+        if(last == null)
             return;
-        }
 
         /* 
          * Determine if any accounts that are used in local went away.
@@ -174,95 +270,33 @@ public class GenericSync {
             return;
         }
 
-        // load remote
-        try {
-            remote = h.load("remote", mRemStore, "synch");
-        } catch(final Marsh.BadVersion e) {
-            // XXX notify: update your software
-            mRes.stats.numParseExceptions++;
-            mRes.databaseError = true;
-            Log.e(TAG, "synch data has bad version! " + e);
+        // load our remote set, make sure it matches our last set...
+        ContactSetBS remote = loadRemote(mRemStore);
+        if(remote == null)
             return;
-        } catch(final Marsh.Error e) {
-            // XXX notify: corrupt, wipe?
-            mRes.stats.numParseExceptions++;
-            mRes.databaseError = true;
-            Log.e(TAG, "synch data corrupt! " + e);
+        if(!checkID(last, remote))
             return;
-        } catch(final IBlobStore.AuthError e) {
-            /* note: we're not using an auth token right now.  If we were, we should:
-            mgr.invalidateAuthToken(TOKENTYPE, token);
-             */
-            // XXX notify: update creds
-            mRes.stats.numAuthExceptions++;
-            Log.e(TAG, "synch auth failed! " + e);
-            return;
-        } catch(final IBlobStore.NotFoundError e) {
-            // XXX notify: synch data not found, wipe?
-            mRes.stats.numParseExceptions++;
-            mRes.databaseError = true;
-            Log.e(TAG, "synch load failed! " + e);
-            return;
-        } catch(final IBlobStore.Error e) { // probably intermittent failure
-            // XXX notify: retry?
-            mRes.stats.numIoExceptions++;
-            Log.e(TAG, "synch load failed! " + e);
-            return;
-        }
 
-        // load local
+        // load local contacts...
         ContactSet local = new ContactSetDB("localdb", mCtx, null, null);
 
-        if(last.id != remote.id) {
-            if(last.contacts.isEmpty()) { // lock on to the remote's ID the first time we run
-                last.id = remote.id;
-            } else { // disallow any changes in remote ID after the first run
-                // XXX notify: synch data changed.  wipe?
-                mRes.stats.numParseExceptions++;
-                mRes.databaseError = true;
-                Log.e(TAG, "synch data was replaced by someone else!");
-                return;
-            }
-        }
-
-        boolean prefLocal = h.getAcctPrefBool("prefLocal", true);
+        // synch between local, last and remote...
+        boolean prefLocal = mHelp.getAcctPrefBool("prefLocal", true);
         Synch s = new Synch(last, local, remote, prefLocal, mRes.stats);
         if(!s.sync()) {
             Log.v(TAG, "no changes!");
             return;
         }
 
+        // save the changes and update the last synch time...
         Log.v(TAG, "saving changes");
-        try {
-            h.save(mRemStore, "synch", remote);
-        } catch(final IBlobStore.AuthError e) {
-            /* invalidate auth tokens here if we were using them */
-            // XXX notify: auth error saving, update creds
-            saveBackup(h, lastStore, remote);
-            mRes.stats.numAuthExceptions++;
-            Log.e(TAG, "auth error saving synch data: " + e);
-            /* keep going.. we cant back out now... */
-        } catch(final IBlobStore.Error e) { // probably intermittent
-            // XXX notify: error saving, try again?
-            saveBackup(h, lastStore, remote);
-            mRes.stats.numIoExceptions++;
-            Log.e(TAG, "error saving synch data: " + e);
-            /* keep going.. we cant back out now... */
-        } catch(final Marsh.Error e) { // should never happen
-            Log.e(TAG, "internal error saving synch data! " + e);
-        } 
-
-        try {
-            h.save(lastStore, "synch", last);
-        } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
-            // XXX notify: delete acct?
-            mRes.stats.numParseExceptions++; // close enough...
-            mRes.databaseError = true;
-            Log.e(TAG, "couldn't update account state! " + e);
-            return;
+        if(!saveRemote(mRemStore, lastStore, remote)) {
+            // too late to back out now.. march on...
         }
+        if(!saveLast(lastStore, last))
+            return;
 
-        h.setAcctPrefLong("lastSync", System.currentTimeMillis());
+        mHelp.setAcctPrefLong("lastSync", System.currentTimeMillis());
     }
 }
 

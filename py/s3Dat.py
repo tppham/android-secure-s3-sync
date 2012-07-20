@@ -34,7 +34,7 @@ def load(bucket=defBucket, key=defKey) :
 
 def save(cs, bucket=defBucket, key=defKey) :
     d = get(getS3(), bucket, key)
-    blob = Blob(pw, genSalt(), genIV())
+    blob = marsh.Blob(pw, marsh.genSalt(), marsh.genIV())
     blob.cset = cs
     b = marsh.Buf()
     b.putBlob(blob)
@@ -46,7 +46,7 @@ def saveRaw(fn, bucket=defBucket, key=defKey) :
     file(fn, 'wb').write(d)
 
 def clear(bucket=defBucket, key=defKey) :
-    #getS3().delete(bucket, key)
+    getS3().delete(bucket, key)
     getS3().delete_bucket(bucket)
 
 def dump() :
