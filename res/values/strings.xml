@@ -15,6 +15,10 @@
 <!--  Account strings -->
     <string name="s3account">S3 Account</string>
     <string name="sdcardaccount">SDCard Account</string>
+    <string name="acct_description">Choose an acount:</string>
+    <string name="existing_str">Choose an existing account</string>
+    <string name="new_str">Add a new account</string>
+    <string name="existing_acct_str">Use credentials of that of a sync account from below: </string>
 
 <!--  Authentication Strings -->
 	<string name="manual_entry">Enter AWS Credentials manually</string>

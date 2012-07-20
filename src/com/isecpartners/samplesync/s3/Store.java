@@ -4,14 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.List;
-
 import android.util.Log;
 import com.amazonaws.*;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -83,15 +80,6 @@ public class Store implements IBlobStore {
 		} catch(AmazonClientException e){
             throw new IBlobStore.IOError("" + e);
 		}
-	}
-	public List<Bucket> getList() {
-		// TODO Auto-generated method stub
-		List<Bucket> l = s3client.listBuckets();
-		if(!l.isEmpty()){
-			return l;
-		}
-		return null;
-		
 	}
 
 	public void put(String store, String name, ByteBuffer data) throws IBlobStore.Error {

@@ -6,6 +6,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,12 +31,17 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "sdcard.AuthActivity";
     public static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_SD;
 
-    private AccountManager mAcctMgr;
+    public AccountManager mAcctMgr;
 
     private TextView mMsgTxt;
-    private EditText mDirIn;
-    private EditText mAcctIn;
-    private EditText mPassphrase;
+    public EditText mDirIn;
+    public EditText mAcctIn;
+    public EditText mPassphrase;
+    public int flag = 0;
+	public String acct;
+	public String dir;
+	public String passphrase;
+	public Context mCtx;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -43,7 +49,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         Log.v(TAG, "onCreate");
         mAcctMgr = AccountManager.get(this);
-
+        mCtx = this;
         setContentView(R.layout.sdcardlogin);
 
         mMsgTxt = (TextView)findViewById(R.id.msg);
@@ -59,20 +65,27 @@ public class AuthActivity extends AccountAuthenticatorActivity {
      * @param view The Submit button for which this method is invoked
      */
     public void onSignIn(View view) {
-        String acct = mAcctIn.getText().toString();
-        String dir = mDirIn.getText().toString();
-        String passphrase = mPassphrase.getText().toString();
+    	
+    	if(flag == 0){
+        acct = mAcctIn.getText().toString();
+        dir = mDirIn.getText().toString();
+        passphrase = mPassphrase.getText().toString();
+    	}
+    	
+    	
+        
         if(acct.equals("") || dir.equals("") || passphrase.equals("")) {
             mMsgTxt.setText("You must enter an account name, a directory and a passphrase");
             return;
         }
 
-        AccountHelper h = new AccountHelper(this, acct, passphrase);
         if(h.accountExists()) {
             mMsgTxt.setText("That account already exists");
             return;
         }
 
+        
+        
         File sd = Environment.getExternalStorageDirectory();
         File d = new File(sd, dir);
         if(d.exists()) {
@@ -118,5 +131,5 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         setAccountAuthenticatorResult(i.getExtras());
         setResult(RESULT_OK, i);
         finish();
-    }
+    } 
 }

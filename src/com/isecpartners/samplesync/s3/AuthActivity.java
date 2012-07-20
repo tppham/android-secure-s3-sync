@@ -19,14 +19,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
-
 import com.google.zxing.integration.android.*;
 
 import com.isecpartners.samplesync.AccountHelper;
+import com.isecpartners.samplesync.AuthNamesActivity;
 import com.isecpartners.samplesync.Constants;
 import com.isecpartners.samplesync.IBlobStore;
 import com.isecpartners.samplesync.R;
@@ -39,7 +35,7 @@ import com.isecpartners.samplesync.R;
 public class AuthActivity extends AccountAuthenticatorActivity {
     private static final String TAG = "s3.AuthActivity";
     public static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_S3;
-    private static final int DIALOG_PROGRESS = 0;
+    public static final int DIALOG_PROGRESS = 0;
 	private static final int AUTH_SDCARD_CREDS = 0x00001010;
 	private static final int QR_CODE_CREDS = 0x0000c0de;
 	private static final int ACCT_INFO = 0x000002020;
@@ -51,16 +47,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
  	
     private final Handler mCb = new Handler();
 
-    private AccountManager mAcctMgr;
-    private AmazonS3Client s3Client = null;
-    
-    private Context mCtx;
+    public AccountManager mAcctMgr;
+    public Context mCtx;
     private TextView mMsgTxt;
-    private EditText mNameIn, mKeyIdIn, mKeyIn, mPassphrase;
+    private EditText mKeyIdIn, mKeyIn;
     private Thread mSigninThread;
 
     /* bg threads for testing creds and creating the state */
-    private class SigninThread extends Thread {
+    public class SigninThread extends Thread {
         private static final String TAG = "s3.SigninThread";
         public String mName, mKeyId, mKey, mPassphrase;
 
@@ -222,7 +216,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     	
      	
      	if(requestCode == ACCT_INFO){
-     		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+     		IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
      		if(resultCode == Activity.RESULT_OK){
      		passphrase = intent.getStringExtra("Passphrase");
      		name = intent.getStringExtra("AccountName");
@@ -264,9 +258,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
        	  }
        	  getAcctInfo();
          }
-             //findViewById(R.id.signin_progress).setVisibility(View.VISIBLE);
-               
-             showDialog(DIALOG_PROGRESS);
+            // showDialog(DIALOG_PROGRESS);
             
              /* thread will invoke onSigninDone when done */
            
@@ -279,7 +271,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
      */
     public void onSigninDone(SigninThread thr, String err) {
         Log.v(TAG, "onSigninDone: " + err);
-        dismissDialog(DIALOG_PROGRESS);
+        
+        
+        //dismissDialog(DIALOG_PROGRESS);
 
         if(err != null) {
             mMsgTxt.setText(err);

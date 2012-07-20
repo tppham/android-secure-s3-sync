@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+    		android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >
+        
+           <TextView 
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/existing_acct_str"/>
+           
+               <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+                 
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/display_creds"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" 
+    	android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >
+    	 	
+    </LinearLayout>
+    </ScrollView>
+           
+           
+           
+           
+        
+    </LinearLayout>
+    
+
+</LinearLayout>

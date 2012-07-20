@@ -91,18 +91,31 @@
             android:excludeFromRecents="true"
             >
              </activity>
+              <activity
+            android:name=".ChooseCredsActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+                </activity>
+                 <activity
+            android:name=".DisplayCredentialsActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+             </activity>
+             <activity
+            android:name=".AuthNamesActivity"
+            android:label="S3 Sign-in"
+            android:excludeFromRecents="true"
+            >
+        </activity>
         <activity
             android:name=".s3.AuthActivity"
             android:label="S3 Sign-in"
             android:excludeFromRecents="true"
             >
         </activity>
-        <activity
-            android:name=".s3.AuthNamesActivity"
-            android:label="S3 Sign-in"
-            android:excludeFromRecents="true"
-            >
-        </activity>
+        
          <activity
             android:name=".s3.FilePickerActivity"
             android:label="S3 Choose File"
