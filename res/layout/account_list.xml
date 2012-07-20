@@ -9,36 +9,24 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#c01220"
     android:orientation="horizontal" >
+
             <ImageButton
-            android:id="@+id/add_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="1"
-            android:background="#00000000"
-            android:src="@drawable/add_icon"
-            android:onClick="addAccount" />
-            <View 
-      android:layout_width="1dip"
-      android:layout_height="48dip"
-      android:background="#888888"
-/>
-            
-            <ImageButton
-            android:id="@+id/edit_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="left"
-            android:background="#00000000"
-            android:src="@drawable/edit_icon"
-            android:onClick="" />
+                android:id="@+id/add_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.98"
+                android:background="#00000000"
+                android:onClick="addAccount"
+                android:src="@drawable/add_icon" />
+
             
             <View 
       android:layout_width="1dip"
       android:layout_height="48dip"
-      android:background="#888888"
+      android:background="#ffffff"
 />
             
             <ImageButton
@@ -46,10 +34,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             android:background="#00000000"
             android:src="@drawable/delete_icon"
             android:onClick="" />
+            
+             <View 
+      android:layout_width="1dip"
+      android:layout_height="48dip"
+      android:background="#ffffff"
+/>
+            
+            <ImageButton
+            android:id="@+id/sync_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:src="@drawable/sync_icon"
+            android:onClick="syncAllAccounts" />
             
            
      </LinearLayout>
@@ -62,11 +66,7 @@
         android:id="@+id/display_accounts"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:orientation="vertical" 
-    	android:paddingTop="5dip"
-        android:paddingBottom="13dip"
-        android:paddingLeft="20dip"
-        android:paddingRight="20dip" >
+    	android:orientation="vertical" >
     	 	
     </LinearLayout>
     </ScrollView>

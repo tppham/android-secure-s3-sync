@@ -129,11 +129,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         	mMsgTxt = (TextView)findViewById(R.id.err1_3_msg);
         }
 
-        
-  //      mNameIn = (EditText)findViewById(R.id.name_edit);
-  //      mKeyIdIn = (EditText)findViewById(R.id.keyid_edit);
-//        mKeyIn = (EditText)findViewById(R.id.key_edit);
-//        mPassphrase = (EditText)findViewById(R.id.s3_passphrase);
     }
 
     @Override

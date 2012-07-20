@@ -61,8 +61,6 @@ public class DisplayCredentialsActivity extends AccountAuthenticatorActivity{
 		sdlayout = (LinearLayout) findViewById(R.id.display_creds);
 		sdmAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
 	    sd_accounts = sdmAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_SD);
-		
-	    Log.v(TAG, "s3accounts: "+s3_accounts.length + "sdaccounts: "+sd_accounts.length);
 	}
 
 	/* List all S3 accounts */
@@ -72,7 +70,8 @@ public class DisplayCredentialsActivity extends AccountAuthenticatorActivity{
 		TextView tv = new TextView(getApplicationContext());
     	tv.setText("AWS S3 Accounts");
     	tv.setTextColor(0xffffffff);
-    	tv.setBackgroundColor(Color.argb(255, 192, 18, 48));
+    	tv.setPadding(10, 10, 10, 10);
+    	tv.setBackgroundColor(Color.argb(255, 88, 88, 88));
     	tv.setTextSize(20);
     	tv.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
     	tv.setLayoutParams(p);
@@ -149,8 +148,9 @@ public class DisplayCredentialsActivity extends AccountAuthenticatorActivity{
     	TextView tv = new TextView(getApplicationContext());
     	tv.setText("SD Card Accounts");
     	tv.setTextColor(0xffffffff);
-    	tv.setBackgroundColor(Color.argb(255, 192, 18, 48));
+    	tv.setBackgroundColor(Color.argb(255, 88, 88, 88));
     	tv.setTextSize(20);
+    	tv.setPadding(10, 10, 10, 10);
     	tv.setTypeface(Typeface.DEFAULT, 1);
     	tv.setLayoutParams(p);
     	sdlayout.addView(tv);
