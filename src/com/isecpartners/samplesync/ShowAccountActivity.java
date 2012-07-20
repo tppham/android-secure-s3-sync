@@ -58,10 +58,13 @@ public class ShowAccountActivity extends Activity{
 		    		break;
 		    	}
 		    }
+		 Log.v(TAG, "index: "+index);
 		 return index;
 	}
 	
 	public void deleteAccount(View v){
+		
+		
 		
 	    mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
 	    accounts = mAcctMgr.getAccountsByType(acctType);

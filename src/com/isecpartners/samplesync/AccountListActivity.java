@@ -213,13 +213,14 @@ public class AccountListActivity extends Activity{
 	public void syncAllAccounts(View v){
 		Log.v(TAG, "In syncAllAccounts()");
 		getAccountInfo();
+		
 		/* sync all S3 accounts */
-		for (int i=0; i<sd_accounts.length;i++){
+		for (int i=0; i<s3_accounts.length;i++){
 			Bundle bundle = new Bundle();
 			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
 			bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-			ContentResolver.requestSync(sd_accounts[i], ContactsContract.AUTHORITY, bundle);
+			ContentResolver.requestSync(s3_accounts[i], ContactsContract.AUTHORITY, bundle);
 			Log.v(TAG, "Finished synching: "+s3_accounts[i].name);
 			
 		}
