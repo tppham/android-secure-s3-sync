@@ -50,7 +50,7 @@ public class GenericSync {
      * An error occurred saving the remote data.  Make a last ditch
      * effort to save a local copy in hopes that we can push it later.
      */
-    public void saveBackup(IBlobStore store, ContactSetBS cs) {
+    void saveBackup(IBlobStore store, ContactSetBS cs) {
         Log.v(TAG, "we couldn't save remote, so we're backing it up for later");
         try {
             mHelp.save(store, "remotebackup", cs);
@@ -63,7 +63,7 @@ public class GenericSync {
      * If there's a previous backup to push, load it, and then
      * save it to the remote.
      */
-    public boolean pushBackup(IBlobStore remStore, IBlobStore lastStore) {
+    boolean pushBackup(IBlobStore remStore, IBlobStore lastStore) {
         ContactSetBS back;
         try {
             back = mHelp.load("backup", lastStore, "remotebackup");
@@ -138,11 +138,16 @@ public class GenericSync {
         return true;
     }
 
+    /* Report a hard error to the user via a notification. */
+    void hardError(String msg, int acts) {
+        Remedy.error(mCtx, msg, acts, mAcct);
+    }
+
     ContactSetBS loadLast(IBlobStore store) {
         try {
             return mHelp.load("last", store, "synch");
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
-            // XXX notify: missing or corrupted state, delete acct?
+            hardError("Account state is corrupt!", Remedy.DELETE);
             mRes.stats.numParseExceptions++;
             mRes.databaseError = true;
             Log.e(TAG, "corrupt account state! " + e);
@@ -154,12 +159,12 @@ public class GenericSync {
         try {
             return mHelp.load("remote", store, "synch");
         } catch(final Marsh.BadVersion e) {
-            // XXX notify: update your software
+            hardError("Bad remote data version.  To synch you may need to update your software", Remedy.WIPEREMOTE);
             mRes.stats.numParseExceptions++;
             mRes.databaseError = true;
             Log.e(TAG, "synch data has bad version! " + e);
         } catch(final Marsh.Error e) {
-            // XXX notify: corrupt, wipe?
+            hardError("Remote data is corrupt.", Remedy.WIPEREMOTE);
             mRes.stats.numParseExceptions++;
             mRes.databaseError = true;
             Log.e(TAG, "synch data corrupt! " + e);
@@ -167,16 +172,15 @@ public class GenericSync {
             /* note: we're not using an auth token right now.  If we were, we should:
             mgr.invalidateAuthToken(TOKENTYPE, token);
              */
-            // XXX notify: update creds
+            hardError("Authentication error reading remote data", Remedy.FIXCREDS | Remedy.DELETE);
             mRes.stats.numAuthExceptions++;
             Log.e(TAG, "synch auth failed! " + e);
         } catch(final IBlobStore.NotFoundError e) {
-            // XXX notify: synch data not found, wipe?
+            hardError("Remote data is missing!", Remedy.WIPEREMOTE | Remedy.DELETE);
             mRes.stats.numParseExceptions++;
             mRes.databaseError = true;
             Log.e(TAG, "synch load failed! " + e);
         } catch(final IBlobStore.Error e) { // probably intermittent failure
-            // XXX notify: retry?
             mRes.stats.numIoExceptions++;
             Log.e(TAG, "synch load failed! " + e);
         }
@@ -188,7 +192,7 @@ public class GenericSync {
             if(last.contacts.isEmpty()) { // lock on to the remote's ID the first time we run
                 last.id = remote.id;
             } else { // disallow any changes in remote ID after the first run
-                // XXX notify: synch data changed.  wipe?
+                hardError("Remote data does not match local data!  It may have been overwritten by another program.", Remedy.DELETE | Remedy.WIPELOCAL | Remedy.WIPEREMOTE);
                 mRes.stats.numParseExceptions++;
                 mRes.databaseError = true;
                 Log.e(TAG, "synch data was replaced by someone else!");
@@ -204,18 +208,17 @@ public class GenericSync {
             return true;
         } catch(final IBlobStore.AuthError e) {
             /* invalidate auth tokens here if we were using them */
-            // XXX notify: auth error saving, update creds
+            hardError("Authentication error reading remote data", Remedy.FIXCREDS | Remedy.DELETE);
             saveBackup(lastStore, remote);
             mRes.stats.numAuthExceptions++;
             Log.e(TAG, "auth error saving synch data: " + e);
-            /* keep going.. we cant back out now... */
         } catch(final IBlobStore.Error e) { // probably intermittent
-            // XXX notify: error saving, try again?
             saveBackup(lastStore, remote);
             mRes.stats.numIoExceptions++;
             Log.e(TAG, "error saving synch data: " + e);
             /* keep going.. we cant back out now... */
         } catch(final Marsh.Error e) { // should never happen
+            hardError("Internal error saving data.", Remedy.DELETE);
             Log.e(TAG, "internal error saving synch data! " + e);
         } 
         return false;
@@ -226,7 +229,7 @@ public class GenericSync {
             mHelp.save(store, "synch", last);
             return true;
         } catch(final Exception e) { // Marsh.Error, IBlobStore.Error
-            // XXX notify: delete acct?
+            hardError("Internal error saving sync state", Remedy.DELETE);
             mRes.stats.numParseExceptions++; // close enough...
             mRes.databaseError = true;
             Log.e(TAG, "couldn't update account state! " + e);

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="5dip"
+            android:paddingBottom="13dip"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip"> 
+            <TextView
+                android:id="@+id/msg"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:textColor="#000001"
+                android:text="" />
+            <Button
+                android:id="@+id/delButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="100dip"
+                android:text="Delete Sync Account" />
+            <Button
+                android:id="@+id/wipeLocalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="100dip"
+                android:text="Resync to the remote data" />
+            <Button
+                android:id="@+id/wipeRemoteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="100dip"
+                android:text="Reinitialize the remote data" />
+            <Button
+                android:id="@+id/fixCredsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="100dip"
+                android:text="Update your credentials" />
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="100dip"
+                android:text="Ignore the error" />
+        </LinearLayout>
+</LinearLayout>
