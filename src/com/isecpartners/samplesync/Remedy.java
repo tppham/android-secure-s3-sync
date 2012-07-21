@@ -94,6 +94,7 @@ public class Remedy extends Activity {
         final int acts = e.getInt("actions");
         final int nid = e.getInt("noteid");
         final Account acct = e.getParcelable("account");
+        final AccountHelper h = new AccountHelper(this, acct);
         Log.v(TAG, "remedy: " + msg + " acts: " + acts + " id: " + nid + " acct: " + acct.name);
 
         // if the account was deleted in the meantime, just give up...
@@ -113,13 +114,21 @@ public class Remedy extends Activity {
 
         new ButtonHelper(R.id.wipeLocalButton, nid, acts, WIPELOCAL, "wipeLocal", new View.OnClickListener() {
             public void onClick(View v) {
-                // XXX todo
+                try {
+                    h.initStore(h.getStateStore());
+                } catch(Exception e) {
+                    Log.v(TAG, "internal error initializing state store!");
+                }
             }
         });
 
         new ButtonHelper(R.id.wipeRemoteButton, nid, acts, WIPEREMOTE, "wipeRemote", new View.OnClickListener() {
             public void onClick(View v) {
-                // XXX todo
+                try {
+                    h.initStore(h.getRemoteStore());
+                } catch(Exception e) {
+                    Log.v(TAG, "internal error initializing remote store!");
+                }
             }
         });
 
@@ -131,7 +140,7 @@ public class Remedy extends Activity {
 
         new ButtonHelper(R.id.cancelButton, nid, 1, 1, "cancel", new View.OnClickListener() {
             public void onClick(View v) {
-                // XXX todo
+                return;
             }
         });
     }
