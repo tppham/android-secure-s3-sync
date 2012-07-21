@@ -1,6 +1,7 @@
 package com.isecpartners.samplesync;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -97,14 +98,16 @@ public class Remedy extends Activity {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
+
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
         Bundle e = this.getIntent().getExtras();
-        String msg = e.getString("message");
+        final String msg = e.getString("message");
         final int acts = e.getInt("actions");
         final int nid = e.getInt("noteid");
         final Account acct = e.getParcelable("account");
         final AccountHelper h = new AccountHelper(this, acct);
+        final Context ctx = this;
         Log.v(TAG, "remedy: " + msg + " acts: " + acts + " id: " + nid + " acct: " + acct.name);
 
         // if the account was deleted in the meantime, just give up...
@@ -118,8 +121,8 @@ public class Remedy extends Activity {
 
         new ButtonHelper(R.id.delButton, nid, acts, DELETE, "delete", new View.OnClickListener() {
             public void onClick(View v) {
-                // XXX todo
-                error("not yet implemented");
+                AccountManager mgr = AccountManager.get(ctx);
+                mgr.removeAccount(acct, null, null);
             }
         });
 
