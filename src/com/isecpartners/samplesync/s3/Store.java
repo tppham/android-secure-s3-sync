@@ -4,7 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+
+import android.accounts.AccountManager;
 import android.util.Log;
+
 import com.amazonaws.*;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -12,10 +15,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+
+import com.isecpartners.samplesync.AccountHelper;
+import com.isecpartners.samplesync.Constants;
 import com.isecpartners.samplesync.IBlobStore;
 
 public class Store implements IBlobStore {
-	
 	public static final String TAG = "s3.Store";
 	private AmazonS3Client s3client;
 	
@@ -26,6 +31,18 @@ public class Store implements IBlobStore {
 	public Store(String name, String pw) {
         this(new BasicAWSCredentials(name, pw));
 	}
+
+    /* return the remote store associated with the account */
+    public static IBlobStore getRemoteStore(AccountHelper h) {
+        if(!h.mAcct.type.equals(Constants.ACCOUNT_TYPE_S3))
+            return null;
+
+        AccountManager mgr = AccountManager.get(h.mCtx);
+        String keyid = h.getAcctPref("keyID", null);
+        String key = mgr.getPassword(h.mAcct);
+        Log.v(TAG, "return s3 store: " + h.mAcct.name + " " +  keyid);
+        return new Store(keyid, key);
+    }
 
 	public void create(String store) throws IBlobStore.Error {
 		try{

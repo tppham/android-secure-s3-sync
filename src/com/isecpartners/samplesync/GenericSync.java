@@ -32,15 +32,13 @@ public class GenericSync {
 
     Context mCtx;
     Account mAcct;
-    IBlobStore mRemStore;
     SyncResult mRes;
     Bundle mExtras;
     AccountHelper mHelp;
 
-    public GenericSync(Context ctx, Account acct, IBlobStore store, Bundle extras, SyncResult res) {
+    public GenericSync(Context ctx, Account acct, Bundle extras, SyncResult res) {
         mCtx = ctx;
         mAcct = acct;
-        mRemStore = store;
         mRes = res;
         mExtras = extras;
         mHelp = new AccountHelper(mCtx, mAcct);
@@ -243,10 +241,11 @@ public class GenericSync {
 
     	Log.v(TAG, "_onPerformSync " + mAcct.name);
         AccountHelper h = new AccountHelper(mCtx, mAcct);
+        IBlobStore remStore = h.getRemoteStore();
         IBlobStore lastStore = mHelp.getStateStore();
 
         // push any backup from a previous error first...
-        if(!pushBackup(mRemStore, lastStore))
+        if(!pushBackup(remStore, lastStore))
             return;
 
         // load our last set
@@ -276,7 +275,7 @@ public class GenericSync {
         }
 
         // load our remote set, make sure it matches our last set...
-        ContactSetBS remote = loadRemote(mRemStore);
+        ContactSetBS remote = loadRemote(remStore);
         if(remote == null)
             return;
         if(!checkID(last, remote))
@@ -295,7 +294,7 @@ public class GenericSync {
 
         // save the changes and update the last synch time...
         Log.v(TAG, "saving changes");
-        if(!saveRemote(mRemStore, lastStore, remote)) {
+        if(!saveRemote(remStore, lastStore, remote)) {
             // too late to back out now.. march on...
         }
         if(!saveLast(lastStore, last))

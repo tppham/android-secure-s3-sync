@@ -13,7 +13,7 @@ import android.util.Log;
  * A simplistic blob-store using local files.
  */
 public class FileStore implements IBlobStore {
-    private static final String LOG_TAG = "FileStore";
+    private static final String TAG = "FileStore";
     private String mDir;
 
     public static boolean checkStore(String dir) {
@@ -26,6 +26,16 @@ public class FileStore implements IBlobStore {
      */
     public FileStore(String dir) {
         mDir = dir;
+    }
+
+    /* return the remote store for the account */
+    public static IBlobStore getRemoteStore(AccountHelper h) {
+        if(!h.mAcct.type.equals(Constants.ACCOUNT_TYPE_SD))
+            return null;
+
+        String path = h.getAcctPref("path", null);
+        Log.v(TAG, "return sdcard store: " + h.mAcct.name + " " + path);
+        return new FileStore(path);
     }
 
     /**
