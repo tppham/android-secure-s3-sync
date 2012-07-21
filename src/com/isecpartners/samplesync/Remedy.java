@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.util.Log;
 
 /*
@@ -87,6 +88,15 @@ public class Remedy extends Activity {
         }
     }
 
+    /* 
+     * The errors that happen here should be infrequent and
+     * unimportant.  So we just throw up a simple toast on error
+     * to let them know what happened.  
+     */
+    void error(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
         Bundle e = this.getIntent().getExtras();
@@ -109,6 +119,7 @@ public class Remedy extends Activity {
         new ButtonHelper(R.id.delButton, nid, acts, DELETE, "delete", new View.OnClickListener() {
             public void onClick(View v) {
                 // XXX todo
+                error("not yet implemented");
             }
         });
 
@@ -118,6 +129,7 @@ public class Remedy extends Activity {
                     h.initStore(h.getStateStore());
                 } catch(Exception e) {
                     Log.v(TAG, "internal error initializing state store!");
+                    error("error initializing local state");
                 }
             }
         });
@@ -125,9 +137,12 @@ public class Remedy extends Activity {
         new ButtonHelper(R.id.wipeRemoteButton, nid, acts, WIPEREMOTE, "wipeRemote", new View.OnClickListener() {
             public void onClick(View v) {
                 try {
+                    /* note: we empty our "last" set anytime we empty the remote */
                     h.initStore(h.getRemoteStore());
+                    h.initStore(h.getStateStore());
                 } catch(Exception e) {
                     Log.v(TAG, "internal error initializing remote store!");
+                    error("error initializing remote state");
                 }
             }
         });
@@ -135,12 +150,13 @@ public class Remedy extends Activity {
         new ButtonHelper(R.id.fixCredsButton, nid, acts, FIXCREDS, "fixCreds", new View.OnClickListener() {
             public void onClick(View v) {
                 // XXX todo
+                error("not yet implemented");
             }
         });
 
         new ButtonHelper(R.id.cancelButton, nid, 1, 1, "cancel", new View.OnClickListener() {
             public void onClick(View v) {
-                return;
+                return; // nothing to do
             }
         });
     }
