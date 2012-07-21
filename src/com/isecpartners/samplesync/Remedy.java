@@ -59,11 +59,32 @@ public class Remedy extends Activity {
         mgr.notify(nid, note);
     }
 
-    static void enable(int x, int flag, Button b) {
-        if((x & flag) != 0)
-            b.setVisibility(View.VISIBLE);
-        else
-            b.setVisibility(View.GONE);
+    // factors out common code for our button handlers...
+    class ButtonHelper implements View.OnClickListener {
+        int mNid;
+        String mName;
+        View.OnClickListener mPress;
+
+        public ButtonHelper(int vid, int nid, int act, int flag, String name, View.OnClickListener press) {
+            Button b = (Button)findViewById(vid);
+            if((act & flag) != 0)
+                b.setVisibility(View.VISIBLE);
+            else
+                b.setVisibility(View.GONE);
+            mNid = nid;
+            mName = name;
+            mPress = press;
+            b.setOnClickListener(this);
+        }
+            
+        public void onClick(View v) {
+            Log.v(TAG, "user pressed " + mName);
+            mPress.onClick(v);
+
+            NotificationManager mgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+            mgr.cancel(mNid);
+            finish();
+        }
     }
 
     public void onCreate(Bundle saved) {
@@ -84,50 +105,33 @@ public class Remedy extends Activity {
         TextView msgView = (TextView)findViewById(R.id.msg);
         msgView.setText("There was an error synching the " + acct.name + " account: " + msg);
 
-        Button delButton = (Button)findViewById(R.id.delButton);
-        Button wipeLocalButton = (Button)findViewById(R.id.wipeLocalButton);
-        Button wipeRemoteButton = (Button)findViewById(R.id.wipeRemoteButton);
-        Button fixCredsButton = (Button)findViewById(R.id.fixCredsButton);
-        Button cancelButton = (Button)findViewById(R.id.cancelButton);
-
-        enable(acts, DELETE, delButton);
-        enable(acts, WIPELOCAL, wipeLocalButton);
-        enable(acts, WIPEREMOTE, wipeRemoteButton);
-        enable(acts, FIXCREDS, fixCredsButton);
-        enable(1, 1, cancelButton);
-
-        delButton.setOnClickListener(new View.OnClickListener() {
+        new ButtonHelper(R.id.delButton, nid, acts, DELETE, "delete", new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG, "delete account: " + acct.name);
-                finish();
+                // XXX todo
             }
         });
 
-        wipeLocalButton.setOnClickListener(new View.OnClickListener() {
+        new ButtonHelper(R.id.wipeLocalButton, nid, acts, WIPELOCAL, "wipeLocal", new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG, "wipe local: " + acct.name);
-                finish();
+                // XXX todo
             }
         });
 
-        wipeRemoteButton.setOnClickListener(new View.OnClickListener() {
+        new ButtonHelper(R.id.wipeRemoteButton, nid, acts, WIPEREMOTE, "wipeRemote", new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG, "wipe remote: " + acct.name);
-                finish();
+                // XXX todo
             }
         });
 
-        fixCredsButton.setOnClickListener(new View.OnClickListener() {
+        new ButtonHelper(R.id.fixCredsButton, nid, acts, FIXCREDS, "fixCreds", new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG, "fix creds: " + acct.name);
-                finish();
+                // XXX todo
             }
         });
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        new ButtonHelper(R.id.cancelButton, nid, 1, 1, "cancel", new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG, "cancel: " + acct.name);
-                finish();
+                // XXX todo
             }
         });
     }
