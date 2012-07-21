@@ -47,16 +47,9 @@ and backs them up remotely.  It then synchs the remote data
 to your contacts database.  It intentionally violates the android
 rules by performing edits on contacts that are owned by
 other providers in order to bring them into synch. 
-When you disassociate with an account, you still have all
-of your contacts saved remotely.
-[XXX description needs work and updating to reflect reality
-and discuss any cons]
-XXX there are tihngs that can go wrong..  wont disassociating
-make the sync think that all the accounts were deleted?
-If these deletions are synched to the remote then we lost the data.
-
-
-
+When you disassociate with an account, although the
+contacts are temporarily deleted from the phone, they
+are saved remotely and will be restored during the next sync.
 
 ** Android
 
@@ -91,7 +84,7 @@ perform a synch by:
 
   - loading up the current local contacts
   - loading up a stored copy of the contacts as of last synch
-  - loading up a reomte copy of the contacts
+  - loading up a remote copy of the contacts
   - merging all three contact lists onto a single list, matched
     up as best as possible.
   - for each contact in the list synch it by:
@@ -132,26 +125,16 @@ CData and Marsh modules.  The data format is a simple binary
 encoding of the mine type and data1..data9 fields of each data
 item.  See Marsh.java for more information.
 
-XXX data encryption 
-
-
-
-
+Data encryption uses AES in EAX mode.  This provides
+confidentiality and authentication.  The actual key used
+is generated from the user supplied passphrase using
+the PBKDF2 key derivation algorithm.
 
 TODO
-  - give notification during synch
-    - any conflicts that were found and resolved
-    - number of contacts that were added, edited or deleted
-    - any failure
-      - mismatch ID with remote and last - start new synch store?
-      - bad data format - user must start new synch store
-      - version mismatch  - user must update or start new synch store
   - allow user to wipe the synch state and start fresh.
   - allow the user to start a new remote data synch store
-
   - allow user to manually run a synch
     - and display the logs as it happens?
-
   - show user last synch time
   - give user option to select how to create new contacts from remote
     - should these new contacts be synched to exchange/google or not
@@ -159,67 +142,30 @@ TODO
     - program should show user which account types he's currently using
   - give user option to prefer local or reomte during conflict resolution
 
-
-  - the s3 auth activity needs some cleanup
-    - would be nice having other options besides just text entry
-      or QR code.  perhaps reading off of /sdcard?
-      fetching from a web page or directly from AWS with creds?
+  - the s3 auth activity
     - we should probably register for some URL type so that
       we can get QR codes directed to us even outside of our app
       s3sync://name:pw/bucketname ?
-    - s3 accounts need better names.  the s3 key id is unreadable
-    - make it a dialog?
-    - check creds in the background.  let user know if they worked
-    - remove cruft
-
-  - the s3 store needs cleanup.. some old code and some TODO items
-
-  - s3 auth activity should prompt user for a bucket name to use
-    and provide a suitable default entry
 
   - need preferences.  per account?  can we store extra info in accts?
 
-  - move the storage of last.bin to somewhere more appropriate.
-    also we need one per account if we want to support multiple 
-    synch accounts at once
-
-  - track local and remote IDs in "last", for easier matchup.
-    add code to assign remote IDs uniquely.
-
   - add versioning using the s3 store key as a version number
     and some well known name to point to the head.
+    - would be nice to be able to revert to older versions on
+      some kind of error, corruption or just user preference
 
   - XXX figure out what we can do about atomicity with s3
-  - we have to honor the "delete" flag.. look into that
 
-  - we need to track what providers we synch, and detect when
-    a provider goes away.. when one goes away we need special
-    handling, possibly involving user interaction
-    - ask the user if he wants to keep the contacts or discard them
-    - if we wants to keep them, we need to discard them from
-      the "last" set before doing a real synch, so that they get
-      added back
-    - if he doesnt want to keep them, then they will go away
-      during a normal synch
+  - let the user choose what to do after another account goes away
+    - right now we have a hard coded policy in place to
+      keep the contacts.  the user may opt to remove them.
 
-
- - on account creation
-   - confirm that the account name is unique
-   - confirm that we can authenticate (bucketlist?)
-   - create a new empty store for "last"
-   - make a list of local account providers we will synch for!
-     - need a gui list of account names and types
-   report any errors to user
- - need to catch account deletion somehow!
-   - cleanup the local storage we used to capture "last" data
+  - we might want to allow the user to pick which account providers
+    to synch to.  right now we hard wire this policy choice.
 
  - make sure that metachars cant be entered into account names!
- - check out bug where synching to multiple synch accounts
-   causes slight disparity - some extra empty contacts!
-   - to repo: add sdcard and s3 account, synch both repeatedly
- - XXX need to call create() on new buckets in generic code somewhere.
-   and remove the call in the file.Store()
-
+   XXX important todo!  do soon!
+   
  - "last" set stores more info (ie. local and remote IDs, account names)
    than "remote".  We could make a more dense encoding of remote if we
    make it skip those items.
@@ -230,14 +176,10 @@ TODO
    - let user change password?
    - show info: last synch time
  - XXX differentiate IO errors and blobstore fetches that have no data
-
- - gui needs to let user enter passphrase or generate one for them
-   right now key is hardwired
+ - XXX investigate how intermitent failures are handled by sync framework
 
 polish:
-  - icon for app
   - icon for providers
-  - figure out which activity we want to launch by default
 
  - something to let the user know how much s3 space is being
    used and what the charges will be like?
