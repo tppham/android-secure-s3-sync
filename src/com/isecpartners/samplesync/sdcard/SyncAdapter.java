@@ -28,10 +28,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     /* a synch is requested. */
     @Override
     public void onPerformSync(Account acct, Bundle extras, String authority, ContentProviderClient provider, SyncResult res) {
-        AccountHelper h = new AccountHelper(mCtx, acct);
-        String path = h.getAcctPref("path", null);
-        Log.v(TAG, "sync with sdcard store: " + acct.name);
-        IBlobStore store = new FileStore(path);
-        new GenericSync(mCtx, acct, store, extras, res).onPerformSync();
+        new GenericSync(mCtx, acct, extras, res).onPerformSync();
     }
 }

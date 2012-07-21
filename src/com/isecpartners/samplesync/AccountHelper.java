@@ -28,10 +28,10 @@ public class AccountHelper {
     private static final String TAG = "AccountHelper";
     private static final int MAXBUFSIZE = 1024 * 1024;
 
-    Context mCtx;
+    public Context mCtx;
     String mName;
     String mPw;
-    Account mAcct;
+    public Account mAcct;
     byte[] mSalt;
 
     private AccountHelper(Context ctx, String name, String pw, Account acct) {
@@ -54,6 +54,13 @@ public class AccountHelper {
         mPw = getAcctPref("passphrase", null);
     }
 
+    /* return the remote store associated with our account */
+    public IBlobStore getRemoteStore() {
+        IBlobStore s = FileStore.getRemoteStore(this);
+        if(s == null)
+            s = com.isecpartners.samplesync.s3.Store.getRemoteStore(this);
+        return s;
+    }
 
     public String getAcctPref(String key, String def) {
         String val = AccountManager.get(mCtx).getUserData(mAcct, key);
