@@ -11,4 +11,7 @@ public interface Constants {
     public static final String ACCOUNT_TYPE_GOOGLE = "com.google";
     public static final String ACCOUNT_TYPE_EXCHANGE = "com.android.exchange";
     public static final String ACCOUNT_TYPE_DEV = "DeviceOnly"; // seen on HTC phone
+
+    /* obfuscate data during logging */
+    public static boolean SAFELOG = true;
 }
