@@ -31,6 +31,7 @@ public class AccountListActivity extends Activity{
 
 	public void onCreate(Bundle icicle){
         super.onCreate(icicle);
+        Log.v(TAG, "OnCreate");
         setContentView(R.layout.account_list);
         p.setMargins(0, 20, 0, 20);
 		
@@ -39,6 +40,17 @@ public class AccountListActivity extends Activity{
         listS3Accounts();
         listSDAccounts();
         }
+	public void onResume(){
+		super.onResume();
+		Log.v(TAG, "OnResume");
+		s3layout.removeAllViews();
+		sdlayout.removeAllViews();
+		
+		getAccountInfo();
+        checkAccounts();
+        listS3Accounts();
+        listSDAccounts();
+	}
 	
 	private void getAccountInfo() {
 		s3layout = (LinearLayout) findViewById(R.id.display_accounts);
@@ -49,7 +61,7 @@ public class AccountListActivity extends Activity{
 		sdmAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
 	    sd_accounts = sdmAcctMgr.getAccountsByType(Constants.ACCOUNT_TYPE_SD);
 	    
-	 //   Log.v(TAG, "s3: "+s3_accounts.length+" sd: "+sd_accounts.length);
+	    Log.v(TAG, "s3: "+s3_accounts.length+" sd: "+sd_accounts.length);
 	        
 		
 	}

@@ -6,7 +6,6 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,34 +27,49 @@ import com.isecpartners.samplesync.AccountHelper;
  * back to our AuthAdapter by calling setAccountAuthenticatorResult.
  */
 public class AuthActivity extends AccountAuthenticatorActivity {
-    public static final String TAG = "sdcard.AuthActivity";
-    public static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_SD;
+    private static final String TAG = "sdcard.AuthActivity";
+    private static final String ACCOUNT_TYPE = Constants.ACCOUNT_TYPE_SD;
 
-    public AccountManager mAcctMgr;
+    private AccountManager mAcctMgr;
 
     private TextView mMsgTxt;
-    public EditText mDirIn;
-    public EditText mAcctIn;
-    public EditText mPassphrase;
-    public int flag = 0;
-	public String acct;
-	public String dir;
-	public String passphrase;
-	public Context mCtx;
-
-    @Override
+    private EditText mDirIn;
+    private EditText mAcctIn;
+    private EditText mPassphrase;
+    private int flag = 0;
+	private String acct;
+	private String dir;
+	private String passphrase;
+	@Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
         Log.v(TAG, "onCreate");
         mAcctMgr = AccountManager.get(this);
-        mCtx = this;
+        Bundle bundle = this.getIntent().getExtras();
+        if (bundle != null){
+        dir = bundle.getString("dir");
+        acct = bundle.getString("acct");
+        passphrase = bundle.getString("passphrase");
+        flag = 1;
+        Log.v(TAG, "dir: "+ dir+" flag: "+flag+" acct: "+acct+" passphrase: "+passphrase);
+        }
+        
+        if(flag == 0){
         setContentView(R.layout.sdcardlogin);
-
         mMsgTxt = (TextView)findViewById(R.id.msg);
         mDirIn = (EditText)findViewById(R.id.dir_edit);
         mAcctIn = (EditText)findViewById(R.id.acct_edit);
         mPassphrase = (EditText)findViewById(R.id.sd_passphrase);
+        }
+        else{
+        	setContentView(R.layout.s3login2);
+        	mMsgTxt = (TextView)findViewById(R.id.err2_msg);
+        	mAcctIn = (EditText)findViewById(R.id.acct_name2);
+            mPassphrase = (EditText)findViewById(R.id.s3_passphrase);
+            View v = (View) findViewById(R.layout.s3login2);
+            onSignIn(v);
+        }
     }
 
     /**
@@ -67,12 +81,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onSignIn(View view) {
     	
     	if(flag == 0){
-        acct = mAcctIn.getText().toString();
         dir = mDirIn.getText().toString();
-        passphrase = mPassphrase.getText().toString();
+    	acct = mAcctIn.getText().toString();
+    	passphrase = mPassphrase.getText().toString();
     	}
     	
     	
+    	Log.v(TAG,"onSignIn: " + acct +" "+passphrase+" "+flag);
         
         if(acct.equals("") || dir.equals("") || passphrase.equals("")) {
             mMsgTxt.setText("You must enter an account name, a directory and a passphrase");
@@ -85,10 +100,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        
-        
-        File sd = Environment.getExternalStorageDirectory();
-        File d = new File(sd, dir);
+        File d;
+        if(flag == 0){
+        	File sd = Environment.getExternalStorageDirectory();
+        	d = new File(sd, dir);
+        }
+        else{
+        	d = new File(dir);
+        }
         if(d.exists()) {
             if(!d.isDirectory()) {
                 mMsgTxt.setText("Can't use that directory");
@@ -124,13 +143,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         h2.setAcctPref("path", d.getPath());
         h2.setAcctPref("passphrase", passphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
-
+        if(flag ==0){
         Intent i = new Intent();
         i.putExtra(AccountManager.KEY_ACCOUNT_NAME, acct);
         i.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE);
         i.putExtra(AccountManager.KEY_AUTHTOKEN, "");
         setAccountAuthenticatorResult(i.getExtras());
         setResult(RESULT_OK, i);
+        }
         finish();
     } 
 }

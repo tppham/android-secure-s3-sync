@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+ <TextView
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:background="#585858"
+     android:paddingTop="15dp"
+     android:paddingBottom="15dp"
+     android:paddingLeft="5dp"
+     android:paddingRight="5dp"
+     android:text="Would you like to delete sync data?"
+     android:textColor="#ffffff"
+     android:textStyle="bold"
+ />
+  <RadioGroup 
+        android:id="@+id/delete_radio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+         <RadioButton
+             android:id="@+id/no_delete"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:textAppearance="@android:style/TextAppearance.Small"
+             android:checked="true"
+             android:text="No, I would like to keep the sync data."/>
+         
+         <RadioButton
+             android:id="@+id/yes_delete"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:textAppearance="@android:style/TextAppearance.Small"
+             android:text="Yes, I would like to delete the sync data." />
+         </RadioGroup>
+         
+  <Button
+      android:id="@+id/confirm_delete"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:background="#c01230"
+      android:paddingBottom="10dp"
+      android:paddingLeft="50dp"
+      android:paddingRight="50dp"
+      android:paddingTop="10dp"
+      android:textColor="#ffffff"
+      android:textStyle="bold"
+      android:text="OK"
+      android:onClick="getChoice" />
+
+</LinearLayout>

@@ -127,7 +127,7 @@ public class FilePickerActivity extends Activity{
 
 			}
 
-			private class Item {
+			public class Item {
 				public String file;
 				public int icon;
 

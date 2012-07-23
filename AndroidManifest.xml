@@ -85,6 +85,13 @@
             android:excludeFromRecents="true"
             >
              </activity>
+             
+         <activity
+            android:name=".DeleteConfirmActivity"
+            android:label="Sync Home"
+            android:excludeFromRecents="true"
+            >
+             </activity>
              <activity
             android:name=".ShowAccountActivity"
             android:label="Sync Home"

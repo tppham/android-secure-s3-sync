@@ -218,25 +218,27 @@ public class DisplayCredentialsActivity extends AccountAuthenticatorActivity{
 	     		com.isecpartners.samplesync.s3.AuthActivity a = new com.isecpartners.samplesync.s3.AuthActivity();
 	     		a.mCtx = this;
 	     		a.mAcctMgr = AccountManager.get(this);
-	             SigninThread mSigninThread = a.new SigninThread(name, passphrase, access_key, secret_key);
-	             mSigninThread.start();
+	     		
+	            SigninThread mSigninThread = a.new SigninThread(name, passphrase, access_key, secret_key);
+	            mSigninThread.start();
 	     		}
 	     	}
 	    	if(requestCode == ACCT_SD_INFO){
-	    		
+	    		Log.v(TAG, "SDCARD result");
 	     		if(resultCode == Activity.RESULT_OK){
+	     			Log.v(TAG, "result OK");
 	     		passphrase = intent.getStringExtra("Passphrase");
 	     		name = intent.getStringExtra("AccountName");
 	     		
-	     		com.isecpartners.samplesync.sdcard.AuthActivity a = new com.isecpartners.samplesync.sdcard.AuthActivity();
-	     		a.mAcctMgr = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-	     		a.flag = 1;
-	     		a.acct = name;
-	     		a.dir = path;
-	     		a.passphrase = passphrase;
-	     		a.mCtx = this;
-	     		a.onSignIn(null);
-	          
+	     		Intent myIntent = new Intent(DisplayCredentialsActivity.this, com.isecpartners.samplesync.sdcard.AuthActivity.class);
+	     		Bundle b = new Bundle();
+	     		b.putString("dir", path);
+	     		b.putString("acct", name);
+	     		b.putString("passphrase", passphrase);
+	     		myIntent.putExtras(b);
+	     		startActivity(myIntent);
+	     		
+	     		
 	     		}
 	     	}
 	    	finish();

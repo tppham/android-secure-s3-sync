@@ -285,6 +285,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         h.setAcctPref("keyID", thr.mKeyId);
         h.setAcctPref("passphrase", thr.mPassphrase);
         ContentResolver.setSyncAutomatically(a, ContactsContract.AUTHORITY, true);
+        Log.v(TAG,"Account created: "+thr.mName);
 
         Intent i = new Intent();
         i.putExtra(AccountManager.KEY_ACCOUNT_NAME, thr.mName);
@@ -293,6 +294,5 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         setAccountAuthenticatorResult(i.getExtras());
         setResult(RESULT_OK, i);
         finish();
-        Log.v(TAG, "Finishing Authentication!");
     }
 }
