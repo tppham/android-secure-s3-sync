@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.provider.ContactsContract.Data;
 import android.util.Log;
 
+import com.isecpartners.samplesync.Constants;
+
 
 /* 
  * Base of all contact model items, including some common code.
@@ -132,10 +134,15 @@ abstract class CData {
         return a.hashCode();
     }
 
+    /* quote a string for printing.  obfuscate string if SAFELOG is on. */
     public static String quote(String s) {
         if(s == null)
             return "null";
-        return "\"" + s + "\"";
+        if(!Constants.SAFELOG)
+            return "\"" + s + "\"";
+
+        /* SAFELOG is on, we obfuscate strings */
+        return "\"" + Crypto.obfuscate(s) + "\"";
     }
 
     public abstract void marshal(ByteBuffer buf, int version) throws Marsh.Error;
