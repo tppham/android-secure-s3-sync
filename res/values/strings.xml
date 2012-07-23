@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="label">Secure Sync</string>
+    <string name="s3label">Secure S3 Sync</string>
+    <string name="sdcardlabel">SDCard Sync</string>
+    
+<!--  Help page -->
+	<string name="help_page">FAQs</string>
+	<string name="faq_text">Here is some info about the app</string>
+	<string name="faq_1">What is \'app name\' ?</string>
+	<string name="faq_2">What does \'app name\' do?</string>
+	<string name="ans_1">Answer.\n</string>
+
+<!--  Account strings -->
+    <string name="s3account">S3 Account</string>
+    <string name="sdcardaccount">SDCard Account</string>
+    <string name="acct_description">Choose an acount:</string>
+    <string name="existing_str">Choose an existing account</string>
+    <string name="new_str">Add a new account</string>
+    <string name="existing_acct_str">Use credentials of that of a sync account from below: </string>
+
+<!--  Authentication Strings -->
+	<string name="manual_entry">Enter AWS Credentials manually</string>
+    <string name="scan_qrcode">Scan a QR Code containing AWS credentials</string>
+    <string name="read_creds">Read AWS credentials from file</string>
+                
+    
+<!--  S3 strings -->
+    <string name="signin_msg">Sign in to your S3 account</string>
+        <string name="qrcode_help1">In order to generate a QR Code, choose any available QR code generator and select the data type as Text or Plain Text.\n\nEnter AWS access key and secret key separated by a new line and generate the code (see example below).</string>
+        <string name="qrcode_help2">\nPress the scan button below when you are ready.\n\n</string>
+        <string name="readfile_help1">In order to read AWS credentials from a file on SD Card, create a file and enter AWS access key and secret key separated by a new line and save the file (see example below).</string>
+        <string name="readfile_help2">\nPress the button below to choose the file from SD Card.\n\n</string>
+    
+<!-- Home page strings -->       
+    <string name="sync_prefs_button_text">Sync Preferences</string>
+    <string name="help_button_text">Help</string>
+    <string name="main_description">Secure sync provider for Android. Secure sync provider for Android. Secure sync provider for Android</string>
+	<string name="auth_description">You do not have any accounts set up. Choose an account type below to Sync contacts.</string>
+    <string
+        name="profile_action">Sample profile</string>
+    <string
+        name="view_profile">View Profile</string>
+    <string
+        name="result_succeeded">Scan Succeeded</string>
+    
+    <string
+        name="result_failed">Scan Failed</string>
+</resources>

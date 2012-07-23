@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+        <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" >    
+    	
+    <TextView 
+        android:id="@+id/welcome_text"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/auth_description"/>
+
+    <TextView
+        android:id="@+id/main_err_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    </LinearLayout>
+    
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:layout_width="match_parent"
+    	 android:layout_height="wrap_content"
+    	 android:orientation="vertical" >
+    <RadioGroup 
+        android:id="@+id/accounttype"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+         <RadioButton
+             android:id="@+id/sd"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:checked="true"
+             android:text="@string/sdcardaccount"/>
+         
+         <RadioButton
+             android:id="@+id/s3"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#000001"
+             android:text="@string/s3account" />
+         </RadioGroup>
+          <ImageButton
+            android:id="@+id/add_account_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:src="@drawable/add_account_button"
+            android:onClick="addAccount" />
+         
+     </LinearLayout>
+
+</LinearLayout>

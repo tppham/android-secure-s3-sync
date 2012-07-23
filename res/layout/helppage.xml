@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/list_accounts"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    		android:paddingTop="5dip"
+        android:paddingBottom="13dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip"
+    	android:orientation="vertical" >
+    	
+          <TextView 
+        android:id="@+id/faq_text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000001"
+        android:textStyle="bold"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/help_page"/>
+         
+           <TextView 
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#000001"
+        android:textStyle="bold"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/faq_1"/>
+           <TextView 
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/ans_1"/>
+           
+           <View android:layout_width="fill_parent" 
+                 android:layout_height="1dp" 
+                 android:layout_marginBottom="10dip"
+                 android:background="#505050" /> 
+                 
+           <TextView 
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#000001"
+        android:textStyle="bold"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/faq_2"/>
+           <TextView 
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#000001"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/ans_1"/>
+    	   <View android:layout_width="fill_parent" 
+                 android:layout_height="1dp" 
+                 android:layout_marginBottom="10dip"
+                 android:background="#505050" />  
+    </LinearLayout>
+    </ScrollView>
+    
+
+</LinearLayout>

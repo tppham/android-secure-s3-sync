@@ -1,0 +1,138 @@
+start:  user installs program
+
+installed: user runs main application
+
+installed: user adds a synch account for s3 or sdcard
+
+installed: user scans QR code for synch account
+
+installed: uninstall
+
+account exists: perform synch
+
+account exists: edit preferences
+
+account exists: user deletes account
+
+main:
+   - screen shows option to add s3 or sdcard account
+     on selected add sdcard account or add s3 account
+   - screen lists all existing accounts
+     on selected, edit account properties
+
+QR code:
+   - parse URI to get sdcard params, go to add sdcard with options prefilled
+     directory, prefs
+   - parse URI to get s3 params, go to add s3 with options prefilled
+     s3 keyid, s3 key, prefs
+
+add sdcard:
+   - screen lets user pick directory
+     check if directory exists, if exists, request confirmation
+     else make directory
+     edit account preferences
+
+add s3:
+   - screen lets user pick s3 keyid and s3 key
+     - option lets them read creds from /sdcard file or URL
+       this just prefills the text input fields
+     - verify credentials, make user reenter if invalid
+     - edit account preferences
+
+uninstall:
+   - system implicitely deletes all accounts
+
+delete account:
+   - remove "last" storage
+
+prefs:
+   - screen lets user pick:
+     - account name, if creating, otherwise uneditable
+       - list existing bucket names, let user pick one or create a new one  
+     - list of accounts to synch
+     - merge resolution: prefer contacts from phone or from synch storage
+     - show last synch time, if it exists
+       - give user the option to wipe the remote data
+   - if creating:
+     - verify that the local account doesnt yet exist and the local file
+       does not yet exist.
+       - if it does exist, warn user, allow them to delete it or give up
+     - check if the remote storage exists, if so ask for confirmation
+       to synch to an existing account
+     - create the local account and local file
+       - report error on create failure
+     - create the reomte storage if it doesnt exist yet
+   - save preferences with account
+     - save list of accounts
+     - save merge preference
+     - save last synch time
+
+synch:
+   - if any unsaved data from last time
+     save unsaved data to remote
+     - on auth error, notify "synch data save failed"
+
+   - load preferences for account
+   - check if all accounts we synch still exist
+     - if any do not, give the user a notification "acct deleted"
+       and stop the synch
+   - load "last"
+     - if missing or corrupt or version mismatch, notify "acct corrupt"
+   - load "remote"
+     - if bad creds, invalidate the creds and stop synch
+       XXX test this, synch provider should restart
+     - if missing, notify "synch data missing"
+     - if corrupt, notify "synch data corrupt"
+     - if version mismatch, notify "synch data requires newer version"
+   - load "local"
+   - perform synch
+   - save "last"
+     - on error, notify "acct save error"
+   - save "remote"
+     - on auth error, notify "synch data save failed"
+       XXX and save a copy of the remote data locally somewhere?
+   - update account last synch time
+
+notify acct deleted:
+   - for each account that was deleted, tell the user that the
+     account has been deleted and ask if they would like to
+     keep or delete the contacts associated with that account
+     - if keep, remove all matching elements from "last"
+     - if delete, do nothing
+   - go to synch
+
+notify acct corrupt:
+   The synch programs local metadata for the account is missing, unreadable or corrupt
+   - tell user the account is corrupt, ask them to delete the account
+
+notify synch data missing:
+  The previously saved synch data cannot be found
+  - notify that the remote synch data is no longer present
+    - give them option to ignore, wipe or delete the account
+
+notify synch data corrupt:
+  The previously saved synch data is corrupt
+  - tell user the data has been corrupted
+    - give them option to ignore, wipe or delete the account
+
+notify synch data requires newer version:
+  The previously saved synch data was saved by a newer version of the program
+  - tell the user the data requires a new version
+    - give them the option to ignore, wipe or delete the account
+
+notify synch data save error:
+  The synch data could not be saved
+  - tell user the data couldnt be saved
+    - XXX go to account prefs for new creds?
+      - XXX if successful, try to save unsaved data again
+      - on error repeat?  XXX have other steps check for unsaved data
+        to try to save it later?
+        XXX this could be a major problem if the device is offline for
+        some reason.. we need to figure out how to handle this gracefully
+
+wipe:
+  - create new remote storage
+    - on auth error, invalidate account creds
+  - erase the last updated time
+  - create new last storage
+

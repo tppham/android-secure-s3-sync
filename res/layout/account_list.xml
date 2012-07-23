@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:textColor="#000001"
+    android:orientation="vertical" >
+    <include  layout="@layout/banner_layout" android:id="@+id/banner_id" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#c01220"
+    android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/add_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.98"
+                android:background="#00000000"
+                android:onClick="addAccount"
+                android:src="@drawable/add_icon" />
+
+            
+            <View 
+      android:layout_width="1dip"
+      android:layout_height="48dip"
+      android:background="#ffffff"
+/>
+            
+            <ImageButton
+            android:id="@+id/delete_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:src="@drawable/delete_icon"
+            android:onClick="" />
+            
+             <View 
+      android:layout_width="1dip"
+      android:layout_height="48dip"
+      android:background="#ffffff"
+/>
+            
+            <ImageButton
+            android:id="@+id/sync_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="#00000000"
+            android:src="@drawable/sync_icon"
+            android:onClick="syncAllAccounts" />
+            
+           
+     </LinearLayout>
+    
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+                 
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/display_accounts"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical" >
+    	<ListView
+        android:id="@+id/s3_list"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        android:drawSelectorOnTop="false"
+        android:choiceMode="multipleChoice"
+        />
+    	<ListView
+        android:id="@+id/sd_list"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        android:drawSelectorOnTop="false"
+        android:choiceMode="multipleChoice"
+        />
+    	 	
+    </LinearLayout>
+    </ScrollView>
+ </LinearLayout>
+     
+    
+

@@ -1,0 +1,15 @@
+- do we need account preferences?
+- do we need to support other account adapter methods, perhaps
+  to let user change their password when it doesnt work?
+  - what happens when a password fails during synch?
+  - do we need to send notification back somehow?
+
+- cant we use a single sync adapter/server and share it with
+  all of the account types?  we're told the account type so we
+  can mux on that.
+
+- can we make the contact manager display our contacts by default?
+  - I think they only merge after we mark them as shown in the mgr
+
+- we shouldnt import from the local contacts by default. 
+  we should have a feature that lets us do that on demand.
