@@ -5,6 +5,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.Security;
 
@@ -88,6 +89,18 @@ public class Crypto {
     /* return a hex string from byte buffer */
     public static String hex(ByteBuffer buf) {
         return new String(Hex.encode(buf.array(), 0, buf.limit()));
+    }
+
+    /* SHA-hash a string to obfuscate it */
+    public static String obfuscate(String s) {
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA-256");
+            sha.update(s.getBytes());
+            String res = hex(sha.digest());
+            return res.substring(0, 8); 
+        } catch(final Exception e) {
+            return "???"; // should never happen
+        }
     }
 }
 
