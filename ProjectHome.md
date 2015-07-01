@@ -1,0 +1,1 @@
+Secure sync provider for Android with S3 backend
